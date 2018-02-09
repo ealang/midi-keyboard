@@ -7,8 +7,14 @@ import { WebMidiService } from './web-midi.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app';
+  supported: boolean;
+  outputs: Array<String>;
 
-  constructor(private webMidiService: WebMidiService) {
+  constructor(private webmidi: WebMidiService) {
+    this.supported = webmidi.midiSupported;
+
+    webmidi.getOutputDevices().then((devices) => {
+      this.outputs = devices;
+    });
   }
 }
