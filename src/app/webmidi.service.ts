@@ -14,15 +14,16 @@ export class WebMidiService {
         Promise.reject('Midi is not supported');
   }
 
-  getOutputDevices(): Promise<Array<String>> {
-    return this.midiAccess.then(
-      (access) => {
-        return Array.from(access.outputs.values()).map((device) => {
-          return device.id;
-        });
-      },
-      () => []
-    );
+  onstatechange(callback: (e: WebMidi.MIDIConnectionEvent) => void) {
+    this.midiAccess.then((access) => {
+      access.onstatechange = callback;
+    });
   }
 
+  outputs(): Promise<Map<String, WebMidi.MIDIOutput>> {
+    return this.midiAccess.then(
+      (access) => access.outputs,
+      () => new Map()
+    );
+  }
 }

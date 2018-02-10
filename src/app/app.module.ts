@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
-import { WebMidiService } from './web-midi.service';
+import { WebMidiService } from './webmidi.service';
 
 
 @NgModule({

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { WebMidiService } from './web-midi.service';
+import { WebMidiService } from './webmidi.service';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +13,12 @@ export class AppComponent {
   constructor(private webmidi: WebMidiService) {
     this.supported = webmidi.midiSupported;
 
-    webmidi.getOutputDevices().then((devices) => {
-      this.outputs = devices;
+    webmidi.onstatechange((e: WebMidi.MIDIConnectionEvent) => {
+      console.log('onstatechange', e);
+    });
+
+    webmidi.outputs().then((devices) => {
+      this.outputs = Array.from(devices.keys());
     });
   }
 }
