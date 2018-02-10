@@ -4,6 +4,7 @@
     *ngFor="let key of keys"
     class="key"
     [ngClass]="{'black': key.black, 'white': !key.black}"
-    (click)="onHitKey(key.midiNote)">
+    (click)="onHitKey(key.midiNote)"
+    appTouch (touch)="onTouchEvent(key.midiNote, $event)">
   </span>
 </div>

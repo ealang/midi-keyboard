@@ -4,11 +4,13 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { WebMidiService } from './webmidi.service';
+import { TouchDirective } from './touch/touch.directive';
 
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    TouchDirective
   ],
   imports: [
     BrowserModule

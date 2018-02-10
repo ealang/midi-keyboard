@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { WebMidiService } from './webmidi.service';
+import { TouchChangeEvent } from './touch/touch.directive';
 
 class PianoKey {
   midiNote: number;
@@ -27,6 +28,12 @@ export class AppComponent {
       setTimeout(() => {
         this.device.send([0x80, midiNote, 0x7F], 0);
       }, 500);
+    }
+  }
+
+  onTouchEvent(midiNote: number, event: TouchChangeEvent) {
+    if (event.eventType === 'touchstart') {
+      this.onHitKey(midiNote);
     }
   }
 
