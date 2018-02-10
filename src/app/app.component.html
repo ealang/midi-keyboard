@@ -1,7 +1,9 @@
-<div>
-  <div>Midi supported: <span>{{ supported }}</span></div>
-  <div>Devices:</div>
-  <ul *ngFor="let device of outputs">
-    <li>{{ device }}</li>
-  </ul>
+<h2>{{ deviceName }}</h2>
+<div class="keyboard">
+  <span
+    *ngFor="let key of keys"
+    class="key"
+    [ngClass]="{'black': key.black, 'white': !key.black}"
+    (click)="onHitKey(key.midiNote)">
+  </span>
 </div>

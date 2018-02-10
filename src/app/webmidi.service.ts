@@ -4,12 +4,12 @@ import { Injectable } from '@angular/core';
 export class WebMidiService {
   private midiAccess: Promise<WebMidi.MIDIAccess>;
 
-  midiSupported: boolean;
+  isSupported: boolean;
 
   constructor() {
-    this.midiSupported = window.navigator.requestMIDIAccess !== undefined;
+    this.isSupported = window.navigator.requestMIDIAccess !== undefined;
     this.midiAccess =
-      (this.midiSupported) ?
+      (this.isSupported) ?
         window.navigator.requestMIDIAccess() :
         Promise.reject('Midi is not supported');
   }
@@ -20,7 +20,7 @@ export class WebMidiService {
     });
   }
 
-  outputs(): Promise<Map<String, WebMidi.MIDIOutput>> {
+  outputs(): Promise<Map<string, WebMidi.MIDIOutput>> {
     return this.midiAccess.then(
       (access) => access.outputs,
       () => new Map()
