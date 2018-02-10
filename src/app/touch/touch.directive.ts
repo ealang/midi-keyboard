@@ -16,7 +16,7 @@ export class TouchChangeEvent {
   selector: '[appTouch]'
 })
 export class TouchDirective {
-  @Output() touch = new EventEmitter<TouchChangeEvent>();
+  @Output('appTouch') touch = new EventEmitter<TouchChangeEvent>();
 
   constructor() {}
 
