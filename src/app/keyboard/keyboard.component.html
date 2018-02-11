@@ -1,0 +1,8 @@
+<div class="keyboard" (appTouch)="onTouchEvent($event)">
+  <span
+    *ngFor="let key of keys"
+    class="key"
+    [attr.data-keynumber]="key.keyNumber"
+    [ngClass]="{'black': key.black, 'white': !key.black}">
+  </span>
+</div>

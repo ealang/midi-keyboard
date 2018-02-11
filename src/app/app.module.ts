@@ -5,12 +5,14 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { WebMidiService } from './webmidi.service';
 import { TouchDirective } from './touch/touch.directive';
+import { KeyboardComponent } from './keyboard/keyboard.component';
 
 
 @NgModule({
   declarations: [
+    TouchDirective,
+    KeyboardComponent,
     AppComponent,
-    TouchDirective
   ],
   imports: [
     BrowserModule

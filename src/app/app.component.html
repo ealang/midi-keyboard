@@ -1,9 +1,9 @@
 <h2>{{ deviceName }}</h2>
-<div class="keyboard" (appTouch)="onTouchEvent($event)">
-  <span
-    *ngFor="let key of keys"
-    class="key"
-    [attr.data-midinote]="key.midiNote"
-    [ngClass]="{'black': key.black, 'white': !key.black}">
-  </span>
-</div>
+<app-keyboard
+  [keyRange]="midiKeyRange1"
+  (keyEvent)="onKeyEvent($event)"
+></app-keyboard>
+<app-keyboard
+  [keyRange]="midiKeyRange2"
+  (keyEvent)="onKeyEvent($event)"
+></app-keyboard>
