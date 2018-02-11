@@ -4,21 +4,27 @@
 
 .keyboard .key {
   display: inline-block;
+  border-style: solid;
 }
 
 .keyboard .key.black {
-  background-color: black;
-  width: 30px;
-  height: 80px;
+  background-color: white;
+  border-color: white;
+  border-width: 2px;
+  width: 60px;
+  height: 160px;
   position: absolute;
-  margin-left: -15px;
+  margin-left: -32px;
 }
 
 .keyboard .key.white {
-  background-color: white;
-  width: 60px;
-  height: 120px;
+  background-color: black;
+  border-color: white;
   border-width: 1px;
-  border-color: black;
-  border-style: solid;
+  width: 120px;
+  height: 240px;
+}
+
+.keyboard .key.held.black, .keyboard .key.held.white {
+  background-color: #F48AF4;
 }
