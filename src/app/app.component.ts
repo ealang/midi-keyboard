@@ -22,24 +22,11 @@ export class AppComponent {
   device: WebMidi.MIDIOutput;
   deviceName: string;
 
-  onHitKey(midiNote: number) {
-    if (this.device) {
-      this.device.send([0x90, midiNote, 0x7F], 0);
-      setTimeout(() => {
-        this.device.send([0x80, midiNote, 0x7F], 0);
-      }, 500);
-    }
-  }
-
-  onTouchEvent(midiNote: number, event: TouchChangeEvent) {
-    if (event.eventType === 'touchstart') {
-      this.onHitKey(midiNote);
-    }
-  }
+  private heldNotes = new Map<number, number>();
 
   constructor(private webmidi: WebMidiService) {
     this.keys = [];
-    for (let i = 12 * 3; i < 18 + 12 * 3; i++) {
+    for (let i = 12 * 3; i < 24 + 12 * 3; i++) {
       this.keys.push(new PianoKey(i));
     }
 
@@ -54,6 +41,49 @@ export class AppComponent {
           this.device = devices.get(this.deviceName);
         }
       });
+    }
+  }
+
+  private sendNoteOn(midiNote: number): void {
+    this.device.send([0x90, midiNote, 0x7F], 0);
+  }
+
+  private sendNoteOff(midiNote: number): void {
+    this.device.send([0x80, midiNote, 0x7F], 0);
+  }
+
+  private getMidiNoteAtCoord(clientX: number, clientY: number): number | null {
+    const elem = document.elementFromPoint(clientX, clientY);
+    if (elem) {
+      const note = elem.dataset.midinote;
+      if (note !== undefined) {
+        return note;
+      }
+    }
+    return null;
+  }
+
+  onTouchEvent(event: TouchChangeEvent): void {
+    const screenMidiNote = this.getMidiNoteAtCoord(event.touch.clientX, event.touch.clientY),
+          existingMidiNote = this.heldNotes.get(event.identifier),
+          isValidNote = screenMidiNote !== null,
+          isExistingTouch = existingMidiNote !== undefined;
+
+    if (event.eventType === 'touchstart' && isValidNote) {
+      if (isExistingTouch) {
+        this.sendNoteOff(existingMidiNote);
+      }
+      this.sendNoteOn(screenMidiNote);
+      this.heldNotes.set(event.identifier, screenMidiNote);
+    } else if (event.eventType === 'touchmove') {
+      if (isValidNote && existingMidiNote !== screenMidiNote) {
+        this.sendNoteOff(existingMidiNote);
+        this.sendNoteOn(screenMidiNote);
+        this.heldNotes.set(event.identifier, screenMidiNote);
+      }
+    } else if ((event.eventType === 'touchend' || event.eventType === 'touchcancel') && isExistingTouch) {
+      this.heldNotes.delete(event.identifier);
+      this.sendNoteOff(existingMidiNote);
     }
   }
 }
