@@ -54,4 +54,26 @@ describe('KeyboardComponent', () => {
 
     expect(event).toEqual(new KeyEvent(KeyEventType.Down, 12));
   });
+
+  it('should ignore touch on a key that is already held', () => {
+    const firstKeyElem = fixture.debugElement.query(By.css('span.key'));
+
+    const events = [];
+    component.keyEvent.subscribe((e: any) => events.push(e));
+
+    const touchEvent1: Touch = new Touch({
+      identifier: 100,
+      target: document.body
+    });
+    const touchEvent2: Touch = new Touch({
+      identifier: 101,
+      target: document.body
+    });
+    component.onTouchEvent(new TouchChangeEvent('touchstart', touchEvent1, firstKeyElem.nativeElement));
+    expect(events.length).toEqual(1);
+
+    component.onTouchEvent(new TouchChangeEvent('touchstart', touchEvent2, firstKeyElem.nativeElement));
+    component.onTouchEvent(new TouchChangeEvent('touchend', touchEvent2, firstKeyElem.nativeElement));
+    expect(events.length).toEqual(1);
+  });
 });

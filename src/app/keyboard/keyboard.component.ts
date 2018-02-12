@@ -37,11 +37,14 @@ export class KeyboardComponent {
     for (let i = startEnd[0]; i < startEnd[1]; i++) {
       this.keys.push(new KeyViewModel(i));
     }
+    this.heldIndexes.clear();
+    this.heldIndexRefCount.clear();
   }
   @Output() keyEvent = new EventEmitter<KeyEvent>();
 
   keys: Array<KeyViewModel> = [];
-  private heldKeys = new Map<number, number>();  // touch id -> keys index
+  private heldIndexes = new Map<number, number>();        // touch id -> keys index
+  private heldIndexRefCount = new Map<number, number>();  // index -> num touches
 
   constructor() {
   }
@@ -56,38 +59,46 @@ export class KeyboardComponent {
     return null;
   }
 
-  private changeKeyState(keyIndex: number, state: string): void {
-    const key = this.keys[keyIndex];
+  private pushKeyState(keyIndex: number, state: string): void {
+    const key = this.keys[keyIndex],
+          refCount = this.heldIndexRefCount.get(keyIndex) || 0;
+
     if (state === 'on') {
-      key.held = true;
-      this.keyEvent.emit(new KeyEvent(KeyEventType.Down, key.keyNumber));
+      this.heldIndexRefCount.set(keyIndex, refCount + 1);
+      if (refCount === 0) {
+        key.held = true;
+        this.keyEvent.emit(new KeyEvent(KeyEventType.Down, key.keyNumber));
+      }
     } else {
-      key.held = false;
-      this.keyEvent.emit(new KeyEvent(KeyEventType.Up, key.keyNumber));
+      this.heldIndexRefCount.set(keyIndex, refCount - 1);
+      if (refCount === 1) {
+        key.held = false;
+        this.keyEvent.emit(new KeyEvent(KeyEventType.Up, key.keyNumber));
+      }
     }
   }
 
   onTouchEvent(event: TouchChangeEvent): void {
     const touchedKeyIndex = this.getKeyIndexFromElement(event.element),
-          existingKeyIndex = this.heldKeys.get(event.identifier),
+          existingKeyIndex = this.heldIndexes.get(event.identifier),
           isValidKey = touchedKeyIndex !== null,
           isExistingTouch = existingKeyIndex !== undefined;
 
     if (event.eventType === 'touchstart' && isValidKey) {
       if (isExistingTouch) {
-        this.changeKeyState(existingKeyIndex, 'off');
+        this.pushKeyState(existingKeyIndex, 'off');
       }
-      this.changeKeyState(touchedKeyIndex, 'on');
-      this.heldKeys.set(event.identifier, touchedKeyIndex);
+      this.pushKeyState(touchedKeyIndex, 'on');
+      this.heldIndexes.set(event.identifier, touchedKeyIndex);
     } else if (event.eventType === 'touchmove' && isExistingTouch) {
       if (isValidKey && existingKeyIndex !== touchedKeyIndex) {
-        this.changeKeyState(existingKeyIndex, 'off');
-        this.changeKeyState(touchedKeyIndex, 'on');
-        this.heldKeys.set(event.identifier, touchedKeyIndex);
+        this.pushKeyState(existingKeyIndex, 'off');
+        this.pushKeyState(touchedKeyIndex, 'on');
+        this.heldIndexes.set(event.identifier, touchedKeyIndex);
       }
     } else if ((event.eventType === 'touchend' || event.eventType === 'touchcancel') && isExistingTouch) {
-      this.heldKeys.delete(event.identifier);
-      this.changeKeyState(existingKeyIndex, 'off');
+      this.heldIndexes.delete(event.identifier);
+      this.pushKeyState(existingKeyIndex, 'off');
     }
   }
 }
