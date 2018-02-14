@@ -15,6 +15,7 @@ declare var Touch: {
 describe('KeyboardComponent', () => {
   let component: KeyboardComponent;
   let fixture: ComponentFixture<KeyboardComponent>;
+  let keyEvents: Array<KeyEvent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -28,6 +29,9 @@ describe('KeyboardComponent', () => {
     component = fixture.componentInstance;
     component.keyRange = [12, 24];
     fixture.detectChanges();
+
+    keyEvents = [];
+    component.keyEvent.subscribe((e: KeyEvent) => keyEvents.push(e));
   });
 
   it('should render the correct number of keys', () => {
@@ -42,38 +46,21 @@ describe('KeyboardComponent', () => {
 
   it('should emit key down event when a key is touched', () => {
     const firstKeyElem = fixture.debugElement.query(By.css('span.key'));
-
-    let event;
-    component.keyEvent.subscribe((e: any) => event = e);
-
     const touchEvent: Touch = new Touch({
       identifier: 101,
       target: document.body
     });
     component.onTouchEvent(new TouchChangeEvent('touchstart', touchEvent, firstKeyElem.nativeElement));
-
-    expect(event).toEqual(new KeyEvent(KeyEventType.Down, 12));
+    expect(keyEvents).toEqual([new KeyEvent(KeyEventType.Down, 12)]);
   });
 
-  it('should ignore touch on a key that is already held', () => {
-    const firstKeyElem = fixture.debugElement.query(By.css('span.key'));
+  it('should emit key down event when a key is clicked', () => {
+    const expectedKeyDownEvent = new KeyEvent(KeyEventType.Down, 12);
+    const expectedKeyUpEvent = new KeyEvent(KeyEventType.Up, 12);
 
-    const events = [];
-    component.keyEvent.subscribe((e: any) => events.push(e));
-
-    const touchEvent1: Touch = new Touch({
-      identifier: 100,
-      target: document.body
-    });
-    const touchEvent2: Touch = new Touch({
-      identifier: 101,
-      target: document.body
-    });
-    component.onTouchEvent(new TouchChangeEvent('touchstart', touchEvent1, firstKeyElem.nativeElement));
-    expect(events.length).toEqual(1);
-
-    component.onTouchEvent(new TouchChangeEvent('touchstart', touchEvent2, firstKeyElem.nativeElement));
-    component.onTouchEvent(new TouchChangeEvent('touchend', touchEvent2, firstKeyElem.nativeElement));
-    expect(events.length).toEqual(1);
+    component.onMouseDown(0);
+    expect(keyEvents).toEqual([expectedKeyDownEvent]);
+    component.onMouseUp();
+    expect(keyEvents).toEqual([expectedKeyDownEvent, expectedKeyUpEvent]);
   });
 });

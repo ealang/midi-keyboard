@@ -1,8 +1,14 @@
-<div class="keyboard" (appTouch)="onTouchEvent($event)">
+<div
+  class="keyboard"
+  (appTouch)="onTouchEvent($event)"
+  (mouseup)="onMouseUp()"
+  (mouseleave)="onMouseOut()">
   <span
     *ngFor="let key of keys; let i = index;"
     class="key"
     [attr.data-keyindex]="i"
-    [ngClass]="{black: key.black, white: !key.black, held: key.held, last: i === keys.length - 1, first: i === 0}">
+    [ngClass]="{black: key.black, white: !key.black, held: key.held, last: i === keys.length - 1, first: i === 0}"
+    (mouseover)="onMouseOver(i)"
+    (mousedown)="onMouseDown(i)">
   </span>
 </div>
