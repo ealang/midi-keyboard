@@ -11,7 +11,7 @@ describe('AppComponent', () => {
       imports: [
         BrowserAnimationsModule,
         MatSelectModule
-      ]
+      ],
       declarations: [
         KeyboardComponent,
         AppComponent
