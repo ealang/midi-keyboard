@@ -1,18 +1,18 @@
 <h2>{{ deviceName }}</h2>
 
 <mat-form-field>
-  <mat-select placeholder="Favorite food">
-    <mat-option *ngFor="let food of foods" [value]="food.value">
-      {{ food.viewValue }}
+  <mat-select (selectionChange)="onDeviceSelected(view.selectedDeviceId)" [(value)]="view.selectedDeviceId" placeholder="Select Output Device">
+    <mat-option *ngFor="let device of view.deviceList" [value]="device.id">
+      {{ device.name }}
     </mat-option>
   </mat-select>
 </mat-form-field>
 
 <app-keyboard
-  [keyRange]="midiKeyRange1"
+  [keyRange]="view.midiKeyRange1"
   (keyEvent)="onKeyEvent($event)"
 ></app-keyboard>
 <app-keyboard
-  [keyRange]="midiKeyRange2"
+  [keyRange]="view.midiKeyRange2"
   (keyEvent)="onKeyEvent($event)"
 ></app-keyboard>

@@ -1,5 +1,6 @@
 .keyboard {
   display: inline-block;
+  white-space: nowrap;
 }
 
 .keyboard .key {

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { WebMidiService } from './webmidi.service';
+import { WebMidiService, Device, DeviceSession } from './webmidi.service';
 import { KeyEvent, KeyEventType } from './keyboard/keyboard.component';
 
 @Component({
@@ -8,32 +8,48 @@ import { KeyEvent, KeyEventType } from './keyboard/keyboard.component';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  midiKeyRange1 = [60, 72];
-  midiKeyRange2 = [48, 60];
-  device: WebMidi.MIDIOutput;
-  deviceName: string;
+  view = {
+    midiKeyRange1: [60, 72],
+    midiKeyRange2: [48, 60],
+    deviceList: new Array<Device>(),
+    selectedDeviceId: <string> null,
+  };
+  private session: DeviceSession;
 
   constructor(private webmidi: WebMidiService) {
-    if (webmidi.isSupported) {
-      webmidi.onstatechange((e: WebMidi.MIDIConnectionEvent) => {
-        console.log('onstatechange', e);
-      });
+    this.webmidi.onDevicesChanged((devices: Array<Device>) => {
+      this.view.deviceList = devices;
+    });
+    this.webmidi.onSessionLost(() => {
+      this.session = null;
+      this.view.selectedDeviceId = null;
+    });
+    this.webmidi.devices().then((devices: Array<Device>) => {
+      this.view.deviceList = devices;
+      const firstDevice = devices[0];
+      if (firstDevice) {
+        this.view.selectedDeviceId = firstDevice.id;
+        this.onDeviceSelected(firstDevice.id);
+      }
+    });
+  }
 
-      webmidi.outputs().then((devices) => {
-        if (devices.size >= 1) {
-          this.deviceName = devices.keys().next().value;
-          this.device = devices.get(this.deviceName);
-        }
-      });
-    }
+  onDeviceSelected(deviceId: string): void {
+    this.session = null;
+    this.webmidi.openSession(deviceId).then((session: DeviceSession) => {
+      this.session = session;
+    }, (error: string) => {
+      console.log(error);
+      this.view.selectedDeviceId = null;
+    });
   }
 
   onKeyEvent(event: KeyEvent): void {
-    if (this.device) {
+    if (this.session) {
       if (event.eventType === KeyEventType.Down) {
-        this.device.send([0x90, event.keyNumber, 0x7F], 0);
+        this.session.send([0x90, event.keyNumber, 0x7F]);
       } else {
-        this.device.send([0x80, event.keyNumber, 0x7F], 0);
+        this.session.send([0x80, event.keyNumber, 0x7F]);
       }
     }
   }
