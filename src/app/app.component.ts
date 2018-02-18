@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { WebMidiService, Device, DeviceSession } from './webmidi.service';
 import { KeyEvent, KeyEventType } from './keyboard/keyboard.component';
 
@@ -9,8 +9,9 @@ import { KeyEvent, KeyEventType } from './keyboard/keyboard.component';
 })
 export class AppComponent {
   view = {
-    midiKeyRange1: [60, 72],
-    midiKeyRange2: [48, 60],
+    midiKeyStart1: 60,
+    midiKeyStart2: 36,
+    keySize: 120,
     deviceList: new Array<Device>(),
     selectedDeviceId: <string> null,
   };
@@ -34,6 +35,14 @@ export class AppComponent {
     });
   }
 
+  onDecreaseKeySize() {
+    this.view.keySize /= 1.1;
+  }
+
+  onIncreaseKeySize() {
+    this.view.keySize *= 1.1;
+  }
+
   onDeviceSelected(deviceId: string): void {
     this.session = null;
     this.webmidi.openSession(deviceId).then((session: DeviceSession) => {
@@ -54,3 +63,4 @@ export class AppComponent {
     }
   }
 }
+

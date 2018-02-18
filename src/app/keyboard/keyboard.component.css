@@ -1,5 +1,5 @@
 .keyboard {
-  display: inline-block;
+  display: block;
   white-space: nowrap;
 }
 
@@ -11,27 +11,12 @@
 .keyboard .key.black {
   background-color: black;
   border-color: black;
-  border-width: 6px;
-  width: 60px;
-  height: 160px;
   position: absolute;
-  margin-left: -36px;  /* -border - width / 2 */
 }
 
 .keyboard .key.white {
   background-color: white;
   border-color: black;
-  border-width: 6px 3px;
-  width: 120px;
-  height: 240px;
-}
-
-.keyboard .key.white.first {
-  border-left-width: 6px;
-}
-
-.keyboard .key.white.last {
-  border-right-width: 6px;
 }
 
 .keyboard .key.held.black, .keyboard .key.held.white {

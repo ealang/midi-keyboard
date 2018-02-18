@@ -1,18 +1,29 @@
-<h2>{{ deviceName }}</h2>
+<div id="background">
 
-<mat-form-field>
-  <mat-select (selectionChange)="onDeviceSelected(view.selectedDeviceId)" [(value)]="view.selectedDeviceId" placeholder="Select Output Device">
-    <mat-option *ngFor="let device of view.deviceList" [value]="device.id">
-      {{ device.name }}
-    </mat-option>
-  </mat-select>
-</mat-form-field>
+  <div>
+    <mat-form-field>
+      <mat-select (selectionChange)="onDeviceSelected(view.selectedDeviceId)" [(value)]="view.selectedDeviceId" placeholder="Select Output Device">
+        <mat-option *ngFor="let device of view.deviceList" [value]="device.id">
+          {{ device.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button (click)="onDecreaseKeySize()" mat-mini-fab>-</button>
+    <button (click)="onIncreaseKeySize()" mat-mini-fab>+</button>
+  </div>
 
-<app-keyboard
-  [keyRange]="view.midiKeyRange1"
-  (keyEvent)="onKeyEvent($event)"
-></app-keyboard>
-<app-keyboard
-  [keyRange]="view.midiKeyRange2"
-  (keyEvent)="onKeyEvent($event)"
-></app-keyboard>
+  <mat-divider></mat-divider>
+
+  <app-keyboard
+    [keyStart]="view.midiKeyStart1"
+    [keySize]="view.keySize"
+    (keyEvent)="onKeyEvent($event)"
+  ></app-keyboard>
+
+  <app-keyboard
+    [keyStart]="view.midiKeyStart2"
+    [keySize]="view.keySize"
+    (keyEvent)="onKeyEvent($event)"
+  ></app-keyboard>
+
+</div>

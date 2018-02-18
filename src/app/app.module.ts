@@ -1,25 +1,32 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatButtonModule } from '@angular/material/button';
+
+import { WebMidiService } from './webmidi.service';
 
 import { AppComponent } from './app.component';
-import { WebMidiService } from './webmidi.service';
-import { TouchDirective } from './touch/touch.directive';
 import { KeyboardComponent } from './keyboard/keyboard.component';
 
+import { TouchDirective } from './touch/touch.directive';
+import { ResizeDirective } from './resize/resize.directive';
 
 @NgModule({
   declarations: [
     TouchDirective,
+    ResizeDirective,
     KeyboardComponent,
     AppComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    MatSelectModule
+    MatDividerModule,
+    MatSelectModule,
+    MatButtonModule
   ],
   providers: [
     WebMidiService

@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 import { TouchDirective, TouchChangeEvent } from '../touch/touch.directive';
+import { ResizeDirective } from '../resize/resize.directive';
 import { KeyboardComponent, KeyEvent, KeyEventType } from './keyboard.component';
 
 declare var Touch: {
@@ -17,9 +18,17 @@ describe('KeyboardComponent', () => {
   let fixture: ComponentFixture<KeyboardComponent>;
   let keyEvents: Array<KeyEvent>;
 
+  const queryAllKeys = () => {
+    return fixture.debugElement.queryAll(By.css('span.key'));
+  };
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ KeyboardComponent, TouchDirective ]
+      declarations: [
+        TouchDirective,
+        ResizeDirective,
+        KeyboardComponent
+      ]
     })
     .compileComponents();
   }));
@@ -27,21 +36,33 @@ describe('KeyboardComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(KeyboardComponent);
     component = fixture.componentInstance;
-    component.keyRange = [12, 24];
+    component.keyStart = 12;
+    component.keySize = 100;
+    component.onResize({width: 1000, height: 200});
     fixture.detectChanges();
 
     keyEvents = [];
     component.keyEvent.subscribe((e: KeyEvent) => keyEvents.push(e));
   });
 
-  it('should render the correct number of keys', () => {
-    expect(fixture.debugElement.queryAll(By.css('span.key')).length).toBe(12);
+  it('should add more keys if window is expanded', () => {
+    const numKeys1 = queryAllKeys().length;
+    component.onResize({width: 1500, height: 200});
+    fixture.detectChanges();
+    const numKeys2 = queryAllKeys().length;
+
+    expect(numKeys1).toEqual(13);
+    expect(numKeys2).toEqual(22);
+    expect(numKeys2).toBeGreaterThan(numKeys1);
   });
 
-  it('should allow number of keys to be updated', () => {
-    component.keyRange = [12, 25];
+  it('should remove keys if key scale is increased', () => {
+    const numKeys1 = queryAllKeys().length;
+    component.keySize = 200;
     fixture.detectChanges();
-    expect(fixture.debugElement.queryAll(By.css('span.key')).length).toBe(13);
+    const numKeys2 = queryAllKeys().length;
+
+    expect(numKeys2).toBeLessThan(numKeys1);
   });
 
   it('should emit key down event when a key is touched', () => {

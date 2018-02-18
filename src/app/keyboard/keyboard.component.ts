@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { TouchChangeEvent } from '../touch/touch.directive';
 import { TouchStack, TouchStackEvent } from './touchstack';
+import { KeyViewModel, createKeysViewModel } from './viewmodel';
 
 export enum KeyEventType {
   Down, Up
@@ -12,18 +13,6 @@ export class KeyEvent {
   constructor(eventType: KeyEventType, keyNumber: number) {
     this.eventType = eventType;
     this.keyNumber = keyNumber;
-  }
-}
-
-class KeyViewModel {
-  keyNumber: number;
-  black: boolean;
-  held: boolean;
-  constructor(keyNumber) {
-    this.keyNumber = keyNumber;
-    const i = keyNumber % 12;
-    this.black = i === 1 || i === 3 || i === 6 || i === 8 || i === 10;
-    this.held = false;
   }
 }
 
@@ -40,20 +29,24 @@ export class KeyboardComponent {
     ['touchcancel', TouchStackEvent.Up],
   ]);
   private static readonly mouseId = 'mouse';
-
-  @Input() set keyRange(startEnd: [number, number]) {
-    this.keys = [];
-    for (let i = startEnd[0]; i < startEnd[1]; i++) {
-      this.keys.push(new KeyViewModel(i));
-    }
-    this.stack.reset();
-    this.mouseDown = false;
-  }
-  @Output() keyEvent = new EventEmitter<KeyEvent>();
-
-  keys: Array<KeyViewModel> = [];
+  private elemWidth: number;
+  private _keySize: number;
+  private _keyStart: number;
   private stack: TouchStack;
   private mouseDown = false;
+  keys: Array<KeyViewModel> = [];
+
+  @Input() set keySize(keySize: number) {
+    this._keySize = keySize;
+    this.resetKeyboard();
+  }
+
+  @Input() set keyStart(keyStart: number) {
+    this._keyStart = keyStart;
+    this.resetKeyboard();
+  }
+
+  @Output() keyEvent = new EventEmitter<KeyEvent>();
 
   constructor() {
     const onKeyDown = (keyIndex: number) => {
@@ -67,6 +60,13 @@ export class KeyboardComponent {
       this.keyEvent.emit(new KeyEvent(KeyEventType.Up, key.keyNumber));
     };
     this.stack = new TouchStack(onKeyDown, onKeyUp);
+    this.resetKeyboard();
+  }
+
+  private resetKeyboard(): void {
+    this.keys = createKeysViewModel(this._keyStart || 0, this._keySize || 0, this.elemWidth || 0);
+    this.stack.reset();
+    this.mouseDown = false;
   }
 
   private getKeyIndexFromElement(elem: Element): number {
@@ -77,6 +77,11 @@ export class KeyboardComponent {
       }
     }
     return null;
+  }
+
+  onResize({width}: {width: number, height: number}): void {
+    this.elemWidth = width;
+    this.resetKeyboard();
   }
 
   onMouseDown(keyIndex: number): void {

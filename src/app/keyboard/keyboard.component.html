@@ -1,5 +1,6 @@
 <div
   class="keyboard"
+  (appResize)="onResize($event)" 
   (appTouch)="onTouchEvent($event)"
   (mouseup)="onMouseUp()"
   (mouseleave)="onMouseOut()">
@@ -7,8 +8,14 @@
     *ngFor="let key of keys; let i = index;"
     class="key"
     [attr.data-keyindex]="i"
-    [ngClass]="{black: key.black, white: !key.black, held: key.held, last: i === keys.length - 1, first: i === 0}"
+    [ngClass]="{black: key.black, white: !key.black, held: key.held}"
     (mouseover)="onMouseOver(i)"
-    (mousedown)="onMouseDown(i)">
+    (mousedown)="onMouseDown(i)"
+    [style.width]="key.width"
+    [style.height]="key.height"
+    [style.marginLeft]="key.marginLeft"
+    [style.borderWidth]="key.borderWidth"
+    [style.borderLeftWidth]="key.borderLeftWidth"
+    [style.borderRightWidth]="key.borderRightWidth">
   </span>
 </div>
