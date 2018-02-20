@@ -12,12 +12,10 @@ import { AppComponent } from './app.component';
 import { KeyboardComponent } from './keyboard/keyboard.component';
 
 import { TouchDirective } from './touch/touch.directive';
-import { ResizeDirective } from './resize/resize.directive';
 
 @NgModule({
   declarations: [
     TouchDirective,
-    ResizeDirective,
     KeyboardComponent,
     AppComponent,
   ],

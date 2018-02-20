@@ -4,7 +4,6 @@ import { WebMidiService } from './webmidi.service';
 import { AppComponent } from './app.component';
 import { KeyboardComponent } from './keyboard/keyboard.component';
 import { TouchDirective } from './touch/touch.directive';
-import { ResizeDirective } from './resize/resize.directive';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSelectModule } from '@angular/material/select';
@@ -23,7 +22,6 @@ describe('AppComponent', () => {
       ],
       declarations: [
         TouchDirective,
-        ResizeDirective,
         KeyboardComponent,
         AppComponent
       ],

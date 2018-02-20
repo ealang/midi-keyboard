@@ -1,74 +1,101 @@
+const numKeys = 88,
+      keyStart = 21,
+      keyEnd = keyStart + numKeys,
+      layout = (function() {
+                 const keySize = 18,
+                       keyBorderWidth = 2,
+                       whiteKeyWidth = keySize,
+                       blackKeyWidth = keySize / 2,
+                       whiteKeyHeight = keySize * 2,
+                       blackKeyHeight = keySize * 4 / 3,
+                       keyboardOffset = keyBorderWidth / 2,
+                       keyboardHeight = whiteKeyHeight + keyBorderWidth;
+                 return {
+                   keyBorderWidth,
+                   whiteKeyWidth,
+                   blackKeyWidth,
+                   whiteKeyHeight,
+                   blackKeyHeight,
+                   keyboardOffset,
+                   keyboardHeight
+                 };
+               })();
+
 function isBlackKey(keyNumber: number): boolean {
   const i = keyNumber % 12;
   return i === 1 || i === 3 || i === 6 || i === 8 || i === 10;
 }
 
-function numKeysToDisplay(keyStart: number, keySizePxl: number, widthAvailPxl: number): number {
-  const nKeys = Math.trunc(widthAvailPxl / keySizePxl * 12 / 7) - 2;
-  return isBlackKey(keyStart + nKeys - 1) ? nKeys - 1 : nKeys;
-}
-
 export class KeyViewModel {
   readonly black: boolean;
-  readonly keyNumber: number;
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+
   held: boolean;
-  width: string;
-  height: string;
-  marginLeft: string;
-  borderWidth: string;
-  borderLeftWidth: string;
-  borderRightWidth: string;
 
-  constructor(keyNumber: number, startNumber: number, endNumber: number, keySize: number) {
-    this.keyNumber = keyNumber;
+  constructor(readonly keyNumber: number, xOffset: number) {
     this.black = isBlackKey(keyNumber);
+    this.x = layout.keyboardOffset + xOffset + (this.black ? -layout.blackKeyWidth / 2 : 0);
+    this.y = layout.keyboardOffset;
+    this.width = this.black ? layout.blackKeyWidth : layout.whiteKeyWidth;
+    this.height = this.black ? layout.blackKeyHeight : layout.whiteKeyHeight;
+    this.resetState();
+  }
+
+  resetState(): void {
     this.held = false;
-
-    const border = 8 / 120 * keySize;
-    let w, h, marginLeft;
-    if (this.black) {
-      w = Math.trunc(keySize / 2);
-      h = Math.trunc(keySize * 4 / 3);
-      marginLeft = -border - w / 2;
-    } else {
-      w = keySize;
-      h = keySize * 2;
-      marginLeft = 0;
-    }
-    this.width = Math.trunc(w) + 'px';
-    this.height = Math.trunc(h) + 'px';
-    this.marginLeft = Math.trunc(marginLeft) + 'px';
-
-    const firstKey = this.keyNumber === startNumber,
-          lastKey = this.keyNumber === endNumber - 1 || (this.keyNumber + 1 === endNumber - 1 && isBlackKey(this.keyNumber + 1));
-
-    let borderLeftWidth, borderRightWidth;
-    if (this.black) {
-      borderLeftWidth = border;
-      borderRightWidth = border;
-    } else {
-      borderLeftWidth = border / 2;
-      borderRightWidth = border / 2;
-      if (lastKey && !this.black) {
-        borderRightWidth = border;
-      } else if (firstKey && !this.black) {
-        borderLeftWidth = border;
-      }
-    }
-    this.borderLeftWidth = Math.trunc(borderLeftWidth) + 'px';
-    this.borderRightWidth = Math.trunc(borderRightWidth) + 'px';
-    this.borderWidth = Math.trunc(border) + 'px';
   }
 }
 
-export function createKeysViewModel(keyStart: number, keySizePxl: number, widthAvailPxl: number): Array<KeyViewModel> {
-  const adjKeyStart = isBlackKey(keyStart) ? keyStart - 1 : keyStart,
-        nKeys = numKeysToDisplay(adjKeyStart, keySizePxl, widthAvailPxl),
-        adjKeyEnd = adjKeyStart + nKeys,
-        keys = new Array<KeyViewModel>();
-
-  for (let i = adjKeyStart; i < adjKeyEnd; i++) {
-    keys.push(new KeyViewModel(i, adjKeyStart, adjKeyEnd, keySizePxl));
+export function createDefaultKeys(): Array<KeyViewModel> {
+  const whiteKeys = new Array<KeyViewModel>(),
+        blackKeys = new Array<KeyViewModel>();
+  let xOffset = 0;
+  for (let i = keyStart; i < keyEnd; i++) {
+    const key = new KeyViewModel(i, xOffset);
+    if (key.black) {
+      blackKeys.push(key);
+    } else {
+      whiteKeys.push(key);
+    }
+    if (!key.black) {
+      xOffset += key.width;
+    }
   }
-  return keys;
+  return [...whiteKeys, ...blackKeys];
+}
+
+export class KeyboardViewModel {
+  private viewPos = 0;
+  private numVisibleKeys = 7;
+  keys: Array<KeyViewModel>;
+  viewBox: Array<number> = [0, 0, 0, 0];
+
+  constructor() {
+    this.keys = createDefaultKeys();
+  }
+
+  resetKeyState(): void {
+    for (const key of this.keys) {
+      key.resetState();
+    }
+  }
+
+  setNumVisibleKeys(num: number): void {
+    this.numVisibleKeys = num;
+    this.viewBox = this.calcViewBox();
+  }
+
+  setViewPosition(pos: number): void {
+    this.viewPos = pos;
+    this.viewBox = this.calcViewBox();
+  }
+
+  private calcViewBox(): Array<number> {
+    const x = this.viewPos * layout.whiteKeyWidth,
+          w = this.numVisibleKeys * layout.whiteKeyWidth;
+    return [x, 0, w, layout.keyboardHeight];
+  }
 }

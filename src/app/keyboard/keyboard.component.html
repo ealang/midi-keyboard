@@ -1,21 +1,18 @@
-<div
-  class="keyboard"
-  (appResize)="onResize($event)" 
-  (appTouch)="onTouchEvent($event)"
-  (mouseup)="onMouseUp()"
-  (mouseleave)="onMouseOut()">
-  <span
-    *ngFor="let key of keys; let i = index;"
-    class="key"
-    [attr.data-keyindex]="i"
-    [ngClass]="{black: key.black, white: !key.black, held: key.held}"
-    (mouseover)="onMouseOver(i)"
-    (mousedown)="onMouseDown(i)"
-    [style.width]="key.width"
-    [style.height]="key.height"
-    [style.marginLeft]="key.marginLeft"
-    [style.borderWidth]="key.borderWidth"
-    [style.borderLeftWidth]="key.borderLeftWidth"
-    [style.borderRightWidth]="key.borderRightWidth">
-  </span>
-</div>
+<svg preserveAspectRatio="xMinYMin"
+     [attr.viewBox]="viewModel.viewBox"
+     class="keyboard"
+     (appTouch)="onTouchEvent($event)"
+     (mouseup)="onMouseUp()"
+     (mouseleave)="onMouseOut()">
+  <rect *ngFor="let key of viewModel.keys; let i = index;"
+        class="key"
+        [attr.data-keyindex]="i"
+        [ngClass]="{black: key.black, white: !key.black, held: key.held}"
+        (mouseover)="onMouseOver(i)"
+        (mousedown)="onMouseDown(i)"
+        [attr.x]="key.x"
+        [attr.y]="key.y"
+        [attr.width]="key.width"
+        [attr.height]="key.height">
+  </rect>
+</svg>

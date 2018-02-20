@@ -9,9 +9,9 @@ import { KeyEvent, KeyEventType } from './keyboard/keyboard.component';
 })
 export class AppComponent {
   view = {
-    midiKeyStart1: 60,
-    midiKeyStart2: 36,
-    keySize: 120,
+    numVisibleKeys: 14,
+    viewPosition1: 23,
+    viewPosition2: 9,
     deviceList: new Array<Device>(),
     selectedDeviceId: <string> null,
   };
@@ -36,11 +36,11 @@ export class AppComponent {
   }
 
   onDecreaseKeySize() {
-    this.view.keySize /= 1.1;
+    this.view.numVisibleKeys--;
   }
 
   onIncreaseKeySize() {
-    this.view.keySize *= 1.1;
+    this.view.numVisibleKeys++;
   }
 
   onDeviceSelected(deviceId: string): void {

@@ -15,14 +15,14 @@
   <mat-divider></mat-divider>
 
   <app-keyboard
-    [keyStart]="view.midiKeyStart1"
-    [keySize]="view.keySize"
+    [numVisibleKeys]="view.numVisibleKeys"
+    [viewPosition]="view.viewPosition1"
     (keyEvent)="onKeyEvent($event)"
   ></app-keyboard>
 
   <app-keyboard
-    [keyStart]="view.midiKeyStart2"
-    [keySize]="view.keySize"
+    [numVisibleKeys]="view.numVisibleKeys"
+    [viewPosition]="view.viewPosition2"
     (keyEvent)="onKeyEvent($event)"
   ></app-keyboard>
 

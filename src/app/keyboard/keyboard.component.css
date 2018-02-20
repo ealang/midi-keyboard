@@ -1,24 +1,21 @@
 .keyboard {
-  display: block;
-  white-space: nowrap;
+  width: 100%;
+  height: 100%;
 }
 
 .keyboard .key {
-  display: inline-block;
-  border-style: solid;
+  stroke: black;
+  stroke-width: 1;
 }
 
 .keyboard .key.black {
-  background-color: black;
-  border-color: black;
-  position: absolute;
+  fill: black;
 }
 
 .keyboard .key.white {
-  background-color: white;
-  border-color: black;
+  fill: white;
 }
 
 .keyboard .key.held.black, .keyboard .key.held.white {
-  background-color: #F48AF4;
+  fill: #F48AF4;
 }
