@@ -1,25 +1,4 @@
-const numKeys = 88,
-      keyStart = 21,
-      keyEnd = keyStart + numKeys,
-      layout = (function() {
-                 const keySize = 18,
-                       keyBorderWidth = 2,
-                       whiteKeyWidth = keySize,
-                       blackKeyWidth = keySize / 2,
-                       whiteKeyHeight = keySize * 2,
-                       blackKeyHeight = keySize * 4 / 3,
-                       keyboardOffset = keyBorderWidth / 2,
-                       keyboardHeight = whiteKeyHeight + keyBorderWidth;
-                 return {
-                   keyBorderWidth,
-                   whiteKeyWidth,
-                   blackKeyWidth,
-                   whiteKeyHeight,
-                   blackKeyHeight,
-                   keyboardOffset,
-                   keyboardHeight
-                 };
-               })();
+import { layout } from './layout';
 
 function isBlackKey(keyNumber: number): boolean {
   const i = keyNumber % 12;
@@ -53,7 +32,7 @@ export function createDefaultKeys(): Array<KeyViewModel> {
   const whiteKeys = new Array<KeyViewModel>(),
         blackKeys = new Array<KeyViewModel>();
   let xOffset = 0;
-  for (let i = keyStart; i < keyEnd; i++) {
+  for (let i = layout.keyStart; i < layout.keyEnd; i++) {
     const key = new KeyViewModel(i, xOffset);
     if (key.black) {
       blackKeys.push(key);
@@ -67,9 +46,8 @@ export function createDefaultKeys(): Array<KeyViewModel> {
   return [...whiteKeys, ...blackKeys];
 }
 
-export class KeyboardViewModel {
-  private viewPos = 0;
-  private numVisibleKeys = 7;
+export class KeysViewModel {
+  private _numVisibleKeys = 7;
   keys: Array<KeyViewModel>;
   viewBox: Array<number> = [0, 0, 0, 0];
 
@@ -83,19 +61,17 @@ export class KeyboardViewModel {
     }
   }
 
-  setNumVisibleKeys(num: number): void {
-    this.numVisibleKeys = num;
+  set numVisibleKeys(num: number) {
+    this._numVisibleKeys = num;
     this.viewBox = this.calcViewBox();
   }
 
-  setViewPosition(pos: number): void {
-    this.viewPos = pos;
-    this.viewBox = this.calcViewBox();
+  get numVisibleKeys(): number {
+    return this._numVisibleKeys;
   }
 
   private calcViewBox(): Array<number> {
-    const x = this.viewPos * layout.whiteKeyWidth,
-          w = this.numVisibleKeys * layout.whiteKeyWidth;
-    return [x, 0, w, layout.keyboardHeight];
+    const w = this._numVisibleKeys * layout.whiteKeyWidth;
+    return [0, 0, w, layout.keyboardHeight];
   }
 }

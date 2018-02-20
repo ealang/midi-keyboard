@@ -1,18 +1,23 @@
 <svg preserveAspectRatio="xMinYMin"
-     [attr.viewBox]="viewModel.viewBox"
+     [attr.viewBox]="keys.viewBox"
      class="keyboard"
      (appTouch)="onTouchEvent($event)"
      (mouseup)="onMouseUp()"
      (mouseleave)="onMouseOut()">
-  <rect *ngFor="let key of viewModel.keys; let i = index;"
-        class="key"
-        [attr.data-keyindex]="i"
-        [ngClass]="{black: key.black, white: !key.black, held: key.held}"
-        (mouseover)="onMouseOver(i)"
-        (mousedown)="onMouseDown(i)"
-        [attr.x]="key.x"
-        [attr.y]="key.y"
-        [attr.width]="key.width"
-        [attr.height]="key.height">
-  </rect>
+  <g [attr.transform]="'translate(' + keyboardTranslation + ')'">
+    <rect *ngFor="let key of keys.keys; let i = index;"
+          class="key"
+          [attr.data-keyindex]="i"
+          [ngClass]="{black: key.black, white: !key.black, held: key.held}"
+          (mouseover)="onMouseOver(i)"
+          (mousedown)="onMouseDown(i)"
+          [attr.x]="key.x"
+          [attr.y]="key.y"
+          [attr.width]="key.width"
+          [attr.height]="key.height">
+    </rect>
+  </g>
+  <g app-dragbar
+     (scroll)="onDragbarScroll($event)">
+  </g>
 </svg>

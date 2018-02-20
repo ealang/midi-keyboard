@@ -8,14 +8,15 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { WebMidiService } from './webmidi.service';
 
-import { AppComponent } from './app.component';
-import { KeyboardComponent } from './keyboard/keyboard.component';
-
 import { TouchDirective } from './touch/touch.directive';
+import { DragbarComponent } from './keyboard/dragbar/dragbar.component';
+import { KeyboardComponent } from './keyboard/keyboard.component';
+import { AppComponent } from './app.component';
 
 @NgModule({
   declarations: [
     TouchDirective,
+    DragbarComponent,
     KeyboardComponent,
     AppComponent,
   ],

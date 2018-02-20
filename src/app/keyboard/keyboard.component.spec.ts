@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { layout } from './layout';
 
 import { TouchDirective, TouchChangeEvent } from '../touch/touch.directive';
 import { KeyboardComponent, KeyEvent, KeyEventType } from './keyboard.component';
@@ -27,7 +28,6 @@ describe('KeyboardComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        TouchDirective,
         KeyboardComponent
       ]
     })
@@ -37,7 +37,7 @@ describe('KeyboardComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(KeyboardComponent);
     component = fixture.componentInstance;
-    component.viewPosition = 0;
+    component.scrollPosition = 0;
     component.numVisibleKeys = 7;
     fixture.detectChanges();
 
@@ -50,16 +50,15 @@ describe('KeyboardComponent', () => {
     expect(allKeys.length).toEqual(88);
   });
 
-  it('should change the viewbox when shifting view to the right', () => {
-    const vb1 = getVBox();
-    component.viewPosition = 1;
+  it('should change the keyboard offset when scrolling to the right', () => {
+    const keyboard = fixture.debugElement.query(By.css('g'));
+    const translate1 = keyboard.attributes.transform;
+    component.scrollPosition = 1;
     fixture.detectChanges();
+    const translate2 = keyboard.attributes.transform;
 
-    const vb2 = getVBox();
-    expect(vb1.x).toBeLessThan(vb2.x);
-    expect(vb1.y).toEqual(vb2.y);
-    expect(vb1.w).toEqual(vb2.w);
-    expect(vb1.h).toEqual(vb2.h);
+    expect(translate1).toEqual('translate(0)');
+    expect(translate2).toEqual(`translate(${-layout.whiteKeyWidth})`);
   });
 
   it('should change the viewbox when zooming out', () => {
@@ -92,5 +91,17 @@ describe('KeyboardComponent', () => {
     expect(keyEvents).toEqual([expectedKeyDownEvent]);
     component.onMouseUp();
     expect(keyEvents).toEqual([expectedKeyDownEvent, expectedKeyUpEvent]);
+  });
+
+  it('should scroll keyboard when dragbar is scrolled', () => {
+    const xformRe = new RegExp('translate\\((.*?)\\)');
+
+    const keyboard = fixture.debugElement.query(By.css('g'));
+    const translate1 = xformRe.exec(keyboard.attributes.transform)[1];
+    component.onDragbarScroll(-100);
+    fixture.detectChanges();
+    const translate2 = xformRe.exec(keyboard.attributes.transform)[1];
+
+    expect(Number(translate1)).toBeGreaterThan(Number(translate2));
   });
 });

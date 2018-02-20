@@ -1,0 +1,12 @@
+<svg:rect class="dragbar"
+          (appTouch)="onTouchEvent($event)"
+          [ngClass]="{selected: selected}"
+          [attr.x]="rect.x"
+          [attr.y]="rect.y"
+          [attr.width]="rect.width"
+          [attr.height]="rect.height"
+          (mousedown)="startScrolling($event.clientX, 'mouse')"
+          (mousemove)="updateScrolling($event.clientX)"
+          (mouseleave)="endScrolling()"
+          (mouseup)="endScrolling()">
+</rect>

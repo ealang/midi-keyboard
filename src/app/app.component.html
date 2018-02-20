@@ -16,13 +16,7 @@
 
   <app-keyboard
     [numVisibleKeys]="view.numVisibleKeys"
-    [viewPosition]="view.viewPosition1"
-    (keyEvent)="onKeyEvent($event)"
-  ></app-keyboard>
-
-  <app-keyboard
-    [numVisibleKeys]="view.numVisibleKeys"
-    [viewPosition]="view.viewPosition2"
+    [(scrollPosition)]="view.scrollPosition"
     (keyEvent)="onKeyEvent($event)"
   ></app-keyboard>
 
