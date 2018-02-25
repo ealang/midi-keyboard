@@ -1,7 +1,9 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef, OnInit } from '@angular/core';
 import { TouchChangeEvent } from '../touch/touch.directive';
 import { TouchStack, TouchStackEvent } from './touchstack';
-import { KeyViewModel, createKeysViewModel } from './viewmodel';
+import { KeysViewModel } from './keys.viewmodel';
+import { LayoutService } from './layout/layout.service';
+import { KeyConfigService } from '../keyconfig.service';
 
 export enum KeyEventType {
   Down, Up
@@ -21,95 +23,139 @@ export class KeyEvent {
   templateUrl: './keyboard.component.html',
   styleUrls: ['./keyboard.component.css']
 })
-export class KeyboardComponent {
+export class KeyboardComponent implements OnInit {
   private static readonly touchEventToEventStackType = new Map<string, TouchStackEvent>([
     ['touchstart', TouchStackEvent.Down],
     ['touchmove', TouchStackEvent.Move],
     ['touchend', TouchStackEvent.Up],
     ['touchcancel', TouchStackEvent.Up],
   ]);
+  private static scrollAmplifier = 2;
   private static readonly mouseId = 'mouse';
-  private elemWidth: number;
-  private _keySize: number;
-  private _keyStart: number;
-  private stack: TouchStack;
+  private touches: TouchStack;
   private mouseDown = false;
-  keys: Array<KeyViewModel> = [];
+  private svgElement: SVGGraphicsElement = null;
+  keys: KeysViewModel;
+  keyboardTranslation = 0;
+  scrollActive = false;
 
-  @Input() set keySize(keySize: number) {
-    this._keySize = keySize;
-    this.resetKeyboard();
+  @Output() scrollPositionChange = new EventEmitter<number>();
+
+  @Input() set scrollPosition(pos: number) {
+    this.scrollPositionChange.emit(pos);
+    this.keyboardTranslation = this.boundKeyboardTranslation(
+      -pos * this.layout.whiteKeyWidth
+    );
   }
 
-  @Input() set keyStart(keyStart: number) {
-    this._keyStart = keyStart;
+  @Input() set numVisibleKeys(num: number) {
+    this.keys.numVisibleKeys = num;
     this.resetKeyboard();
+    this.keyboardTranslation = this.boundKeyboardTranslation(
+      this.keyboardTranslation
+    );
   }
 
   @Output() keyEvent = new EventEmitter<KeyEvent>();
 
-  constructor() {
-    const onKeyDown = (keyIndex: number) => {
-      const key = this.keys[keyIndex];
-      key.held = true;
-      this.keyEvent.emit(new KeyEvent(KeyEventType.Down, key.keyNumber));
-    };
-    const onKeyUp = (keyIndex: number) => {
-      const key = this.keys[keyIndex];
-      key.held = false;
-      this.keyEvent.emit(new KeyEvent(KeyEventType.Up, key.keyNumber));
-    };
-    this.stack = new TouchStack(onKeyDown, onKeyUp);
-    this.resetKeyboard();
-  }
-
-  private resetKeyboard(): void {
-    this.keys = createKeysViewModel(this._keyStart || 0, this._keySize || 0, this.elemWidth || 0);
-    this.stack.reset();
-    this.mouseDown = false;
-  }
-
-  private getKeyIndexFromElement(elem: Element): number {
-    if (elem !== null) {
-      const attr = elem.attributes.getNamedItem('data-keyindex');
-      if (attr !== null) {
+  private static getKeyIndexFromElement(element: Element): number {
+    if (element !== null) {
+      const attr = element.attributes.getNamedItem('data-keyindex');
+      if (attr) {
         return Number(attr.value);
       }
     }
     return null;
   }
 
-  onResize({width}: {width: number, height: number}): void {
-    this.elemWidth = width;
+  constructor(
+    private readonly layout: LayoutService,
+    private readonly keyconfig: KeyConfigService,
+    private readonly element: ElementRef
+  ) {
+    this.keys = new KeysViewModel(layout, keyconfig);
+    const onKeyDown = (keyIndex: number) => {
+      const key = this.keys.keys[keyIndex];
+      key.held = true;
+      this.keyEvent.emit(new KeyEvent(KeyEventType.Down, key.keyNumber));
+    };
+    const onKeyUp = (keyIndex: number) => {
+      const key = this.keys.keys[keyIndex];
+      key.held = false;
+      this.keyEvent.emit(new KeyEvent(KeyEventType.Up, key.keyNumber));
+    };
+    this.touches = new TouchStack(onKeyDown, onKeyUp);
     this.resetKeyboard();
+  }
+
+  ngOnInit(): void {
+    this.svgElement = this.element.nativeElement.querySelector('svg');
+  }
+
+  private boundKeyboardTranslation(translation: number): number {
+    return Math.max(
+      Math.min(0, translation),
+      (this.keys.numVisibleKeys - this.keyconfig.numWhiteKeys) * this.layout.whiteKeyWidth
+    );
+  }
+
+  private resetKeyboard(): void {
+    this.touches.reset();
+    this.mouseDown = false;
+    this.keys.resetKeyState();
   }
 
   onMouseDown(keyIndex: number): void {
     this.mouseDown = true;
-    this.stack.push(KeyboardComponent.mouseId, keyIndex, TouchStackEvent.Down);
+    this.touches.push(KeyboardComponent.mouseId, keyIndex, TouchStackEvent.Down);
   }
 
   onMouseUp(): void {
     this.mouseDown = false;
-    this.stack.push(KeyboardComponent.mouseId, null, TouchStackEvent.Up);
+    this.touches.push(KeyboardComponent.mouseId, null, TouchStackEvent.Up);
   }
 
   onMouseOver(keyIndex: number): void {
     if (this.mouseDown) {
-      this.stack.push(KeyboardComponent.mouseId, keyIndex, TouchStackEvent.Move);
+      this.touches.push(KeyboardComponent.mouseId, keyIndex, TouchStackEvent.Move);
     }
   }
 
   onMouseOut(): void {
     if (this.mouseDown) {
       this.mouseDown = false;
-      this.stack.push(KeyboardComponent.mouseId, null, TouchStackEvent.Up);
+      this.touches.push(KeyboardComponent.mouseId, null, TouchStackEvent.Up);
     }
   }
 
   onTouchEvent(event: TouchChangeEvent): void {
     const eventType = KeyboardComponent.touchEventToEventStackType.get(event.eventType),
-          touchedKeyIndex = this.getKeyIndexFromElement(event.element);
-    this.stack.push(event.identifier.toString(), touchedKeyIndex, eventType);
+          touchedKeyIndex = KeyboardComponent.getKeyIndexFromElement(event.element),
+          identifier = event.identifier.toString();
+    this.touches.push(identifier, touchedKeyIndex, eventType);
+    if (this.scrollActive) {
+      this.touches.freezeAll();
+    }
+  }
+
+  onDragbarScroll(pxlDelta: number): void {
+    const pxlToSvgPt = (x: number) => {
+      const matrix = this.svgElement.getScreenCTM().inverse(),
+            pt = this.svgElement['createSVGPoint']();
+      pt.x = x;
+      return pt.matrixTransform(matrix).x;
+    };
+    const svgPtDelta = pxlToSvgPt(pxlDelta);
+    this.keyboardTranslation = this.boundKeyboardTranslation(
+      this.keyboardTranslation + svgPtDelta * KeyboardComponent.scrollAmplifier,
+    );
+    this.scrollPosition = -this.keyboardTranslation / this.layout.whiteKeyWidth;
+  }
+
+  onScrollStatusChanged(scrolling: boolean): void {
+    this.scrollActive = scrolling;
+    if (scrolling) {
+      this.touches.freezeAll();
+    }
   }
 }

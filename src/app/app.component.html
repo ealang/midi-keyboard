@@ -15,14 +15,8 @@
   <mat-divider></mat-divider>
 
   <app-keyboard
-    [keyStart]="view.midiKeyStart1"
-    [keySize]="view.keySize"
-    (keyEvent)="onKeyEvent($event)"
-  ></app-keyboard>
-
-  <app-keyboard
-    [keyStart]="view.midiKeyStart2"
-    [keySize]="view.keySize"
+    [numVisibleKeys]="view.numVisibleKeys"
+    [(scrollPosition)]="view.scrollPosition"
     (keyEvent)="onKeyEvent($event)"
   ></app-keyboard>
 

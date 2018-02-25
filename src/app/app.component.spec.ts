@@ -1,10 +1,11 @@
 import { TestBed, async } from '@angular/core/testing';
 
 import { WebMidiService } from './webmidi.service';
+import { LayoutService } from './keyboard/layout/layout.service';
+import { KeyConfigService } from './keyconfig.service';
 import { AppComponent } from './app.component';
 import { KeyboardComponent } from './keyboard/keyboard.component';
 import { TouchDirective } from './touch/touch.directive';
-import { ResizeDirective } from './resize/resize.directive';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSelectModule } from '@angular/material/select';
@@ -23,12 +24,13 @@ describe('AppComponent', () => {
       ],
       declarations: [
         TouchDirective,
-        ResizeDirective,
         KeyboardComponent,
         AppComponent
       ],
       providers: [
-        WebMidiService
+        WebMidiService,
+        LayoutService,
+        KeyConfigService
       ]
     }).compileComponents();
   }));

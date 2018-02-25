@@ -1,0 +1,7 @@
+.dragbar {
+  fill: black;
+}
+
+.dragbar.selected {
+  fill: #444;
+}

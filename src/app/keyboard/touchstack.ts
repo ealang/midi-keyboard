@@ -5,6 +5,7 @@ export enum TouchStackEvent {
 export class TouchStack {
   private heldIndexes = new Map<string, number>();        // touch id -> keys index
   private heldIndexRefCount = new Map<number, number>();  // index -> num touches
+  private frozenIds = new Set<string>();
 
   constructor(
     private onKeyDown: (keyIndex: number) => void,
@@ -41,7 +42,7 @@ export class TouchStack {
       this.pushState(keyIndex, on);
       this.heldIndexes.set(identifier, keyIndex);
     } else if (eventType === TouchStackEvent.Move && isExistingTouch) {
-      if (isValidKey && existingKeyIndex !== keyIndex) {
+      if (isValidKey && existingKeyIndex !== keyIndex && !this.frozenIds.has(identifier)) {
         this.pushState(existingKeyIndex, off);
         this.pushState(keyIndex, on);
         this.heldIndexes.set(identifier, keyIndex);
@@ -49,6 +50,7 @@ export class TouchStack {
     } else if (eventType === TouchStackEvent.Up && isExistingTouch) {
       this.heldIndexes.delete(identifier);
       this.pushState(existingKeyIndex, off);
+      this.frozenIds.delete(identifier);
     }
   }
 
@@ -58,5 +60,12 @@ export class TouchStack {
     });
     this.heldIndexes.clear();
     this.heldIndexRefCount.clear();
+    this.frozenIds.clear();
+  }
+
+  freezeAll(): void {
+    this.heldIndexes.forEach((_, id) => {
+      this.frozenIds.add(id);
+    });
   }
 }

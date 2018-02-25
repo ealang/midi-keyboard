@@ -7,19 +7,20 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 
 import { WebMidiService } from './webmidi.service';
-
-import { AppComponent } from './app.component';
-import { KeyboardComponent } from './keyboard/keyboard.component';
+import { KeyConfigService } from './keyconfig.service';
+import { LayoutService } from './keyboard/layout/layout.service';
 
 import { TouchDirective } from './touch/touch.directive';
-import { ResizeDirective } from './resize/resize.directive';
+import { DragbarComponent } from './keyboard/dragbar/dragbar.component';
+import { KeyboardComponent } from './keyboard/keyboard.component';
+import { AppComponent } from './app.component';
 
 @NgModule({
   declarations: [
     TouchDirective,
-    ResizeDirective,
+    DragbarComponent,
     KeyboardComponent,
-    AppComponent,
+    AppComponent
   ],
   imports: [
     BrowserModule,
@@ -29,6 +30,8 @@ import { ResizeDirective } from './resize/resize.directive';
     MatButtonModule
   ],
   providers: [
+    KeyConfigService,
+    LayoutService,
     WebMidiService
   ],
   bootstrap: [AppComponent]
