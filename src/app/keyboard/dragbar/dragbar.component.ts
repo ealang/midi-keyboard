@@ -21,6 +21,7 @@ class Rectangle {
 export class DragbarComponent {
 
   @Output() scroll = new EventEmitter<number>();
+  @Output() scrollActive = new EventEmitter<boolean>();
 
   selected = false;
   rect: Rectangle;
@@ -40,6 +41,7 @@ export class DragbarComponent {
     this.selected = true;
     this.lastCursorPos = x;
     this.identifier = identifier;
+    this.scrollActive.emit(true);
   }
 
   updateScrolling(x: number): void {
@@ -53,7 +55,10 @@ export class DragbarComponent {
   }
 
   endScrolling(): void {
-    this.selected = false;
+    if (this.selected) {
+      this.selected = false;
+      this.scrollActive.emit(false);
+    }
   }
 
   onTouchEvent(event: TouchChangeEvent): void {

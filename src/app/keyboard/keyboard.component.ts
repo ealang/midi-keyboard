@@ -37,6 +37,7 @@ export class KeyboardComponent implements OnInit {
   private svgElement: SVGGraphicsElement = null;
   keys: KeysViewModel;
   keyboardTranslation = 0;
+  scrollActive = false;
 
   @Output() scrollPositionChange = new EventEmitter<number>();
 
@@ -56,13 +57,6 @@ export class KeyboardComponent implements OnInit {
   }
 
   @Output() keyEvent = new EventEmitter<KeyEvent>();
-
-  private boundKeyboardTranslation(translation: number): number {
-    return Math.max(
-      Math.min(0, translation),
-      (this.keys.numVisibleKeys - this.keyconfig.numWhiteKeys) * this.layout.whiteKeyWidth
-    );
-  }
 
   private static getKeyIndexFromElement(element: Element): number {
     if (element !== null) {
@@ -96,6 +90,13 @@ export class KeyboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.svgElement = this.element.nativeElement.querySelector('svg');
+  }
+
+  private boundKeyboardTranslation(translation: number): number {
+    return Math.max(
+      Math.min(0, translation),
+      (this.keys.numVisibleKeys - this.keyconfig.numWhiteKeys) * this.layout.whiteKeyWidth
+    );
   }
 
   private resetKeyboard(): void {

@@ -10,6 +10,7 @@ export class LayoutService {
   readonly keyboardOffset: number;
   readonly keyboardHeight: number;
   readonly dragBarHeight: number;
+  readonly labelFontSize: number;
 
   constructor() {
     const keySize = 18;
@@ -21,5 +22,6 @@ export class LayoutService {
     this.keyboardOffset = this.keyBorderWidth / 2;
     this.dragBarHeight = keySize;
     this.keyboardHeight = this.whiteKeyHeight + this.keyBorderWidth + this.dragBarHeight;
+    this.labelFontSize = keySize / 3;
   }
 }

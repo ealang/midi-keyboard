@@ -3,19 +3,31 @@
   height: 100%;
 }
 
-.keyboard .key {
+.key {
   stroke: black;
   stroke-width: 1;
 }
 
-.keyboard .key.black {
+.key.black {
   fill: black;
 }
 
-.keyboard .key.white {
+.key.white {
   fill: white;
 }
 
-.keyboard .key.held.black, .keyboard .key.held.white {
+.key.held.black, .key.held.white {
   fill: #F48AF4;
+}
+
+.key-labels .key-label.black {
+  fill: none;
+}
+
+.key-labels .key-label.white {
+  fill: none;
+}
+
+.key-labels.scrolling .key-label.white {
+  fill: black;
 }

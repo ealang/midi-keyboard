@@ -7,11 +7,15 @@ function isBlackKey(keyNumber: number): boolean {
 }
 
 export class KeyViewModel {
+  private static readonly midiKeyOctave0 = 12;
+  private static readonly keyLabels = ['C', '', 'D', '', 'E', 'F', '', 'G', '', 'A', '', 'B'];
+
   readonly black: boolean;
   readonly x: number;
   readonly y: number;
   readonly width: number;
   readonly height: number;
+  readonly label: string;
 
   held: boolean;
 
@@ -22,6 +26,9 @@ export class KeyViewModel {
     this.width = this.black ? layout.blackKeyWidth : layout.whiteKeyWidth;
     this.height = this.black ? layout.blackKeyHeight : layout.whiteKeyHeight;
     this.resetState();
+
+    const octave = Math.floor((keyNumber - KeyViewModel.midiKeyOctave0) / 12);
+    this.label = KeyViewModel.keyLabels[keyNumber % 12] + octave;
   }
 
   resetState(): void {
@@ -51,9 +58,11 @@ export class KeysViewModel {
   private _numVisibleKeys = 7;
   keys: Array<KeyViewModel>;
   viewBox: Array<number> = [0, 0, 0, 0];
+  labelFontSize: number;
 
   constructor(private readonly layout: LayoutService, keyconfig: KeyConfigService) {
     this.keys = createDefaultKeys(layout, keyconfig);
+    this.labelFontSize = layout.labelFontSize;
   }
 
   resetKeyState(): void {
