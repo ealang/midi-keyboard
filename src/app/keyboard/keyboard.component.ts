@@ -139,13 +139,13 @@ export class KeyboardComponent implements OnInit {
   }
 
   onDragbarScroll(pxlDelta: number): void {
+    const matrix = this.svgElement.getScreenCTM().inverse();
     const pxlToSvgPt = (x: number) => {
-      const matrix = this.svgElement.getScreenCTM().inverse(),
-            pt = this.svgElement['createSVGPoint']();
+      const pt = this.svgElement['createSVGPoint']();
       pt.x = x;
       return pt.matrixTransform(matrix).x;
     };
-    const svgPtDelta = pxlToSvgPt(pxlDelta);
+    const svgPtDelta = pxlToSvgPt(pxlDelta) - pxlToSvgPt(0);
     this.keyboardTranslation = this.boundKeyboardTranslation(
       this.keyboardTranslation + svgPtDelta * KeyboardComponent.scrollAmplifier,
     );
