@@ -1,7 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { layout } from './layout';
 
+import { LayoutService } from './layout/layout.service';
+import { KeyConfigService } from '../keyconfig.service';
 import { TouchDirective, TouchChangeEvent } from '../touch/touch.directive';
 import { KeyboardComponent, KeyEvent, KeyEventType } from './keyboard.component';
 
@@ -15,6 +16,11 @@ declare var Touch: {
 
 describe('KeyboardComponent', () => {
   const firstMidiNote = 21;
+  const getTranslation = () => {
+    const xformRe = new RegExp('translate\\((.*?)\\)'),
+          keyboard = fixture.debugElement.query(By.css('g'));
+    return Number(xformRe.exec(keyboard.attributes.transform)[1]);
+  };
   const getVBox = () => {
     const vb = fixture.debugElement.query(By.css('svg')).attributes.viewBox;
     const [x, y, w, h] = vb.split(',').map((i) => Number(i));
@@ -29,6 +35,10 @@ describe('KeyboardComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         KeyboardComponent
+      ],
+      providers: [
+        LayoutService,
+        KeyConfigService
       ]
     })
     .compileComponents();
@@ -52,13 +62,12 @@ describe('KeyboardComponent', () => {
 
   it('should change the keyboard offset when scrolling to the right', () => {
     const keyboard = fixture.debugElement.query(By.css('g'));
-    const translate1 = keyboard.attributes.transform;
+    const translate1 = getTranslation();
     component.scrollPosition = 1;
     fixture.detectChanges();
-    const translate2 = keyboard.attributes.transform;
+    const translate2 = getTranslation();
 
-    expect(translate1).toEqual('translate(0)');
-    expect(translate2).toEqual(`translate(${-layout.whiteKeyWidth})`);
+    expect(translate1).toBeGreaterThan(translate2);
   });
 
   it('should change the viewbox when zooming out', () => {
@@ -94,14 +103,12 @@ describe('KeyboardComponent', () => {
   });
 
   it('should scroll keyboard when dragbar is scrolled', () => {
-    const xformRe = new RegExp('translate\\((.*?)\\)');
-
     const keyboard = fixture.debugElement.query(By.css('g'));
-    const translate1 = xformRe.exec(keyboard.attributes.transform)[1];
+    const translate1 = getTranslation();
     component.onDragbarScroll(-100);
     fixture.detectChanges();
-    const translate2 = xformRe.exec(keyboard.attributes.transform)[1];
+    const translate2 = getTranslation();
 
-    expect(Number(translate1)).toBeGreaterThan(Number(translate2));
+    expect(translate1).toBeGreaterThan(translate2);
   });
 });

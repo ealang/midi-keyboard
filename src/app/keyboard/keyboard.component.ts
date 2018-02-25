@@ -2,7 +2,8 @@ import { Component, Input, Output, EventEmitter, ElementRef, OnInit } from '@ang
 import { TouchChangeEvent } from '../touch/touch.directive';
 import { TouchStack, TouchStackEvent } from './touchstack';
 import { KeysViewModel } from './keys.viewmodel';
-import { layout } from './layout';
+import { LayoutService } from './layout/layout.service';
+import { KeyConfigService } from '../keyconfig.service';
 
 export enum KeyEventType {
   Down, Up
@@ -34,32 +35,32 @@ export class KeyboardComponent implements OnInit {
   private stack: TouchStack;
   private mouseDown = false;
   private svgElement: SVGGraphicsElement = null;
-  keys = new KeysViewModel();
+  keys: KeysViewModel;
   keyboardTranslation = 0;
 
   @Output() scrollPositionChange = new EventEmitter<number>();
 
   @Input() set scrollPosition(pos: number) {
     this.scrollPositionChange.emit(pos);
-    this.keyboardTranslation = KeyboardComponent.boundKeyboardTranslation(
-      -pos * layout.whiteKeyWidth, this.keys.numVisibleKeys
+    this.keyboardTranslation = this.boundKeyboardTranslation(
+      -pos * this.layout.whiteKeyWidth
     );
   }
 
   @Input() set numVisibleKeys(num: number) {
     this.keys.numVisibleKeys = num;
     this.resetKeyboard();
-    this.keyboardTranslation = KeyboardComponent.boundKeyboardTranslation(
-      this.keyboardTranslation, num
+    this.keyboardTranslation = this.boundKeyboardTranslation(
+      this.keyboardTranslation
     );
   }
 
   @Output() keyEvent = new EventEmitter<KeyEvent>();
 
-  private static boundKeyboardTranslation(translation: number, numVisibleKeys: number): number {
+  private boundKeyboardTranslation(translation: number): number {
     return Math.max(
       Math.min(0, translation),
-      (numVisibleKeys - layout.numWhiteKeys) * layout.whiteKeyWidth
+      (this.keys.numVisibleKeys - this.keyconfig.numWhiteKeys) * this.layout.whiteKeyWidth
     );
   }
 
@@ -73,7 +74,12 @@ export class KeyboardComponent implements OnInit {
     return null;
   }
 
-  constructor(private readonly element: ElementRef) {
+  constructor(
+    private readonly layout: LayoutService,
+    private readonly keyconfig: KeyConfigService,
+    private readonly element: ElementRef
+  ) {
+    this.keys = new KeysViewModel(layout, keyconfig);
     const onKeyDown = (keyIndex: number) => {
       const key = this.keys.keys[keyIndex];
       key.held = true;
@@ -135,9 +141,9 @@ export class KeyboardComponent implements OnInit {
       return pt.matrixTransform(matrix).x;
     };
     const svgPtDelta = pxlToSvgPt(pxlDelta);
-    this.keyboardTranslation = KeyboardComponent.boundKeyboardTranslation(
-      this.keyboardTranslation + svgPtDelta * KeyboardComponent.scrollAmplifier, this.keys.numVisibleKeys
+    this.keyboardTranslation = this.boundKeyboardTranslation(
+      this.keyboardTranslation + svgPtDelta * KeyboardComponent.scrollAmplifier,
     );
-    this.scrollPosition = -this.keyboardTranslation / layout.whiteKeyWidth;
+    this.scrollPosition = -this.keyboardTranslation / this.layout.whiteKeyWidth;
   }
 }

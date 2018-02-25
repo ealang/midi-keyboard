@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { layout } from '../layout';
 import { TouchChangeEvent } from '../../touch/touch.directive';
+import { LayoutService } from '../layout/layout.service';
+import { KeyConfigService } from '../../keyconfig.service';
 
 class Rectangle {
   constructor(
@@ -21,17 +22,19 @@ export class DragbarComponent {
 
   @Output() scroll = new EventEmitter<number>();
 
-  constructor() { }
-
   selected = false;
-  rect: Rectangle = new Rectangle(
-    layout.keyboardOffset,
-    layout.keyboardOffset + layout.whiteKeyHeight,
-    layout.whiteKeyWidth * layout.numWhiteKeys,
-    layout.dragBarHeight
-  );
+  rect: Rectangle;
   private lastCursorPos = 0;
-  private identifier: string = null;
+  private identifier: string;
+
+  constructor(layout: LayoutService, keyconfig: KeyConfigService) {
+    this.rect = new Rectangle(
+      layout.keyboardOffset,
+      layout.keyboardOffset + layout.whiteKeyHeight,
+      layout.whiteKeyWidth * keyconfig.numWhiteKeys,
+      layout.dragBarHeight
+    );
+  }
 
   startScrolling(x: number, identifier: string): void {
     this.selected = true;

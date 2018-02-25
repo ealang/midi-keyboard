@@ -1,4 +1,5 @@
-import { layout } from './layout';
+import { LayoutService } from './layout/layout.service';
+import { KeyConfigService } from './../keyconfig.service';
 
 function isBlackKey(keyNumber: number): boolean {
   const i = keyNumber % 12;
@@ -14,7 +15,7 @@ export class KeyViewModel {
 
   held: boolean;
 
-  constructor(readonly keyNumber: number, xOffset: number) {
+  constructor(readonly keyNumber: number, xOffset: number, layout: LayoutService) {
     this.black = isBlackKey(keyNumber);
     this.x = layout.keyboardOffset + xOffset + (this.black ? -layout.blackKeyWidth / 2 : 0);
     this.y = layout.keyboardOffset;
@@ -28,12 +29,12 @@ export class KeyViewModel {
   }
 }
 
-export function createDefaultKeys(): Array<KeyViewModel> {
+export function createDefaultKeys(layout: LayoutService, keyconfig: KeyConfigService): Array<KeyViewModel> {
   const whiteKeys = new Array<KeyViewModel>(),
         blackKeys = new Array<KeyViewModel>();
   let xOffset = 0;
-  for (let i = layout.keyStart; i < layout.keyEnd; i++) {
-    const key = new KeyViewModel(i, xOffset);
+  for (let i = keyconfig.keyStart; i < keyconfig.keyEnd; i++) {
+    const key = new KeyViewModel(i, xOffset, layout);
     if (key.black) {
       blackKeys.push(key);
     } else {
@@ -51,8 +52,8 @@ export class KeysViewModel {
   keys: Array<KeyViewModel>;
   viewBox: Array<number> = [0, 0, 0, 0];
 
-  constructor() {
-    this.keys = createDefaultKeys();
+  constructor(private readonly layout: LayoutService, keyconfig: KeyConfigService) {
+    this.keys = createDefaultKeys(layout, keyconfig);
   }
 
   resetKeyState(): void {
@@ -71,7 +72,7 @@ export class KeysViewModel {
   }
 
   private calcViewBox(): Array<number> {
-    const w = this._numVisibleKeys * layout.whiteKeyWidth;
-    return [0, 0, w, layout.keyboardHeight];
+    const w = this._numVisibleKeys * this.layout.whiteKeyWidth;
+    return [0, 0, w, this.layout.keyboardHeight];
   }
 }

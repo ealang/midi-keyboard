@@ -1,7 +1,7 @@
 import { Component, HostListener } from '@angular/core';
 import { WebMidiService, Device, DeviceSession } from './webmidi.service';
 import { KeyEvent, KeyEventType } from './keyboard/keyboard.component';
-import { layout } from './keyboard/layout';
+import { KeyConfigService } from './keyconfig.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +17,7 @@ export class AppComponent {
   };
   private session: DeviceSession;
 
-  constructor(private webmidi: WebMidiService) {
+  constructor(private readonly webmidi: WebMidiService, private readonly keyconfig: KeyConfigService) {
     this.webmidi.onDevicesChanged((devices: Array<Device>) => {
       this.view.deviceList = devices;
     });
@@ -42,7 +42,7 @@ export class AppComponent {
   }
 
   onIncreaseKeySize() {
-    if (this.view.numVisibleKeys < layout.numWhiteKeys) {
+    if (this.view.numVisibleKeys < this.keyconfig.numWhiteKeys) {
       this.view.numVisibleKeys++;
     }
   }

@@ -1,6 +1,8 @@
 import { TestBed, async } from '@angular/core/testing';
 
 import { WebMidiService } from './webmidi.service';
+import { LayoutService } from './keyboard/layout/layout.service';
+import { KeyConfigService } from './keyconfig.service';
 import { AppComponent } from './app.component';
 import { KeyboardComponent } from './keyboard/keyboard.component';
 import { TouchDirective } from './touch/touch.directive';
@@ -26,7 +28,9 @@ describe('AppComponent', () => {
         AppComponent
       ],
       providers: [
-        WebMidiService
+        WebMidiService,
+        LayoutService,
+        KeyConfigService
       ]
     }).compileComponents();
   }));
