@@ -1,7 +1,9 @@
 .dragbar {
   fill: black;
+  stroke: black;
 }
 
 .dragbar.selected {
-  fill: #444;
+  fill-opacity: 0;
 }
+

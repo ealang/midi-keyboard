@@ -5,6 +5,7 @@
           [attr.y]="rect.y"
           [attr.width]="rect.width"
           [attr.height]="rect.height"
+          [attr.stroke-width]="strokeWidth"
           (mousedown)="startScrolling($event.clientX, 'mouse')"
           (mousemove)="updateScrolling($event.clientX)"
           (mouseleave)="endScrolling()"

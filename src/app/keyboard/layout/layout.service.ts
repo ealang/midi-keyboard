@@ -1,27 +1,27 @@
 import { Injectable } from '@angular/core';
 
+const keySize = 16,
+      keyBorderWidth = 1,
+      whiteKeyWidth = keySize,
+      blackKeyWidth = keySize * 2 / 3,
+      whiteKeyHeight = keySize * 4.5,
+      blackKeyHeight = keySize * 5 / 2,
+      keyboardOffset = keyBorderWidth / 2,
+      dragBarHeight = keySize,
+      dragBarBorderWidth = 1,
+      keyboardHeight = whiteKeyHeight + keyBorderWidth + dragBarHeight + dragBarBorderWidth,
+      labelFontSize = keySize / 4;
+
 @Injectable()
 export class LayoutService {
-  readonly keyBorderWidth: number;
-  readonly whiteKeyWidth: number;
-  readonly blackKeyWidth: number;
-  readonly whiteKeyHeight: number;
-  readonly blackKeyHeight: number;
-  readonly keyboardOffset: number;
-  readonly keyboardHeight: number;
-  readonly dragBarHeight: number;
-  readonly labelFontSize: number;
-
-  constructor() {
-    const keySize = 18;
-    this.keyBorderWidth = 2;
-    this.whiteKeyWidth = keySize;
-    this.blackKeyWidth = keySize * 2 / 3;
-    this.whiteKeyHeight = keySize * 5;
-    this.blackKeyHeight = keySize * 5 / 2;
-    this.keyboardOffset = this.keyBorderWidth / 2;
-    this.dragBarHeight = keySize;
-    this.keyboardHeight = this.whiteKeyHeight + this.keyBorderWidth + this.dragBarHeight;
-    this.labelFontSize = keySize / 3;
-  }
+  readonly keyBorderWidth = keyBorderWidth;
+  readonly whiteKeyWidth = whiteKeyWidth;
+  readonly blackKeyWidth = blackKeyWidth;
+  readonly whiteKeyHeight = whiteKeyHeight;
+  readonly blackKeyHeight = blackKeyHeight;
+  readonly keyboardOffset = keyboardOffset;
+  readonly keyboardHeight = keyboardHeight;
+  readonly dragBarHeight = dragBarHeight;
+  readonly dragBarBorderWidth = dragBarBorderWidth;
+  readonly labelFontSize = labelFontSize;
 }

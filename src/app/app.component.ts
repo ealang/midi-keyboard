@@ -11,13 +11,17 @@ import { KeyConfigService } from './keyconfig.service';
 export class AppComponent {
   view = {
     numVisibleKeys: 12,
-    scrollPosition: 23,
+    minVisibleKeys: 4,
+    maxVisibleKeys: <number> null,
+    scrollPosition: <number> null,
     deviceList: new Array<Device>(),
-    selectedDeviceId: <string> null,
+    selectedDeviceId: <string> null
   };
   private session: DeviceSession;
 
   constructor(private readonly webmidi: WebMidiService, private readonly keyconfig: KeyConfigService) {
+    this.view.maxVisibleKeys = keyconfig.numWhiteKeys;
+    this.view.scrollPosition = Math.floor(keyconfig.numWhiteKeys / 2 - this.view.numVisibleKeys / 2);
     this.webmidi.onDevicesChanged((devices: Array<Device>) => {
       this.view.deviceList = devices;
     });
@@ -35,16 +39,12 @@ export class AppComponent {
     });
   }
 
-  onDecreaseKeySize() {
-    if (this.view.numVisibleKeys > 1) {
-      this.view.numVisibleKeys--;
-    }
+  onRemoveKey() {
+    this.view.numVisibleKeys--;
   }
 
-  onIncreaseKeySize() {
-    if (this.view.numVisibleKeys < this.keyconfig.numWhiteKeys) {
-      this.view.numVisibleKeys++;
-    }
+  onAddKey() {
+    this.view.numVisibleKeys++;
   }
 
   onDeviceSelected(deviceId: string): void {

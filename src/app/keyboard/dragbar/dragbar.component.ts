@@ -25,16 +25,18 @@ export class DragbarComponent {
 
   selected = false;
   rect: Rectangle;
+  strokeWidth: number;
   private lastCursorPos = 0;
   private identifier: string;
 
   constructor(layout: LayoutService, keyconfig: KeyConfigService) {
     this.rect = new Rectangle(
-      layout.keyboardOffset,
+      -layout.dragBarBorderWidth / 2,
       layout.keyboardOffset + layout.whiteKeyHeight,
-      layout.whiteKeyWidth * keyconfig.numWhiteKeys,
+      layout.dragBarBorderWidth + layout.whiteKeyWidth * keyconfig.numWhiteKeys,
       layout.dragBarHeight
     );
+    this.strokeWidth = layout.dragBarBorderWidth;
   }
 
   startScrolling(x: number, identifier: string): void {

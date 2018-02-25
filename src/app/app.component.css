@@ -1,12 +1,17 @@
-#background {
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
 app-keyboard {
   display: block;
+}
+
+mat-toolbar .fill-space {
+  flex-grow: 1;
+}
+
+mat-toolbar button {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+mat-toolbar mat-slider {
+  margin-left: 4px;
+  margin-right: 4px;
 }

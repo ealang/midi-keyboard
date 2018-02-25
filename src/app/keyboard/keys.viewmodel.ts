@@ -15,6 +15,7 @@ export class KeyViewModel {
   readonly y: number;
   readonly width: number;
   readonly height: number;
+  readonly strokeWidth: number;
   readonly label: string;
 
   held: boolean;
@@ -25,6 +26,7 @@ export class KeyViewModel {
     this.y = layout.keyboardOffset;
     this.width = this.black ? layout.blackKeyWidth : layout.whiteKeyWidth;
     this.height = this.black ? layout.blackKeyHeight : layout.whiteKeyHeight;
+    this.strokeWidth = layout.keyBorderWidth;
     this.resetState();
 
     const octave = Math.floor((keyNumber - KeyViewModel.midiKeyOctave0) / 12);

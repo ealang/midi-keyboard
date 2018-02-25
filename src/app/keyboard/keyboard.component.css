@@ -1,11 +1,5 @@
-.keyboard {
-  width: 100%;
-  height: 100%;
-}
-
 .key {
   stroke: black;
-  stroke-width: 1;
 }
 
 .key.black {
@@ -17,7 +11,11 @@
 }
 
 .key.held.black, .key.held.white {
-  fill: #F48AF4;
+  fill: #FF4081;
+}
+
+.key-labels {
+  font-family: Roboto,"Helvetica Neue",sans-serif;
 }
 
 .key-labels .key-label.black {
