@@ -109,4 +109,36 @@ describe('TouchStack', () => {
     expect(downEvents).toEqual([32, 30]);
     expect(upEvents).toEqual([32, 30]);
   });
+
+  it('should ignore further movement if touches are marked frozen', () => {
+    const id1 = '1';
+    inst.push(id1, 32, TouchStackEvent.Down);
+    expect(downEvents).toEqual([32]);
+    expect(upEvents).toEqual([]);
+    inst.freezeAll();
+    inst.push(id1, 33, TouchStackEvent.Move);
+    expect(downEvents).toEqual([32]);
+    expect(upEvents).toEqual([]);
+    inst.push(id1, 33, TouchStackEvent.Up);
+    expect(downEvents).toEqual([32]);
+    expect(upEvents).toEqual([32]);
+  });
+
+  it('should unfreeze touch after key is lifted', () => {
+    const id1 = '1';
+    // 1st action
+    inst.push(id1, 32, TouchStackEvent.Down);
+    inst.freezeAll();
+    inst.push(id1, 33, TouchStackEvent.Move);
+    inst.push(id1, 33, TouchStackEvent.Up);
+    expect(downEvents).toEqual([32]);
+    expect(upEvents).toEqual([32]);
+
+    // 2nd action
+    inst.push(id1, 34, TouchStackEvent.Down);
+    inst.push(id1, 35, TouchStackEvent.Move);
+    inst.freezeAll();
+    expect(downEvents).toEqual([32, 34, 35]);
+    expect(upEvents).toEqual([32, 34]);
+  });
 });

@@ -35,6 +35,6 @@
   </g>
   <g app-dragbar
      (scroll)="onDragbarScroll($event)"
-     (scrollActive)="scrollActive = $event">
+     (scrollActive)="onScrollStatusChanged($event)">
   </g>
 </svg>

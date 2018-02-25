@@ -32,7 +32,7 @@ export class KeyboardComponent implements OnInit {
   ]);
   private static scrollAmplifier = 2;
   private static readonly mouseId = 'mouse';
-  private stack: TouchStack;
+  private touches: TouchStack;
   private mouseDown = false;
   private svgElement: SVGGraphicsElement = null;
   keys: KeysViewModel;
@@ -84,7 +84,7 @@ export class KeyboardComponent implements OnInit {
       key.held = false;
       this.keyEvent.emit(new KeyEvent(KeyEventType.Up, key.keyNumber));
     };
-    this.stack = new TouchStack(onKeyDown, onKeyUp);
+    this.touches = new TouchStack(onKeyDown, onKeyUp);
     this.resetKeyboard();
   }
 
@@ -100,38 +100,42 @@ export class KeyboardComponent implements OnInit {
   }
 
   private resetKeyboard(): void {
-    this.stack.reset();
+    this.touches.reset();
     this.mouseDown = false;
     this.keys.resetKeyState();
   }
 
   onMouseDown(keyIndex: number): void {
     this.mouseDown = true;
-    this.stack.push(KeyboardComponent.mouseId, keyIndex, TouchStackEvent.Down);
+    this.touches.push(KeyboardComponent.mouseId, keyIndex, TouchStackEvent.Down);
   }
 
   onMouseUp(): void {
     this.mouseDown = false;
-    this.stack.push(KeyboardComponent.mouseId, null, TouchStackEvent.Up);
+    this.touches.push(KeyboardComponent.mouseId, null, TouchStackEvent.Up);
   }
 
   onMouseOver(keyIndex: number): void {
     if (this.mouseDown) {
-      this.stack.push(KeyboardComponent.mouseId, keyIndex, TouchStackEvent.Move);
+      this.touches.push(KeyboardComponent.mouseId, keyIndex, TouchStackEvent.Move);
     }
   }
 
   onMouseOut(): void {
     if (this.mouseDown) {
       this.mouseDown = false;
-      this.stack.push(KeyboardComponent.mouseId, null, TouchStackEvent.Up);
+      this.touches.push(KeyboardComponent.mouseId, null, TouchStackEvent.Up);
     }
   }
 
   onTouchEvent(event: TouchChangeEvent): void {
     const eventType = KeyboardComponent.touchEventToEventStackType.get(event.eventType),
-          touchedKeyIndex = KeyboardComponent.getKeyIndexFromElement(event.element);
-    this.stack.push(event.identifier.toString(), touchedKeyIndex, eventType);
+          touchedKeyIndex = KeyboardComponent.getKeyIndexFromElement(event.element),
+          identifier = event.identifier.toString();
+    this.touches.push(identifier, touchedKeyIndex, eventType);
+    if (this.scrollActive) {
+      this.touches.freezeAll();
+    }
   }
 
   onDragbarScroll(pxlDelta: number): void {
@@ -146,5 +150,12 @@ export class KeyboardComponent implements OnInit {
       this.keyboardTranslation + svgPtDelta * KeyboardComponent.scrollAmplifier,
     );
     this.scrollPosition = -this.keyboardTranslation / this.layout.whiteKeyWidth;
+  }
+
+  onScrollStatusChanged(scrolling: boolean): void {
+    this.scrollActive = scrolling;
+    if (scrolling) {
+      this.touches.freezeAll();
+    }
   }
 }
