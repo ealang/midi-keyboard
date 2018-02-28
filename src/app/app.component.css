@@ -1,9 +1,19 @@
+:host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+mat-toolbar {
+  flex: 0 0 auto;
+}
+
 app-keyboard {
-  display: block;
+  flex: 1 1 auto;
 }
 
 mat-toolbar .fill-space {
-  flex-grow: 1;
+  flex: 1 1 auto;
 }
 
 mat-toolbar button {

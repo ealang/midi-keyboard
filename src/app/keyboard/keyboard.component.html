@@ -1,41 +1,43 @@
-<svg preserveAspectRatio="xMinYMin"
-     [attr.viewBox]="keys.viewBox"
-     class="keyboard"
-     (appTouch)="onTouchEvent($event)"
-     (mouseup)="onMouseUp()"
-     (mouseleave)="onMouseOut()">
-  <g [attr.transform]="'translate(' + keyboardTranslation + ')'">
-    <g>
-      <rect *ngFor="let key of keys.keys; let i = index;"
-            class="key"
-            [attr.data-keyindex]="i"
-            [ngClass]="{black: key.black, white: !key.black, held: key.held}"
-            (mouseover)="onMouseOver(i)"
-            (mousedown)="onMouseDown(i)"
-            [attr.stroke-width]="key.strokeWidth"
-            [attr.x]="key.x"
-            [attr.y]="key.y"
-            [attr.width]="key.width"
-            [attr.height]="key.height">
-      </rect>
+<svg class="keyboard"
+     preserveAspectRatio="xMidYMid"
+     [attr.viewBox]="keys.viewBox">
+  <svg [attr.viewBox]="keys.viewBox"
+       (appTouch)="onTouchEvent($event)"
+       (mouseup)="onMouseUp()"
+       (mouseleave)="onMouseOut()">
+    <g [attr.transform]="'translate(' + keyboardTranslation + ')'">
+      <g>
+        <rect *ngFor="let key of keys.keys; let i = index;"
+              class="key"
+              [attr.data-keyindex]="i"
+              [ngClass]="{black: key.black, white: !key.black, held: key.held}"
+              (mouseover)="onMouseOver(i)"
+              (mousedown)="onMouseDown(i)"
+              [attr.stroke-width]="key.strokeWidth"
+              [attr.x]="key.x"
+              [attr.y]="key.y"
+              [attr.width]="key.width"
+              [attr.height]="key.height">
+        </rect>
+      </g>
+      <g class="key-labels" [ngClass]="{scrolling: scrollActive}">
+        <text *ngFor="let key of keys.keys; let i = index;"
+              class="key-label"
+              [attr.data-keyindex]="i"
+              [ngClass]="{black: key.black, white: !key.black}"
+              [attr.x]="key.x"
+              [attr.y]="key.y"
+              [attr.dx]="key.width / 2"
+              [attr.dy]="key.height - keys.labelFontSize * 2"
+              [attr.font-size]="keys.labelFontSize"
+              text-anchor="middle">
+          {{ key.label }}
+        </text>
+      </g>
     </g>
-    <g class="key-labels" [ngClass]="{scrolling: scrollActive}">
-      <text *ngFor="let key of keys.keys; let i = index;"
-            class="key-label"
-            [attr.data-keyindex]="i"
-            [ngClass]="{black: key.black, white: !key.black}"
-            [attr.x]="key.x"
-            [attr.y]="key.y"
-            [attr.dx]="key.width / 2"
-            [attr.dy]="key.height - keys.labelFontSize * 2"
-            [attr.font-size]="keys.labelFontSize"
-            text-anchor="middle">
-        {{ key.label }}
-      </text>
+    <g app-dragbar
+       (scroll)="onDragbarScroll($event)"
+       (scrollActive)="onScrollStatusChanged($event)">
     </g>
-  </g>
-  <g app-dragbar
-     (scroll)="onDragbarScroll($event)"
-     (scrollActive)="onScrollStatusChanged($event)">
-  </g>
+  </svg>
 </svg>
