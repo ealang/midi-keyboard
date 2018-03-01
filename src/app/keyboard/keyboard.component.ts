@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ElementRef, OnInit } from '@angular/core';
-import { TouchChangeEvent } from '../touch/touch.directive';
+import { TouchChangeEvent } from './touch/touch.directive';
 import { TouchStack, TouchStackEvent } from './touchstack';
 import { KeysViewModel } from './keys.viewmodel';
 import { LayoutService } from './layout/layout.service';

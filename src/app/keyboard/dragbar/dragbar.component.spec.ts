@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { KeyConfigService } from '../../keyconfig.service';
 import { LayoutService } from '../layout/layout.service';
 import { DragbarComponent } from './dragbar.component';
-import { TouchChangeEvent } from '../../touch/touch.directive';
+import { TouchChangeEvent } from '../touch/touch.directive';
 
 declare var Touch: {
   prototype: Touch;

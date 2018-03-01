@@ -3,7 +3,7 @@ import { By } from '@angular/platform-browser';
 
 import { LayoutService } from './layout/layout.service';
 import { KeyConfigService } from '../keyconfig.service';
-import { TouchDirective, TouchChangeEvent } from '../touch/touch.directive';
+import { TouchDirective, TouchChangeEvent } from './touch/touch.directive';
 import { KeyboardComponent, KeyEvent, KeyEventType } from './keyboard.component';
 
 declare var Touch: {
@@ -16,6 +16,9 @@ declare var Touch: {
 
 describe('KeyboardComponent', () => {
   const firstMidiNote = 21;
+  let component: KeyboardComponent;
+  let fixture: ComponentFixture<KeyboardComponent>;
+  let keyEvents: Array<KeyEvent>;
   const getTranslation = () => {
     const xformRe = new RegExp('translate\\((.*?)\\)'),
           keyboard = fixture.debugElement.query(By.css('g'));
@@ -26,10 +29,6 @@ describe('KeyboardComponent', () => {
     const [x, y, w, h] = vb.split(',').map((i) => Number(i));
     return {x, y, w, h};
   };
-
-  let component: KeyboardComponent;
-  let fixture: ComponentFixture<KeyboardComponent>;
-  let keyEvents: Array<KeyEvent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

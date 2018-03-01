@@ -5,10 +5,9 @@ import { KeyConfigService } from './keyconfig.service';
 import { LayoutService } from './keyboard/layout/layout.service';
 
 import { NgModel } from '@angular/forms';
-import { KeyboardComponent } from './keyboard/keyboard.component';
-import { TouchDirective } from './touch/touch.directive';
 import { AppComponent } from './app.component';
 
+import { KeyboardModule } from './keyboard/keyboard.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,10 +24,9 @@ describe('AppComponent', () => {
         MatButtonModule,
         MatToolbarModule,
         MatSliderModule,
+        KeyboardModule
       ],
       declarations: [
-        TouchDirective,
-        KeyboardComponent,
         AppComponent,
         NgModel
       ],
