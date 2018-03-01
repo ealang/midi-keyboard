@@ -1,0 +1,30 @@
+<mat-toolbar>
+  <mat-form-field>
+    <mat-select [(value)]="selectedDeviceId"
+                [disabled]="deviceListDisabled"
+                [placeholder]="placeholder">
+      <mat-option *ngFor="let device of deviceList"
+                  [value]="device.id">
+        {{ device.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <span class="fill-space"></span>
+
+  <mat-slider
+    [min]="minVisibleKeys"
+    [max]="maxVisibleKeys"
+    [(ngModel)]="numVisibleKeys">
+  </mat-slider>
+  <button (click)="onRemoveKey()"
+          mat-mini-fab
+          [disabled]="removeKeyDisabled">
+    -
+  </button>
+  <button (click)="onAddKey()"
+          mat-mini-fab
+          [disabled]="addKeyDisabled">
+    +
+  </button>
+</mat-toolbar>

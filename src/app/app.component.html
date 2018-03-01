@@ -1,36 +1,12 @@
-<mat-toolbar>
-  <mat-form-field>
-    <mat-select (selectionChange)="onDeviceSelected(view.selectedDeviceId)"
-                [(value)]="view.selectedDeviceId"
-                [disabled]="view.deviceList.length === 0"
-                [placeholder]="view.selectedDeviceId === null ? 'Output Device' : undefined">
-      <mat-option *ngFor="let device of view.deviceList" [value]="device.id">
-        {{ device.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+<app-controls [deviceList]="deviceList"
+              [selectedDeviceId]="selectedDeviceId"
+              (selectedDeviceIdChange)="selectDevice($event)"
+              [minVisibleKeys]="minVisibleKeys"
+              [maxVisibleKeys]="maxVisibleKeys"
+              [(numVisibleKeys)]="numVisibleKeys">
+</app-controls>
 
-  <span class="fill-space"></span>
-
-  <mat-slider
-    [min]="view.minVisibleKeys"
-    [max]="view.maxVisibleKeys"
-    [(ngModel)]="view.numVisibleKeys">
-  </mat-slider>
-  <button (click)="onRemoveKey()"
-          mat-mini-fab
-          [disabled]="view.numVisibleKeys - 1 < view.minVisibleKeys">
-    -
-  </button>
-  <button (click)="onAddKey()"
-          mat-mini-fab
-          [disabled]="view.numVisibleKeys + 1 > view.maxVisibleKeys">
-    +
-  </button>
-</mat-toolbar>
-
-<app-keyboard
-  [numVisibleKeys]="view.numVisibleKeys"
-  [(scrollPosition)]="view.scrollPosition"
-  (keyEvent)="onKeyEvent($event)"
+<app-keyboard [numVisibleKeys]="numVisibleKeys"
+              [(scrollPosition)]="scrollPosition"
+              (keyEvent)="onKeyEvent($event)"
 ></app-keyboard>

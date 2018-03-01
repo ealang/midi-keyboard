@@ -9,52 +9,44 @@ import { KeyConfigService } from './keyconfig.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  view = {
-    numVisibleKeys: 12,
-    minVisibleKeys: 4,
-    maxVisibleKeys: <number> null,
-    scrollPosition: <number> null,
-    deviceList: new Array<Device>(),
-    selectedDeviceId: <string> null
-  };
   private session: DeviceSession;
+  numVisibleKeys = 12;
+  minVisibleKeys = 3;
+  maxVisibleKeys = <number> null;
+  deviceList = new Array<Device>();
+  selectedDeviceId = <string> null;
+  scrollPosition = <number> null;
 
-  constructor(private readonly webmidi: WebMidiService, private readonly keyconfig: KeyConfigService) {
-    this.view.maxVisibleKeys = keyconfig.numWhiteKeys;
-    this.view.scrollPosition = Math.floor(keyconfig.numWhiteKeys / 2 - this.view.numVisibleKeys / 2);
+  constructor(private readonly webmidi: WebMidiService, keyconfig: KeyConfigService) {
+    this.maxVisibleKeys = keyconfig.numWhiteKeys;
+    this.scrollPosition = Math.floor(keyconfig.numWhiteKeys / 2 - this.numVisibleKeys / 2);
     this.webmidi.onDevicesChanged((devices: Array<Device>) => {
-      this.view.deviceList = devices;
+      this.deviceList = devices;
     });
     this.webmidi.onSessionLost(() => {
       this.session = null;
-      this.view.selectedDeviceId = null;
+      this.selectedDeviceId = null;
     });
     this.webmidi.devices().then((devices: Array<Device>) => {
-      this.view.deviceList = devices;
+      this.deviceList = devices;
       const firstDevice = devices[0];
       if (firstDevice) {
-        this.view.selectedDeviceId = firstDevice.id;
-        this.onDeviceSelected(firstDevice.id);
+        this.selectDevice(firstDevice.id);
       }
     });
   }
 
-  onRemoveKey() {
-    this.view.numVisibleKeys--;
-  }
-
-  onAddKey() {
-    this.view.numVisibleKeys++;
-  }
-
-  onDeviceSelected(deviceId: string): void {
+  selectDevice(deviceId: string): void {
     this.session = null;
-    this.webmidi.openSession(deviceId).then((session: DeviceSession) => {
-      this.session = session;
-    }, (error: string) => {
-      console.log(error);
-      this.view.selectedDeviceId = null;
-    });
+    this.selectedDeviceId = deviceId;
+    if (deviceId !== null) {
+      this.webmidi.openSession(deviceId).then((session: DeviceSession) => {
+        this.session = session;
+      }, (error: string) => {
+        console.log(error);
+        this.selectedDeviceId = null;
+      });
+    }
   }
 
   onKeyEvent(event: KeyEvent): void {
@@ -67,4 +59,3 @@ export class AppComponent {
     }
   }
 }
-

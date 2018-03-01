@@ -4,24 +4,10 @@
   flex-direction: column;
 }
 
-mat-toolbar {
+app-controls {
   flex: 0 0 auto;
 }
 
 app-keyboard {
   flex: 1 1 auto;
-}
-
-mat-toolbar .fill-space {
-  flex: 1 1 auto;
-}
-
-mat-toolbar button {
-  margin-left: 2px;
-  margin-right: 2px;
-}
-
-mat-toolbar mat-slider {
-  margin-left: 4px;
-  margin-right: 4px;
 }
