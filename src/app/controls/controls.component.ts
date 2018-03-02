@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { KeyConfigService } from '../keyconfig.service';
 
 @Component({
   selector: 'app-controls',
@@ -8,6 +9,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 export class ControlsComponent {
   private selectedDeviceId_ = <string> null;
   private numVisibleKeys_ = 0;
+  minVisibleKeys = 3;
+  maxVisibleKeys: number;
 
   @Input() deviceList: Array<string>;
 
@@ -21,9 +24,6 @@ export class ControlsComponent {
   }
 
   @Output() selectedDeviceIdChange = new EventEmitter<string>();
-
-  @Input() minVisibleKeys: number;
-  @Input() maxVisibleKeys: number;
 
   @Input() set numVisibleKeys(num: number) {
     this.numVisibleKeys_ = num;
@@ -59,5 +59,9 @@ export class ControlsComponent {
 
   get addKeyDisabled() {
     return this.numVisibleKeys + 1 > this.maxVisibleKeys;
+  }
+
+  constructor(keyconfig: KeyConfigService) {
+    this.maxVisibleKeys = keyconfig.numWhiteKeys;
   }
 }

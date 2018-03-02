@@ -6,12 +6,14 @@ import { TouchDirective } from './touch/touch.directive';
 import { DragbarComponent } from './dragbar/dragbar.component';
 import { KeyboardComponent } from './keyboard.component';
 import { LayoutService } from './layout/layout.service';
+import { KeysComponent } from './keys/keys.component';
 
 @NgModule({
   declarations: [
     TouchDirective,
     DragbarComponent,
-    KeyboardComponent
+    KeyboardComponent,
+    KeysComponent
   ],
   imports: [
     CommonModule,

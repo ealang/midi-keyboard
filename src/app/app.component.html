@@ -1,12 +1,9 @@
 <app-controls [deviceList]="deviceList"
               [selectedDeviceId]="selectedDeviceId"
               (selectedDeviceIdChange)="selectDevice($event)"
-              [minVisibleKeys]="minVisibleKeys"
-              [maxVisibleKeys]="maxVisibleKeys"
               [(numVisibleKeys)]="numVisibleKeys">
 </app-controls>
 
 <app-keyboard [numVisibleKeys]="numVisibleKeys"
-              [(scrollPosition)]="scrollPosition"
               (keyEvent)="onKeyEvent($event)"
 ></app-keyboard>

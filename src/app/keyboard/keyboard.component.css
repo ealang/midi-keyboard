@@ -6,35 +6,3 @@
 .keyboard {
   flex-grow: 1;
 }
-
-.key {
-  stroke: black;
-}
-
-.key.black {
-  fill: black;
-}
-
-.key.white {
-  fill: white;
-}
-
-.key.held.black, .key.held.white {
-  fill: #FF4081;
-}
-
-.key-labels {
-  font-family: Roboto,"Helvetica Neue",sans-serif;
-}
-
-.key-labels .key-label.black {
-  fill: none;
-}
-
-.key-labels .key-label.white {
-  fill: none;
-}
-
-.key-labels.scrolling .key-label.white {
-  fill: black;
-}
