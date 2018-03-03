@@ -1,18 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
+import { TouchModule } from '../../touch/touch.module';
+import { TouchService, TouchEvent } from '../../touch/touch.service';
 import { LayoutService } from '../layout/layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
-import { TouchDirective, TouchChangeEvent } from '../touch/touch.directive';
 import { KeysComponent, KeyEvent, KeyEventType } from './keys.component';
-
-declare var Touch: {
-  prototype: Touch;
-  new(touchInit: {
-    target: HTMLElement,
-    identifier: number
-  }): Touch;
-};
 
 describe('KeysComponent', () => {
   let component: KeysComponent;
@@ -22,8 +15,9 @@ describe('KeysComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TouchDirective, KeysComponent ],
-      providers: [ LayoutService, KeyConfigService ]
+      imports: [ TouchModule ],
+      declarations: [ KeysComponent ],
+      providers: [ TouchService, LayoutService, KeyConfigService ]
     })
     .compileComponents();
   }));
@@ -36,23 +30,39 @@ describe('KeysComponent', () => {
     component.keyEvent.subscribe((e: KeyEvent) => keyEvents.push(e));
   });
 
-  it('should emit key down event when a key is touched', () => {
-    const firstKeyElem = fixture.debugElement.query(By.css('rect.key'));
-    const touchEvent: Touch = new Touch({
-      identifier: 101,
-      target: document.body
-    });
-    component.onTouchEvent(new TouchChangeEvent('touchstart', touchEvent, firstKeyElem.nativeElement));
-    expect(keyEvents).toEqual([new KeyEvent(KeyEventType.Down, firstMidiNote)]);
-  });
+  it('should emit key down event when a key is pressed', () => {
+    const touchstart = new TouchEvent(
+      'start',
+      'mouse',
+      'keys/0',
+      {x: 0, y: 0}
+    );
+    const touchmove = new TouchEvent(
+      'move',
+      'mouse',
+      'keys/1',
+      {x: 3, y: 0}
+    );
+    const touchend = new TouchEvent(
+      'end',
+      'mouse',
+      'keys/1',
+      {x: 3, y: 0}
+    );
 
-  it('should emit key down event when a key is clicked', () => {
-    const expectedKeyDownEvent = new KeyEvent(KeyEventType.Down, firstMidiNote);
-    const expectedKeyUpEvent = new KeyEvent(KeyEventType.Up, firstMidiNote);
+    const key1DownEvent = new KeyEvent(KeyEventType.Down, firstMidiNote);
+    const key1UpEvent = new KeyEvent(KeyEventType.Up, firstMidiNote);
+    const key2DownEvent = new KeyEvent(KeyEventType.Down, firstMidiNote + 2);
+    const key2UpEvent = new KeyEvent(KeyEventType.Up, firstMidiNote + 2);
 
-    component.onMouseDown(0);
-    expect(keyEvents).toEqual([expectedKeyDownEvent]);
-    component.onMouseUp();
-    expect(keyEvents).toEqual([expectedKeyDownEvent, expectedKeyUpEvent]);
+    expect(keyEvents.length).toEqual(0);
+    component.onTouchEvent(touchstart);
+    expect(keyEvents[0]).toEqual(key1DownEvent);
+    component.onTouchEvent(touchmove);
+    expect(keyEvents[1]).toEqual(key1UpEvent);
+    expect(keyEvents[2]).toEqual(key2DownEvent);
+    component.onTouchEvent(touchend);
+    expect(keyEvents[3]).toEqual(key2UpEvent);
+    expect(keyEvents.length).toEqual(4);
   });
 });

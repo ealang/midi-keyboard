@@ -2,24 +2,27 @@ import { NgModule } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
-import { TouchDirective } from './touch/touch.directive';
 import { DragbarComponent } from './dragbar/dragbar.component';
 import { KeyboardComponent } from './keyboard.component';
-import { LayoutService } from './layout/layout.service';
 import { KeysComponent } from './keys/keys.component';
 
+import { TouchModule } from '../touch/touch.module';
+import { TouchService } from '../touch/touch.service';
+import { LayoutService } from './layout/layout.service';
+
 @NgModule({
+  imports: [
+    CommonModule,
+    TouchModule
+  ],
   declarations: [
-    TouchDirective,
     DragbarComponent,
     KeyboardComponent,
     KeysComponent
   ],
-  imports: [
-    CommonModule,
-  ],
   providers: [
     LayoutService,
+    TouchService
   ],
   exports: [
     KeyboardComponent

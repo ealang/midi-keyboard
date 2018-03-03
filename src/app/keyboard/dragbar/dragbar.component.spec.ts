@@ -1,9 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { TouchModule } from '../../touch/touch.module';
+import { TouchService, TouchEvent } from '../../touch/touch.service';
 import { KeyConfigService } from '../../keyconfig.service';
 import { LayoutService } from '../layout/layout.service';
 import { DragbarComponent } from './dragbar.component';
-import { TouchChangeEvent } from '../touch/touch.directive';
 
 declare var Touch: {
   prototype: Touch;
@@ -21,8 +22,10 @@ describe('DragbarComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [ TouchModule ],
       declarations: [ DragbarComponent ],
       providers: [
+        TouchService,
         KeyConfigService,
         LayoutService
       ]
@@ -36,38 +39,39 @@ describe('DragbarComponent', () => {
     fixture.detectChanges();
 
     spyOn(component.scroll, 'emit');
+    spyOn(component.scrollActive, 'emit');
   });
 
-  it('should emit scroll events when mouse is used to scroll', () => {
-    component.startScrolling(0, 'mouse');
-    expect(component.scroll.emit).not.toHaveBeenCalled();
-    component.updateScrolling(10);
-    expect(component.scroll.emit).toHaveBeenCalledWith(10);
-  });
+  it('should emit scroll events when user scrolls', () => {
+    const touchstart = new TouchEvent(
+      'start',
+      'mouse',
+      component.elemTouchId,
+      {x: 0, y: 0}
+    );
+    const touchmove = new TouchEvent(
+      'move',
+      'mouse',
+      component.elemTouchId,
+      {x: 3, y: 0}
+    );
+    const touchend = new TouchEvent(
+      'end',
+      'mouse',
+      component.elemTouchId,
+      {x: 3, y: 0}
+    );
 
-  it('should emit scroll events when touch is used to scroll', () => {
-    const touchstart = new TouchChangeEvent(
-      'touchstart',
-      new Touch({
-        identifier: 101,
-        target: dummyElem,
-        clientX: 0
-      }),
-      dummyElem
-    );
-    const touchmove = new TouchChangeEvent(
-      'touchmove',
-      new Touch({
-        identifier: 101,
-        target: dummyElem,
-        clientX: 3
-      }),
-      dummyElem
-    );
+    expect(component.scrollActive.emit).not.toHaveBeenCalled();
 
     component.onTouchEvent(touchstart);
     expect(component.scroll.emit).not.toHaveBeenCalled();
+    expect(component.scrollActive.emit).toHaveBeenCalledWith(true);
+
     component.onTouchEvent(touchmove);
     expect(component.scroll.emit).toHaveBeenCalledWith(3);
+
+    component.onTouchEvent(touchend);
+    expect(component.scrollActive.emit).toHaveBeenCalledWith(false);
   });
 });

@@ -2,8 +2,9 @@ import { Component, Input, Output, EventEmitter, ElementRef } from '@angular/cor
 
 import { LayoutService } from '../layout/layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
+import { TouchService, TouchEvent } from '../../touch/touch.service';
+
 import { KeyViewModel, createDefaultKeys } from './key.viewmodel';
-import { TouchChangeEvent } from '../touch/touch.directive';
 import { TouchStack, TouchStackEvent } from './touchstack';
 
 export enum KeyEventType {
@@ -22,17 +23,16 @@ export class KeyEvent {
   styleUrls: ['./keys.component.css']
 })
 export class KeysComponent {
-  private static readonly touchEventToEventStackType = new Map<string, TouchStackEvent>([
-    ['touchstart', TouchStackEvent.Down],
-    ['touchmove', TouchStackEvent.Move],
-    ['touchend', TouchStackEvent.Up],
-    ['touchcancel', TouchStackEvent.Up],
+  private static readonly eventTranslation = new Map<string, TouchStackEvent>([
+    ['start', TouchStackEvent.Down],
+    ['move', TouchStackEvent.Move],
+    ['end', TouchStackEvent.Up]
   ]);
   private static readonly mouseId = 'mouse';
   private touches: TouchStack;
-  private mouseDown = false;
   private scrollActive_ = false;
 
+  touchElemIdBase = 'keys';
   keys: Array<KeyViewModel>;
   labelFontSize: number;
 
@@ -54,6 +54,7 @@ export class KeysComponent {
   constructor(
     layout: LayoutService,
     keyconfig: KeyConfigService,
+    touch: TouchService,
     private readonly element: ElementRef
   ) {
     const onKeyDown = (keyIndex: number) => {
@@ -69,46 +70,27 @@ export class KeysComponent {
     this.touches = new TouchStack(onKeyDown, onKeyUp);
     this.keys = createDefaultKeys(layout, keyconfig);
     this.labelFontSize = layout.labelFontSize;
+    touch.subscribe(this.touchElemIdBase, (event: TouchEvent) => {
+      this.onTouchEvent(event);
+    });
   }
 
-  private static getKeyIndexFromElement(element: Element): number {
-    if (element !== null) {
-      const attr = element.attributes.getNamedItem('data-keyindex');
-      if (attr) {
-        return Number(attr.value);
+  private parseKeyFromElemId(elemId: string): number {
+    if (elemId === null) {
+      return null;
+    } else {
+      const index = elemId.split('/')[1];
+      if (index === undefined) {
+        return null;
+      } else {
+        return Number(index);
       }
     }
-    return null;
   }
 
-  onMouseDown(keyIndex: number): void {
-    this.mouseDown = true;
-    this.touches.push(KeysComponent.mouseId, keyIndex, TouchStackEvent.Down);
-  }
-
-  onMouseUp(): void {
-    this.mouseDown = false;
-    this.touches.push(KeysComponent.mouseId, null, TouchStackEvent.Up);
-  }
-
-  onMouseOver(keyIndex: number): void {
-    if (this.mouseDown) {
-      this.touches.push(KeysComponent.mouseId, keyIndex, TouchStackEvent.Move);
-    }
-  }
-
-  onMouseOut(): void {
-    if (this.mouseDown) {
-      this.mouseDown = false;
-      this.touches.push(KeysComponent.mouseId, null, TouchStackEvent.Up);
-    }
-  }
-
-  onTouchEvent(event: TouchChangeEvent): void {
-    const eventType = KeysComponent.touchEventToEventStackType.get(event.eventType),
-          touchedKeyIndex = KeysComponent.getKeyIndexFromElement(event.element),
-          identifier = event.identifier.toString();
-    this.touches.push(identifier, touchedKeyIndex, eventType);
+  onTouchEvent(event: TouchEvent): void {
+    const keyIndex = this.parseKeyFromElemId(event.elemId);
+    this.touches.push(event.touchId, keyIndex, KeysComponent.eventTranslation.get(event.eventType));
     if (this.scrollActive_) {
       this.touches.freezeAll();
     }

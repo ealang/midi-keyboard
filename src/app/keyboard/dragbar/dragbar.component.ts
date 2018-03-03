@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { TouchChangeEvent } from '../touch/touch.directive';
 import { LayoutService } from '../layout/layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
+import { TouchService, TouchEvent } from '../../touch/touch.service';
 
 class Rectangle {
   constructor(
@@ -26,10 +26,11 @@ export class DragbarComponent {
   selected = false;
   rect: Rectangle;
   strokeWidth: number;
+  elemTouchId = 'dragbar';
   private lastCursorPos = 0;
   private identifier: string;
 
-  constructor(layout: LayoutService, keyconfig: KeyConfigService) {
+  constructor(layout: LayoutService, keyconfig: KeyConfigService, touch: TouchService) {
     this.rect = new Rectangle(
       -layout.dragBarBorderWidth / 2,
       layout.keyboardOffset + layout.whiteKeyHeight,
@@ -37,6 +38,7 @@ export class DragbarComponent {
       layout.dragBarHeight
     );
     this.strokeWidth = layout.dragBarBorderWidth;
+    touch.subscribe(this.elemTouchId, (event: TouchEvent) => this.onTouchEvent(event));
   }
 
   startScrolling(x: number, identifier: string): void {
@@ -63,14 +65,14 @@ export class DragbarComponent {
     }
   }
 
-  onTouchEvent(event: TouchChangeEvent): void {
-    const identifier = event.identifier.toString(),
-          x = event.touch.clientX;
-    if (event.eventType === 'touchstart') {
+  onTouchEvent(event: TouchEvent): void {
+    const identifier = event.touchId,
+          x = event.coordinates.x;
+    if (event.eventType === 'start') {
       if (!this.selected) {
         this.startScrolling(x, identifier);
       }
-    } else if (event.eventType === 'touchmove') {
+    } else if (event.eventType === 'move') {
       if (this.identifier === identifier) {
         this.updateScrolling(x);
       }

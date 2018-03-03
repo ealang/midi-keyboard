@@ -1,33 +1,28 @@
 <svg:g class="keys"
-       [attr.transform]="'translate(' + scrollPosition + ')'"
-       (appTouch)="onTouchEvent($event)"
-       (mouseup)="onMouseUp()"
-       (mouseleave)="onMouseOut()">
+       [attr.transform]="'translate(' + scrollPosition + ')'">
   <svg:g>
     <svg:rect *ngFor="let key of keys; let i = index;"
               class="key"
-              [attr.data-keyindex]="i"
               [ngClass]="{black: key.black, white: !key.black, held: key.held}"
-              (mouseover)="onMouseOver(i)"
-              (mousedown)="onMouseDown(i)"
               [attr.stroke-width]="key.strokeWidth"
               [attr.x]="key.x"
               [attr.y]="key.y"
               [attr.width]="key.width"
-              [attr.height]="key.height">
+              [attr.height]="key.height"
+              appTouchId="{{ touchElemIdBase }}/{{ i }}">
     </rect>
   </g>
   <svg:g class="key-labels" [ngClass]="{scrolling: scrollActive}">
     <svg:text *ngFor="let key of keys; let i = index;"
               class="key-label"
-              [attr.data-keyindex]="i"
               [ngClass]="{black: key.black, white: !key.black}"
               [attr.x]="key.x"
               [attr.y]="key.y"
               [attr.dx]="key.width / 2"
               [attr.dy]="key.height - labelFontSize * 2"
               [attr.font-size]="labelFontSize"
-              text-anchor="middle">
+              text-anchor="middle"
+              appTouchId="{{ touchElemIdBase }}/{{ i }}">
       {{ key.label }}
     </text>
   </g>
