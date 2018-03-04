@@ -27,8 +27,7 @@ export class DragbarComponent {
   rect: Rectangle;
   strokeWidth: number;
   touchElemId = 'dragbar';
-  private lastCursorPos = 0;
-  private identifier: string;
+  private lastIdPosition = new Map<string, number>();
 
   constructor(layout: LayoutService, keyconfig: KeyConfigService, touch: TouchService) {
     this.rect = new Rectangle(
@@ -41,25 +40,27 @@ export class DragbarComponent {
     touch.subscribeSticky(this.touchElemId, (event: TouchEvent) => this.onTouchEvent(event));
   }
 
-  startScrolling(x: number, identifier: string): void {
-    this.selected = true;
-    this.lastCursorPos = x;
-    this.identifier = identifier;
-    this.scrollActive.emit(true);
+  startScrolling(identifier: string, x: number): void {
+    this.lastIdPosition.set(identifier, x);
+    if (!this.selected) {
+      this.selected = true;
+      this.scrollActive.emit(true);
+    }
   }
 
-  updateScrolling(x: number): void {
+  updateScrolling(identifier: string, x: number): void {
     if (this.selected) {
-      const offset = x - this.lastCursorPos;
-      this.lastCursorPos = x;
+      const offset = x - this.lastIdPosition.get(identifier);
       if (offset !== 0) {
         this.scroll.emit(offset);
+        this.lastIdPosition.set(identifier, x);
       }
     }
   }
 
-  endScrolling(): void {
-    if (this.selected) {
+  endScrolling(identifier: string): void {
+    this.lastIdPosition.delete(identifier);
+    if (this.lastIdPosition.size === 0) {
       this.selected = false;
       this.scrollActive.emit(false);
     }
@@ -69,17 +70,11 @@ export class DragbarComponent {
     const identifier = event.touchId,
           x = event.coordinates.x;
     if (event.eventType === 'start') {
-      if (!this.selected) {
-        this.startScrolling(x, identifier);
-      }
+      this.startScrolling(identifier, x);
     } else if (event.eventType === 'move') {
-      if (this.identifier === identifier) {
-        this.updateScrolling(x);
-      }
+      this.updateScrolling(identifier, x);
     } else {
-      if (this.identifier === identifier) {
-        this.endScrolling();
-      }
+      this.endScrolling(identifier);
     }
   }
 }
