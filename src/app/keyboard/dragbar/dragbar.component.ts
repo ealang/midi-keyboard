@@ -26,7 +26,7 @@ export class DragbarComponent {
   selected = false;
   rect: Rectangle;
   strokeWidth: number;
-  elemTouchId = 'dragbar';
+  touchElemId = 'dragbar';
   private lastCursorPos = 0;
   private identifier: string;
 
@@ -38,7 +38,7 @@ export class DragbarComponent {
       layout.dragBarHeight
     );
     this.strokeWidth = layout.dragBarBorderWidth;
-    touch.subscribe(this.elemTouchId, (event: TouchEvent) => this.onTouchEvent(event));
+    touch.subscribeRoaming(this.touchElemId, (event: TouchEvent) => this.onTouchEvent(event));
   }
 
   startScrolling(x: number, identifier: string): void {

@@ -34,19 +34,19 @@ describe('KeysComponent', () => {
     const touchstart = new TouchEvent(
       'start',
       'mouse',
-      'keys/0',
+      'keys:0',
       {x: 0, y: 0}
     );
     const touchmove = new TouchEvent(
       'move',
       'mouse',
-      'keys/1',
+      'keys:1',
       {x: 3, y: 0}
     );
     const touchend = new TouchEvent(
       'end',
       'mouse',
-      'keys/1',
+      'keys:1',
       {x: 3, y: 0}
     );
 

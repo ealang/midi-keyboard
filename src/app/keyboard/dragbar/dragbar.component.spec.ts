@@ -46,19 +46,19 @@ describe('DragbarComponent', () => {
     const touchstart = new TouchEvent(
       'start',
       'mouse',
-      component.elemTouchId,
+      component.touchElemId,
       {x: 0, y: 0}
     );
     const touchmove = new TouchEvent(
       'move',
       'mouse',
-      component.elemTouchId,
+      component.touchElemId,
       {x: 3, y: 0}
     );
     const touchend = new TouchEvent(
       'end',
       'mouse',
-      component.elemTouchId,
+      component.touchElemId,
       {x: 3, y: 0}
     );
 

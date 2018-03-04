@@ -9,55 +9,104 @@ describe('TouchService', () => {
     inst = new TouchService();
   });
 
-  it('should allow subscription to element events', () => {
-    const events = [];
-    inst.subscribe('keys/1', (e) => events.push(e));
+  describe('origin touch subscription', () => {
+    let events;
+    beforeEach(() => {
+      events = [];
+      inst.subscribeOrigin('keys', (e) => events.push(e));
+      expect(events.length).toEqual(0);
+    });
 
-    expect(events.length).toEqual(0);
-    inst.emitEvent('start', 'mouse', 'keys/1', {x: 0, y: 0});
-    expect(events[0]).toEqual(new TouchEvent('start', 'mouse', 'keys/1', dummyPt));
+    it('should capture touches that start on element', () => {
+      inst.emitEvent('start', 'mouse', 'keys:1', dummyPt);
+      expect(events[0]).toEqual(new TouchEvent('start', 'mouse', 'keys:1', dummyPt));
 
-    inst.emitEvent('move', 'mouse', 'keys/1', {x: 0, y: 0});
-    expect(events[1]).toEqual(new TouchEvent('move', 'mouse', 'keys/1', dummyPt));
+      inst.emitEvent('move', 'mouse', 'keys:1', dummyPt);
+      expect(events[1]).toEqual(new TouchEvent('move', 'mouse', 'keys:1', dummyPt));
 
-    inst.emitEvent('end', 'mouse', 'keys/1', {x: 0, y: 0});
-    expect(events[2]).toEqual(new TouchEvent('end', 'mouse', 'keys/1', dummyPt));
-    expect(events.length).toEqual(3);
+      inst.emitEvent('end', 'mouse', 'keys:1', dummyPt);
+      expect(events[2]).toEqual(new TouchEvent('end', 'mouse', 'keys:1', dummyPt));
+      expect(events.length).toEqual(3);
+    });
+
+    it('should ignore touches that cross element', () => {
+      inst.emitEvent('start', 'mouse', 'dragbar', dummyPt);
+      expect(events.length).toEqual(0);
+
+      inst.emitEvent('move', 'mouse', 'keys:1', dummyPt);
+      expect(events.length).toEqual(0);
+
+      inst.emitEvent('end', 'mouse', 'keys:1', dummyPt);
+      expect(events.length).toEqual(0);
+    });
+
+    it('should conceal current element id if touch is no longer contained in subscription element', () => {
+      inst.emitEvent('start', 'mouse', 'keys:0', dummyPt);
+      expect(events[0]).toEqual(new TouchEvent('start', 'mouse', 'keys:0', dummyPt));
+
+      inst.emitEvent('move', 'mouse', 'keys:1', dummyPt);
+      expect(events[1]).toEqual(new TouchEvent('move', 'mouse', 'keys:1', dummyPt));
+
+      inst.emitEvent('move', 'mouse', 'dragbar', dummyPt);
+      expect(events[2]).toEqual(new TouchEvent('move', 'mouse', null, dummyPt));
+
+      inst.emitEvent('end', 'mouse', 'keys:2', dummyPt);
+      expect(events[3]).toEqual(new TouchEvent('end', 'mouse', 'keys:2', dummyPt));
+      expect(events.length).toEqual(4);
+    });
   });
 
-  it('should allow hierarchical subscription', () => {
-    const events = [];
-    inst.subscribe('a/b', (e) => events.push(e));
+  describe('roaming touch subscription', () => {
+    let events;
+    beforeEach(() => {
+      events = [];
+      inst.subscribeRoaming('dragbar', (e) => events.push(e));
+      expect(events.length).toEqual(0);
+    });
 
-    expect(events.length).toEqual(0);
-    inst.emitEvent('start', 'touch1', 'a/b/c', dummyPt);
-    inst.emitEvent('start', 'touch2', 'a/b', dummyPt);
-    inst.emitEvent('start', 'touch3', 'a', dummyPt);
-    inst.emitEvent('start', 'touch4', 'a/bb', dummyPt);
+    it('should capture touches that start on element', () => {
+      inst.emitEvent('start', 'mouse', 'dragbar', dummyPt);
+      expect(events[0]).toEqual(new TouchEvent('start', 'mouse', 'dragbar', dummyPt));
 
-    expect(events).toEqual([
-      new TouchEvent('start', 'touch1', 'a/b/c', dummyPt),
-      new TouchEvent('start', 'touch2', 'a/b', dummyPt)
-    ]);
-  });
+      inst.emitEvent('move', 'mouse', 'dragbar', dummyPt);
+      expect(events[1]).toEqual(new TouchEvent('move', 'mouse', 'dragbar', dummyPt));
 
-  it('should conceal elemId if touch is no longer contained in subscription', () => {
-    const events = [];
-    inst.subscribe('keys', (e) => events.push(e));
+      inst.emitEvent('end', 'mouse', 'dragbar', dummyPt);
+      expect(events[2]).toEqual(new TouchEvent('end', 'mouse', 'dragbar', dummyPt));
+      expect(events.length).toEqual(3);
+    });
 
-    expect(events.length).toEqual(0);
+    it('should capture touches that cross element', () => {
+      inst.emitEvent('start', 'mouse', 'keys:0', dummyPt);
+      expect(events.length).toEqual(0);
 
-    inst.emitEvent('start', 'mouse', 'keys', dummyPt);
-    expect(events[0]).toEqual(new TouchEvent('start', 'mouse', 'keys', dummyPt));
+      inst.emitEvent('move', 'mouse', 'dragbar', dummyPt);
+      expect(events[0]).toEqual(new TouchEvent('start', 'mouse', 'dragbar', dummyPt));
 
-    inst.emitEvent('move', 'mouse', 'keys/1', dummyPt);
-    expect(events[1]).toEqual(new TouchEvent('move', 'mouse', 'keys/1', dummyPt));
+      inst.emitEvent('move', 'mouse', 'dragbar', dummyPt);
+      expect(events[1]).toEqual(new TouchEvent('move', 'mouse', 'dragbar', dummyPt));
 
-    inst.emitEvent('move', 'mouse', 'dragbar', dummyPt);
-    expect(events[2]).toEqual(new TouchEvent('move', 'mouse', null, dummyPt));
+      inst.emitEvent('end', 'mouse', 'dragbar', dummyPt);
+      expect(events[2]).toEqual(new TouchEvent('end', 'mouse', 'dragbar', dummyPt));
+      expect(events.length).toEqual(3);
+    });
 
-    inst.emitEvent('end', 'mouse', 'keys', dummyPt);
-    expect(events[3]).toEqual(new TouchEvent('end', 'mouse', 'keys', dummyPt));
-    expect(events.length).toEqual(4);
+    it('should conceal current element id if touch is no longer in a valid element', () => {
+      inst.emitEvent('start', 'mouse', 'dragbar', dummyPt);
+      expect(events[0]).toEqual(new TouchEvent('start', 'mouse', 'dragbar', dummyPt));
+
+      inst.emitEvent('move', 'mouse', null, dummyPt);
+      expect(events[1]).toEqual(new TouchEvent('move', 'mouse', null, dummyPt));
+      expect(events.length).toEqual(2);
+    });
+
+    it('should emit end event when touch moves to another valid element', () => {
+      inst.emitEvent('start', 'mouse', 'dragbar', dummyPt);
+      expect(events[0]).toEqual(new TouchEvent('start', 'mouse', 'dragbar', dummyPt));
+
+      inst.emitEvent('move', 'mouse', 'keys:0', dummyPt);
+      expect(events[1]).toEqual(new TouchEvent('end', 'mouse', null, dummyPt));
+      expect(events.length).toEqual(2);
+    });
   });
 });
