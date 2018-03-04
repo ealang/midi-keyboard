@@ -22,8 +22,8 @@ type Subscriber = (event: TouchEvent) => void;
 
 @Injectable()
 export class TouchService {
-  private readonly originService = new OriginTouchService();
-  private readonly roamingService = new RoamingTouchService();
+  private readonly origin = new OriginPublisher();
+  private readonly sticky = new StickyPublisher();
 
   static stripData(elemId: ElemId): ElemId {
     return elemId && elemId.split(':')[0];
@@ -36,22 +36,22 @@ export class TouchService {
   /* Subscribe to touches which strictly originate on the given element.
    */
   subscribeOrigin(elemId: ElemId, subscriber: Subscriber): void {
-    this.originService.subscribe(elemId, subscriber);
+    this.origin.subscribe(elemId, subscriber);
   }
 
   /* Subscribe to touches which originate or cross through the given element.
    */
-  subscribeRoaming(elemId: ElemId, subscriber: Subscriber): void {
-    this.roamingService.subscribe(elemId, subscriber);
+  subscribeSticky(elemId: ElemId, subscriber: Subscriber): void {
+    this.sticky.subscribe(elemId, subscriber);
   }
 
   emitEvent(eventType: string, touchId: TouchId, elemId: ElemId, coordinates: Point): void {
-    this.originService.emitEvent(eventType, touchId, elemId, coordinates);
-    this.roamingService.emitEvent(eventType, touchId, elemId, coordinates);
+    this.origin.emitEvent(eventType, touchId, elemId, coordinates);
+    this.sticky.emitEvent(eventType, touchId, elemId, coordinates);
   }
 }
 
-class OriginTouchService {
+export class OriginPublisher {
   private origins = new Map<TouchId, ElemId>();
   private subscribers = new Map<ElemId, Array<Subscriber>>();
 
@@ -84,8 +84,8 @@ class OriginTouchService {
   }
 }
 
-class RoamingTouchService {
-  private lastElem = new Map<TouchId, ElemId>();
+export class StickyPublisher {
+  private capturedElem = new Map<TouchId, ElemId>();
   private subscribers = new Map<ElemId, Array<Subscriber>>();
 
   subscribe(elemId: ElemId, subscriber: Subscriber): void {
@@ -93,46 +93,28 @@ class RoamingTouchService {
     this.subscribers.set(elemId, [...oldSubs, subscriber]);
   }
 
-  private publishVirtualEvents(events: Array<[ElemId, string]>, curElemId: ElemId, touchId: TouchId, coordinates: Point): void {
-    for (const [subElemId, eventType] of events) {
-      if (this.subscribers.has(subElemId)) {
-        const event = new TouchEvent(
-          eventType,
-          touchId,
-          TouchService.elemsAreEqual(subElemId, curElemId) ? subElemId : null,
-          coordinates
-        );
-        this.subscribers.get(subElemId).forEach((subscriber) => {
-          subscriber(event);
-        });
-      }
-    }
-  }
-
   emitEvent(eventType: string, touchId: TouchId, curElemId: ElemId, coordinates: Point): void {
-    const lastElemId = this.lastElem.get(touchId) || null;
+    let isFirstCapture = false;
+    if (!this.capturedElem.has(touchId) && this.subscribers.has(TouchService.stripData(curElemId))) {
+      isFirstCapture = true;
+      this.capturedElem.set(touchId, TouchService.stripData(curElemId));
+    }
+
+    const capturedElemId = this.capturedElem.get(touchId) || null;
+    if (capturedElemId !== null) {
+      const event = new TouchEvent(
+        isFirstCapture ? 'start' : eventType,
+        touchId,
+        TouchService.elemsAreEqual(capturedElemId, curElemId) ? curElemId : null,
+        coordinates
+      );
+      this.subscribers.get(capturedElemId).forEach((subscriber) => {
+        subscriber(event);
+      });
+    }
 
     if (eventType === 'end') {
-      this.lastElem.delete(touchId);
-    } else if (curElemId !== null) {
-      this.lastElem.set(touchId, curElemId);
+      this.capturedElem.delete(touchId);
     }
-
-    const virtualEvents = new Array<[ElemId, string]>();
-    if (eventType === 'start') {
-      virtualEvents.push([curElemId, 'start']);
-    } else if (eventType === 'move') {
-      if (curElemId !== null && !TouchService.elemsAreEqual(lastElemId, curElemId)) {
-        virtualEvents.push([lastElemId, 'end']);
-        virtualEvents.push([curElemId, 'start']);
-      } else {
-        virtualEvents.push([lastElemId, 'move']);
-      }
-    } else if (eventType === 'end') {
-      if (lastElemId !== null) {
-        virtualEvents.push([lastElemId, 'end']);
-      }
-    }
-    this.publishVirtualEvents(virtualEvents, curElemId, touchId, coordinates);
   }
 }

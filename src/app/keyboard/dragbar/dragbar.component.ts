@@ -38,7 +38,7 @@ export class DragbarComponent {
       layout.dragBarHeight
     );
     this.strokeWidth = layout.dragBarBorderWidth;
-    touch.subscribeRoaming(this.touchElemId, (event: TouchEvent) => this.onTouchEvent(event));
+    touch.subscribeSticky(this.touchElemId, (event: TouchEvent) => this.onTouchEvent(event));
   }
 
   startScrolling(x: number, identifier: string): void {

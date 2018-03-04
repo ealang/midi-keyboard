@@ -56,11 +56,11 @@ describe('TouchService', () => {
     });
   });
 
-  describe('roaming touch subscription', () => {
+  describe('sticky touch subscription', () => {
     let events;
     beforeEach(() => {
       events = [];
-      inst.subscribeRoaming('dragbar', (e) => events.push(e));
+      inst.subscribeSticky('dragbar', (e) => events.push(e));
       expect(events.length).toEqual(0);
     });
 
@@ -91,22 +91,16 @@ describe('TouchService', () => {
       expect(events.length).toEqual(3);
     });
 
-    it('should conceal current element id if touch is no longer in a valid element', () => {
+    it('should conceal current element id if touch is no longer contained in subscription', () => {
       inst.emitEvent('start', 'mouse', 'dragbar', dummyPt);
       expect(events[0]).toEqual(new TouchEvent('start', 'mouse', 'dragbar', dummyPt));
 
       inst.emitEvent('move', 'mouse', null, dummyPt);
       expect(events[1]).toEqual(new TouchEvent('move', 'mouse', null, dummyPt));
-      expect(events.length).toEqual(2);
-    });
-
-    it('should emit end event when touch moves to another valid element', () => {
-      inst.emitEvent('start', 'mouse', 'dragbar', dummyPt);
-      expect(events[0]).toEqual(new TouchEvent('start', 'mouse', 'dragbar', dummyPt));
 
       inst.emitEvent('move', 'mouse', 'keys:0', dummyPt);
-      expect(events[1]).toEqual(new TouchEvent('end', 'mouse', null, dummyPt));
-      expect(events.length).toEqual(2);
+      expect(events[2]).toEqual(new TouchEvent('move', 'mouse', null, dummyPt));
+      expect(events.length).toEqual(3);
     });
   });
 });
