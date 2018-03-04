@@ -2,8 +2,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TouchModule } from '../../touch/touch.module';
 import { TouchService, TouchEvent } from '../../touch/touch.service';
-import { KeyConfigService } from '../../keyconfig.service';
-import { LayoutService } from '../layout/layout.service';
 import { DragbarComponent } from './dragbar.component';
 
 declare var Touch: {
@@ -25,9 +23,7 @@ describe('DragbarComponent', () => {
       imports: [ TouchModule ],
       declarations: [ DragbarComponent ],
       providers: [
-        TouchService,
-        KeyConfigService,
-        LayoutService
+        TouchService
       ]
     })
     .compileComponents();

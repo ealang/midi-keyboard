@@ -1,7 +1,5 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { LayoutService } from '../layout/layout.service';
-import { KeyConfigService } from '../../keyconfig.service';
-import { TouchService, TouchEvent } from '../../touch/touch.service';
+import { Component, EventEmitter, Input, Output, HostBinding } from '@angular/core';
+import { TouchService, TouchEvent, ElemId } from '../../touch/touch.service';
 
 class Rectangle {
   constructor(
@@ -19,25 +17,28 @@ class Rectangle {
   styleUrls: ['./dragbar.component.css']
 })
 export class DragbarComponent {
+  selected = false;
+  touchElemId_: ElemId;
+
+  @Input() width: number;
+  @Input() height: number;
+  @Input() strokeWidth: number;
 
   @Output() scroll = new EventEmitter<number>();
   @Output() scrollActive = new EventEmitter<boolean>();
 
-  selected = false;
-  rect: Rectangle;
-  strokeWidth: number;
-  touchElemId = 'dragbar';
+  @Input() set touchElemId(elemId: ElemId) {
+    this.touchElemId_ = elemId;
+    this.touch.subscribeSticky(elemId, (event: TouchEvent) => this.onTouchEvent(event));
+  }
+
+  get touchElemId(): ElemId {
+    return this.touchElemId_;
+  }
+
   private lastIdPosition = new Map<string, number>();
 
-  constructor(layout: LayoutService, keyconfig: KeyConfigService, touch: TouchService) {
-    this.rect = new Rectangle(
-      -layout.dragBarBorderWidth / 2,
-      layout.keyboardOffset + layout.whiteKeyHeight,
-      layout.dragBarBorderWidth + layout.whiteKeyWidth * keyconfig.numWhiteKeys,
-      layout.dragBarHeight
-    );
-    this.strokeWidth = layout.dragBarBorderWidth;
-    touch.subscribeSticky(this.touchElemId, (event: TouchEvent) => this.onTouchEvent(event));
+  constructor(private touch: TouchService) {
   }
 
   startScrolling(identifier: string, x: number): void {

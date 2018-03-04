@@ -26,7 +26,7 @@ export class KeyboardComponent implements OnInit {
   @Output() keyEvent = new EventEmitter<KeyEvent>();
 
   constructor(
-    private readonly layout: LayoutService,
+    readonly layout: LayoutService,
     private readonly keyconfig: KeyConfigService,
     private readonly element: ElementRef
   ) {
@@ -36,8 +36,11 @@ export class KeyboardComponent implements OnInit {
   }
 
   private calcViewBox(): Array<number> {
-    const w = this.numVisibleKeys_ * this.layout.whiteKeyWidth;
-    return [0, 0, w, this.layout.keyboardHeight];
+    return [
+      0, 0,
+      this.numVisibleKeys_ * this.layout.whiteKeyWidth,
+      this.layout.whiteKeyHeight + (this.layout.dragBarHeight + this.layout.keyBoardPadding) * 2 + this.layout.dragBarStrokeWidth
+    ];
   }
 
   private boundScrollPosition(position: number): number {

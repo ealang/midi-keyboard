@@ -3,14 +3,31 @@
      [attr.viewBox]="viewBox"
      appTouchRoot>
   <svg [attr.viewBox]="viewBox">
-    <g app-keys
-       [scrollPosition]="scrollPosition"
-       [scrollActive]="scrollActive"
-       (keyEvent)="onKeyEvent($event)">
-    </g>
-    <g app-dragbar
-       (scroll)="onDragbarScroll($event)"
-       (scrollActive)="scrollActive = $event">
+    <g attr.transform="translate(0, {{ layout.dragBarStrokeWidth / 2 }})">
+      <svg:g app-dragbar
+             attr.transform="translate({{ -layout.dragBarStrokeWidth / 2 }}, 0)"
+             touchElemId="dragbar1"
+             [width]="layout.dragBarWidth"
+             [height]="layout.dragBarHeight"
+             [strokeWidth]="layout.dragBarStrokeWidth"
+             (scroll)="onDragbarScroll($event)"
+             (scrollActive)="scrollActive = $event">
+      </g>
+      <svg:g app-keys
+             attr.transform="translate(0, {{ layout.dragBarHeight + layout.keyBoardPadding }})"
+             [scrollPosition]="scrollPosition"
+             [scrollActive]="scrollActive"
+             (keyEvent)="onKeyEvent($event)">
+      </g>
+      <svg:g app-dragbar
+             attr.transform="translate({{ -layout.dragBarStrokeWidth / 2 }}, {{ layout.dragBarHeight + layout.keyBoardPadding * 2 + layout.whiteKeyHeight }})"
+             touchElemId="dragbar2"
+             [width]="layout.dragBarWidth"
+             [height]="layout.dragBarHeight"
+             [strokeWidth]="layout.dragBarStrokeWidth"
+             (scroll)="onDragbarScroll($event)"
+             (scrollActive)="scrollActive = $event">
+      </g>
     </g>
   </svg>
 </svg>

@@ -22,8 +22,8 @@ export class KeyViewModel {
 
   constructor(readonly keyNumber: number, xOffset: number, layout: LayoutService) {
     this.black = isBlackKey(keyNumber);
-    this.x = layout.keyboardOffset + xOffset + (this.black ? -layout.blackKeyWidth / 2 : 0);
-    this.y = layout.keyboardOffset;
+    this.x = xOffset + (this.black ? -layout.blackKeyWidth / 2 : 0);
+    this.y = 0;
     this.width = this.black ? layout.blackKeyWidth : layout.whiteKeyWidth;
     this.height = this.black ? layout.blackKeyHeight : layout.whiteKeyHeight;
     this.strokeWidth = layout.keyBorderWidth;

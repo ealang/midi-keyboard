@@ -10,7 +10,7 @@ describe('KeyboardComponent', () => {
   let component: KeyboardComponent;
   let fixture: ComponentFixture<KeyboardComponent>;
   const getTranslation = () => {
-    const xformRe = new RegExp('translate\\((.*?)\\)'),
+    const xformRe = new RegExp('translate\\((.*?),.*?\\)'),
           keyboard = fixture.debugElement.query(By.css('g.keys'));
     return Number(xformRe.exec(keyboard.attributes.transform)[1]);
   };
@@ -59,7 +59,7 @@ describe('KeyboardComponent', () => {
   });
 
   it('should scroll keyboard when dragbar is scrolled', () => {
-    const keyboard = fixture.debugElement.query(By.css('g'));
+    const keyboard = fixture.debugElement.query(By.css('app-dragbar'));
     const translate1 = getTranslation();
     component.onDragbarScroll(-100);
     fixture.detectChanges();

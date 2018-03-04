@@ -1,5 +1,5 @@
 <svg:g class="keys"
-       [attr.transform]="'translate(' + scrollPosition + ')'">
+       attr.transform="translate({{ scrollPosition }}, 0)">
   <svg:g>
     <svg:rect *ngFor="let key of keys; let i = index;"
               class="key"
