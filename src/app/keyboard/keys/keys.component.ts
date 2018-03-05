@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, ElementRef } from '@angular/cor
 
 import { LayoutService } from '../layout/layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
-import { TouchService, TouchEvent } from '../../touch/touch.service';
+import { TouchService, TouchEvent, ElemId } from '../../touch/touch.service';
 
 import { KeyViewModel, createDefaultKeys } from './key.viewmodel';
 import { TouchStack, TouchStackEvent } from './touchstack';
@@ -32,7 +32,7 @@ export class KeysComponent {
   private touches: TouchStack;
   private scrollActive_ = false;
 
-  touchElemIdBase = 'keys';
+  touchElemId = 'keys';
   keys: Array<KeyViewModel>;
   labelFontSize: number;
 
@@ -70,22 +70,13 @@ export class KeysComponent {
     this.touches = new TouchStack(onKeyDown, onKeyUp);
     this.keys = createDefaultKeys(layout, keyconfig);
     this.labelFontSize = layout.labelFontSize;
-    touch.subscribe(this.touchElemIdBase, (event: TouchEvent) => {
+    touch.subscribeOrigin(this.touchElemId, (event: TouchEvent) => {
       this.onTouchEvent(event);
     });
   }
 
-  private parseKeyFromElemId(elemId: string): number {
-    if (elemId === null) {
-      return null;
-    } else {
-      const index = elemId.split('/')[1];
-      if (index === undefined) {
-        return null;
-      } else {
-        return Number(index);
-      }
-    }
+  private parseKeyFromElemId(elemId: ElemId): number {
+    return elemId && Number(elemId.split(':')[1]);
   }
 
   onTouchEvent(event: TouchEvent): void {

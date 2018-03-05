@@ -1,5 +1,5 @@
 <svg:g class="keys"
-       [attr.transform]="'translate(' + scrollPosition + ')'">
+       attr.transform="translate({{ scrollPosition }}, 0)">
   <svg:g>
     <svg:rect *ngFor="let key of keys; let i = index;"
               class="key"
@@ -9,7 +9,7 @@
               [attr.y]="key.y"
               [attr.width]="key.width"
               [attr.height]="key.height"
-              appTouchId="{{ touchElemIdBase }}/{{ i }}">
+              appTouchId="{{ touchElemId }}:{{ i }}">
     </rect>
   </g>
   <svg:g class="key-labels" [ngClass]="{scrolling: scrollActive}">
@@ -22,7 +22,7 @@
               [attr.dy]="key.height - labelFontSize * 2"
               [attr.font-size]="labelFontSize"
               text-anchor="middle"
-              appTouchId="{{ touchElemIdBase }}/{{ i }}">
+              appTouchId="{{ touchElemId }}:{{ i }}">
       {{ key.label }}
     </text>
   </g>

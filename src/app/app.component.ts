@@ -11,7 +11,7 @@ export class AppComponent {
   private session: DeviceSession;
   deviceList = new Array<Device>();
   selectedDeviceId = <string> null;
-  numVisibleKeys = 7;
+  numVisibleKeys = 12;
 
   constructor(private readonly webmidi: WebMidiService) {
     this.webmidi.onDevicesChanged((devices: Array<Device>) => {

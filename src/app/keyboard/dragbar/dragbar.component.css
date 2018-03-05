@@ -4,6 +4,6 @@
 }
 
 .dragbar.selected {
-  fill-opacity: 0;
+  fill: #FF4081;
 }
 

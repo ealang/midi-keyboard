@@ -1,79 +1,29 @@
 import { Injectable } from '@angular/core';
 
-export interface Point {
-  readonly x: number;
-  readonly y: number;
-}
-
-export class TouchEvent {
-  constructor(
-    readonly eventType: string,
-    readonly touchId: string,
-    readonly elemId: string,
-    readonly coordinates: Point
-  ) {
-  }
-}
-
-type Subscriber = (event: TouchEvent) => void;
+import { OriginPublisher } from './origin-publisher';
+import { StickyPublisher } from './sticky-publisher';
+import { ElemId, TouchId, Point, Subscriber } from './touch-types';
+export { ElemId, TouchId, Point, TouchEvent, Subscriber } from './touch-types';
 
 @Injectable()
 export class TouchService {
-  private originElemIdForTouch = new Map<string, string>();     // touch id -> elem id
-  private subscribers = new Map<string, Array<Subscriber>>();   // elem name -> subs
+  private readonly origin = new OriginPublisher();
+  private readonly sticky = new StickyPublisher();
 
-  private static allMatchingIds(elemId: string): Array<string> {
-    const ids = [];
-    if (elemId !== null) {
-      const parts = elemId.split('/');
-      for (let i = 1; i <= parts.length; i++) {
-        ids.push(parts.slice(0, i).join('/'));
-      }
-    }
-    return ids;
+  /* Subscribe to touches which strictly originate on the given element.
+   */
+  subscribeOrigin(elemId: ElemId, subscriber: Subscriber): void {
+    this.origin.subscribe(elemId, subscriber);
   }
 
-  private static subscriptionContains(subscription: string, id: string): boolean {
-    return (id + '/').startsWith(subscription + '/');
+  /* Subscribe to touches which originate or cross through the given element.
+   */
+  subscribeSticky(elemId: ElemId, subscriber: Subscriber): void {
+    this.sticky.subscribe(elemId, subscriber);
   }
 
-  private forSubscribersTo(elemId: string, handler: (subscriber: Subscriber, subscription: string) => void) {
-    TouchService.allMatchingIds(elemId).forEach((subscription) => {
-      if (this.subscribers.has(subscription)) {
-        this.subscribers.get(subscription).forEach((subscriber) => {
-          handler(subscriber, subscription);
-        });
-      }
-    });
-  }
-
-  emitEvent(eventType: string, touchId: string, elemId: string, coordinates: Point): void {
-    if (eventType === 'start') {
-      this.originElemIdForTouch.set(touchId, elemId);
-    }
-    const originElemId = this.originElemIdForTouch.get(touchId);
-
-    this.forSubscribersTo(originElemId, (subscriber, subscription) => {
-      const event = new TouchEvent(
-        eventType,
-        touchId,
-        TouchService.subscriptionContains(subscription, elemId) ?
-          elemId : null,
-        coordinates
-      );
-      subscriber(event);
-    });
-
-    if (eventType === 'end') {
-      this.originElemIdForTouch.delete(touchId);
-    }
-  }
-
-  subscribe(elemName: string, callback: Subscriber): void {
-    if (this.subscribers.has(elemName)) {
-      this.subscribers.get(elemName).push(callback);
-    } else {
-      this.subscribers.set(elemName, [callback]);
-    }
+  emitEvent(eventType: string, touchId: TouchId, elemId: ElemId, coordinates: Point): void {
+    this.origin.emitEvent(eventType, touchId, elemId, coordinates);
+    this.sticky.emitEvent(eventType, touchId, elemId, coordinates);
   }
 }
