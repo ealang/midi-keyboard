@@ -3,15 +3,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TouchService, TouchEvent } from '../../touch/touch.service';
 import { DragbarService } from './dragbar.service';
 
-declare var Touch: {
-  prototype: Touch;
-  new(touchInit: {
-    target: HTMLElement,
-    identifier: number,
-    clientX: number
-  }): Touch;
-};
-
 describe('DragbarService', () => {
   let touch: TouchService;
   let dragbar: DragbarService;
