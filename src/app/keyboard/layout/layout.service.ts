@@ -2,19 +2,19 @@ import { Injectable } from '@angular/core';
 import { KeyConfigService } from '../../keyconfig.service';
 
 const keySize = 16,
-      keyBorderWidth = 1,
+      keyStrokeWidth = 1,
       whiteKeyWidth = keySize,
       blackKeyWidth = keySize * 2 / 3,
       whiteKeyHeight = keySize * 5,
       blackKeyHeight = keySize * 5 / 2,
-      dragBarHeight = keySize / 5,
-      keyBoardPadding = keySize / 4,
+      dragBarHeight = keySize * 4 / 9,
+      keyBoardPadding = 0,
       dragBarStrokeWidth = 1,
       labelFontSize = keySize / 4;
 
 @Injectable()
 export class LayoutService {
-  readonly keyBorderWidth = keyBorderWidth;
+  readonly keyStrokeWidth = keyStrokeWidth;
   readonly whiteKeyWidth = whiteKeyWidth;
   readonly blackKeyWidth = blackKeyWidth;
   readonly whiteKeyHeight = whiteKeyHeight;

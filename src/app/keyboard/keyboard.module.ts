@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { DragbarComponent } from './dragbar/dragbar.component';
+import { DragbarService } from './dragbar/dragbar.service';
 import { KeyboardComponent } from './keyboard.component';
 import { KeysComponent } from './keys/keys.component';
 
@@ -22,7 +23,8 @@ import { LayoutService } from './layout/layout.service';
   ],
   providers: [
     LayoutService,
-    TouchService
+    TouchService,
+    DragbarService
   ],
   exports: [
     KeyboardComponent

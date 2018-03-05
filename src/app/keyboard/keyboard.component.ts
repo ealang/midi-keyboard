@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, ElementRef, OnInit } from '@angular/core';
+import { DragbarService } from './dragbar/dragbar.service';
 import { LayoutService } from './layout/layout.service';
 import { KeyConfigService } from '../keyconfig.service';
 import { KeyEvent } from './keys/keys.component';
@@ -26,6 +27,7 @@ export class KeyboardComponent implements OnInit {
   @Output() keyEvent = new EventEmitter<KeyEvent>();
 
   constructor(
+    dragbar: DragbarService,
     readonly layout: LayoutService,
     private readonly keyconfig: KeyConfigService,
     private readonly element: ElementRef
@@ -33,6 +35,12 @@ export class KeyboardComponent implements OnInit {
     this.scrollPosition = this.boundScrollPosition(
       -keyconfig.initScrollPosition * layout.whiteKeyWidth
     );
+    dragbar.scroll.subscribe((pxlDelta) => {
+      this.onDragbarScroll(pxlDelta);
+    });
+    dragbar.scrollActive.subscribe((active) => {
+      this.scrollActive = active;
+    });
   }
 
   private calcViewBox(): Array<number> {
@@ -46,7 +54,7 @@ export class KeyboardComponent implements OnInit {
   private boundScrollPosition(position: number): number {
     return Math.max(
       Math.min(0, position),
-      -(this.keyconfig.numWhiteKeys - this.numVisibleKeys_) * this.layout.whiteKeyWidth
+      -(this.keyconfig.numWhiteKeys - this.numVisibleKeys_) * this.layout.whiteKeyWidth - this.layout.keyStrokeWidth
     );
   }
 
@@ -58,7 +66,7 @@ export class KeyboardComponent implements OnInit {
     this.keyEvent.emit(event);
   }
 
-  onDragbarScroll(pxlDelta: number): void {
+  private onDragbarScroll(pxlDelta: number): void {
     const matrix = this.svgElement.getScreenCTM().inverse();
     const pxlToSvgPt = (x: number) => {
       const pt = this.svgElement['createSVGPoint']();

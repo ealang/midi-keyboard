@@ -1,12 +1,15 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
+import { DragbarService } from './dragbar/dragbar.service';
+import { TouchService } from '../touch/touch.service';
 import { KeyConfigService } from '../keyconfig.service';
 import { KeyboardModule } from './keyboard.module';
 import { KeyboardComponent } from './keyboard.component';
-import { KeyEvent } from './keys/keys.component';
 
 describe('KeyboardComponent', () => {
+  let touch: TouchService;
+  let dragbar: DragbarService;
   let component: KeyboardComponent;
   let fixture: ComponentFixture<KeyboardComponent>;
   const getTranslation = () => {
@@ -34,6 +37,8 @@ describe('KeyboardComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(KeyboardComponent);
+    touch = TestBed.get(TouchService);
+    dragbar = TestBed.get(DragbarService);
     component = fixture.componentInstance;
     component.scrollPosition = 0;
     component.numVisibleKeys = 7;
@@ -61,7 +66,20 @@ describe('KeyboardComponent', () => {
   it('should scroll keyboard when dragbar is scrolled', () => {
     const keyboard = fixture.debugElement.query(By.css('app-dragbar'));
     const translate1 = getTranslation();
-    component.onDragbarScroll(-100);
+
+    touch.emitEvent(
+      'start',
+      'mouse',
+      dragbar.touchElemId,
+      {x: 100, y: 0}
+    );
+    touch.emitEvent(
+      'move',
+      'mouse',
+      dragbar.touchElemId,
+      {x: 0, y: 0}
+    );
+
     fixture.detectChanges();
     const translate2 = getTranslation();
 
