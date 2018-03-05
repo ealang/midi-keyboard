@@ -46,7 +46,7 @@ export class KeyboardComponent implements OnInit {
   private calcViewBox(): Array<number> {
     return [
       0, 0,
-      this.numVisibleKeys_ * this.layout.whiteKeyWidth,
+      this.numVisibleKeys_ * this.layout.whiteKeyWidth + this.layout.keyStrokeWidth,
       this.layout.whiteKeyHeight + (this.layout.dragBarHeight + this.layout.keyBoardPadding) * 2 + this.layout.dragBarStrokeWidth
     ];
   }
@@ -54,7 +54,7 @@ export class KeyboardComponent implements OnInit {
   private boundScrollPosition(position: number): number {
     return Math.max(
       Math.min(0, position),
-      -(this.keyconfig.numWhiteKeys - this.numVisibleKeys_) * this.layout.whiteKeyWidth - this.layout.keyStrokeWidth
+      -(this.keyconfig.numWhiteKeys - this.numVisibleKeys_) * this.layout.whiteKeyWidth + this.layout.keyStrokeWidth
     );
   }
 
