@@ -4,7 +4,7 @@ import { KeyConfigService } from '../../keyconfig.service';
 const keySize = 16,
       keyStrokeWidth = 1,
       whiteKeyWidth = keySize,
-      blackKeyWidth = keySize * 2 / 3,
+      blackKeyWidth = keySize * 13.7 / 23.5,
       whiteKeyHeight = keySize * 5,
       blackKeyHeight = keySize * 5 / 2,
       dragBarHeight = keySize * 4 / 9,
