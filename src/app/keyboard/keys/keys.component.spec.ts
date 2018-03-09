@@ -1,9 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
-import { TouchModule } from '../../touch/touch.module';
-import { TouchService, TouchEvent } from '../../touch/touch.service';
-import { LayoutService } from '../layout/layout.service';
+import { TouchModule } from '../touch/touch.module';
+import { TouchService, TouchEvent } from '../touch/touch.service';
+import { LayoutService } from '../layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
 import { KeysComponent, KeyEvent, KeyEventType } from './keys.component';
 

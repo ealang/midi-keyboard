@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter, ElementRef } from '@angular/core';
 
-import { LayoutService } from '../layout/layout.service';
+import { LayoutService } from '../layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
-import { TouchService, TouchEvent, ElemId } from '../../touch/touch.service';
+import { TouchService, TouchEvent, ElemId } from '../touch/touch.service';
 
 import { KeyViewModel, createDefaultKeys } from './key.viewmodel';
 import { TouchStack, TouchStackEvent } from './touchstack';

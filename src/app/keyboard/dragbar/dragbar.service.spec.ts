@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TouchService, TouchEvent } from '../../touch/touch.service';
+import { TouchService, TouchEvent } from '../touch/touch.service';
 import { DragbarService } from './dragbar.service';
 
 describe('DragbarService', () => {

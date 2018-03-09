@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { KeyConfigService } from '../../keyconfig.service';
+import { KeyConfigService } from '../keyconfig.service';
 
 const keySize = 16,
       keyStrokeWidth = 1,

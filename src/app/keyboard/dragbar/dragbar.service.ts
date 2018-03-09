@@ -1,5 +1,5 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { TouchService, TouchEvent, ElemId } from '../../touch/touch.service';
+import { TouchService, TouchEvent, ElemId } from '../touch/touch.service';
 
 @Injectable()
 export class DragbarService {

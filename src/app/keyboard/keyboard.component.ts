@@ -1,13 +1,20 @@
 import { Component, Input, Output, EventEmitter, ElementRef, OnInit } from '@angular/core';
+
+import { TouchService } from './touch/touch.service';
 import { DragbarService } from './dragbar/dragbar.service';
-import { LayoutService } from './layout/layout.service';
+import { LayoutService } from './layout.service';
 import { KeyConfigService } from '../keyconfig.service';
 import { KeyEvent } from './keys/keys.component';
 
 @Component({
   selector: 'app-keyboard',
   templateUrl: './keyboard.component.html',
-  styleUrls: ['./keyboard.component.css']
+  styleUrls: ['./keyboard.component.css'],
+  providers: [
+    LayoutService,
+    TouchService,
+    DragbarService
+  ],
 })
 export class KeyboardComponent implements OnInit {
   private static scrollAmplifier = 2;

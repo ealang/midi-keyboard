@@ -1,4 +1,4 @@
-import { LayoutService } from '../layout/layout.service';
+import { LayoutService } from '../layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
 
 function isBlackKey(keyNumber: number): boolean {
