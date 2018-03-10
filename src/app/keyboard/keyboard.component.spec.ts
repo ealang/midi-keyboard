@@ -6,6 +6,7 @@ import { KeyboardComponent } from './keyboard.component';
 import { DragbarService } from './dragbar/dragbar.service';
 import { LayoutService } from './layout.service';
 import { TouchService } from './touch/touch.service';
+import { KeypressService } from '../keypress/keypress.service';
 import { KeyConfigService } from '../keyconfig.service';
 
 describe('KeyboardComponent', () => {
@@ -30,7 +31,8 @@ describe('KeyboardComponent', () => {
         KeyboardModule
       ],
       providers: [
-        KeyConfigService
+        KeyConfigService,
+        KeypressService
       ]
     })
     .compileComponents();

@@ -1,23 +1,28 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 
 import { TouchModule } from '../touch/touch.module';
 import { TouchService, TouchEvent } from '../touch/touch.service';
 import { LayoutService } from '../layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
-import { KeysComponent, KeyEvent, KeyEventType } from './keys.component';
+import { KeypressService } from '../../keypress/keypress.service';
+import { KeysComponent } from './keys.component';
 
 describe('KeysComponent', () => {
   let component: KeysComponent;
   let fixture: ComponentFixture<KeysComponent>;
-  let keyEvents: Array<KeyEvent>;
+  let keyServiceSpy: any;
   const firstMidiNote = 21;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [ TouchModule ],
       declarations: [ KeysComponent ],
-      providers: [ TouchService, LayoutService, KeyConfigService ]
+      providers: [
+        TouchService,
+        LayoutService,
+        KeyConfigService,
+        KeypressService
+      ]
     })
     .compileComponents();
   }));
@@ -25,12 +30,12 @@ describe('KeysComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(KeysComponent);
     component = fixture.componentInstance;
+    keyServiceSpy = spyOn(TestBed.get(KeypressService), 'emitEvent');
+
     fixture.detectChanges();
-    keyEvents = [];
-    component.keyEvent.subscribe((e: KeyEvent) => keyEvents.push(e));
   });
 
-  it('should emit key down event when a key is pressed', () => {
+  it('should emit input events with midi note number attached when a key is pressed', () => {
     const touchstart = new TouchEvent(
       'start',
       'mouse',
@@ -50,19 +55,12 @@ describe('KeysComponent', () => {
       {x: 3, y: 0}
     );
 
-    const key1DownEvent = new KeyEvent(KeyEventType.Down, firstMidiNote);
-    const key1UpEvent = new KeyEvent(KeyEventType.Up, firstMidiNote);
-    const key2DownEvent = new KeyEvent(KeyEventType.Down, firstMidiNote + 2);
-    const key2UpEvent = new KeyEvent(KeyEventType.Up, firstMidiNote + 2);
-
-    expect(keyEvents.length).toEqual(0);
+    expect(keyServiceSpy).not.toHaveBeenCalled();
     component.onTouchEvent(touchstart);
-    expect(keyEvents[0]).toEqual(key1DownEvent);
+    expect(keyServiceSpy).toHaveBeenCalledWith('mouse', firstMidiNote, 'start');
     component.onTouchEvent(touchmove);
-    expect(keyEvents[1]).toEqual(key1UpEvent);
-    expect(keyEvents[2]).toEqual(key2DownEvent);
+    expect(keyServiceSpy).toHaveBeenCalledWith('mouse', firstMidiNote + 2, 'move');
     component.onTouchEvent(touchend);
-    expect(keyEvents[3]).toEqual(key2UpEvent);
-    expect(keyEvents.length).toEqual(4);
+    expect(keyServiceSpy).toHaveBeenCalledWith('mouse', firstMidiNote + 2, 'end');
   });
 });

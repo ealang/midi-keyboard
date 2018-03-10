@@ -1,6 +1,7 @@
 import { TestBed, async } from '@angular/core/testing';
-
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { KeypressModule } from './keypress/keypress.module';
 import { KeyboardModule } from './keyboard/keyboard.module';
 import { ControlsModule } from './controls/controls.module';
 
@@ -15,6 +16,7 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         BrowserAnimationsModule,
+        KeypressModule,
         KeyboardModule,
         ControlsModule
       ],

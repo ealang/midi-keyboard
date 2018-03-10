@@ -4,7 +4,6 @@ import { TouchService } from './touch/touch.service';
 import { DragbarService } from './dragbar/dragbar.service';
 import { LayoutService } from './layout.service';
 import { KeyConfigService } from '../keyconfig.service';
-import { KeyEvent } from './keys/keys.component';
 
 @Component({
   selector: 'app-keyboard',
@@ -30,8 +29,6 @@ export class KeyboardComponent implements OnInit {
     this.viewBox = this.calcViewBox();
     this.scrollPosition = this.boundScrollPosition(this.scrollPosition);
   }
-
-  @Output() keyEvent = new EventEmitter<KeyEvent>();
 
   constructor(
     dragbar: DragbarService,
@@ -67,10 +64,6 @@ export class KeyboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.svgElement = this.element.nativeElement.querySelector('svg');
-  }
-
-  onKeyEvent(event: KeyEvent) {
-    this.keyEvent.emit(event);
   }
 
   private onDragbarScroll(pxlDelta: number): void {
