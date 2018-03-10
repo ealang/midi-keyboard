@@ -7,6 +7,7 @@ import { TouchService } from './touch.service';
 export class TouchRootDirective {
   private static mouseId = 'mouse';
   private mouseActive = false;
+  private ownedTouchIds = new Set<number>();
 
   constructor(private root: ElementRef, private touch: TouchService) {
   }
@@ -29,19 +30,35 @@ export class TouchRootDirective {
     }
   }
 
-  @HostListener('touchstart', ['"start"', '$event'])
-  @HostListener('touchmove', ['"move"', '$event'])
-  @HostListener('touchend', ['"end"', '$event'])
-  @HostListener('touchcancel', ['"end"', '$event'])
-  onTouchEvent(eventType: string, event: TouchEvent): void {
-    Array.from(event.changedTouches).forEach((touch) => {
-      this.touch.emitEvent(
-        eventType,
-        'touch' + touch.identifier.toString(),
-        this.touchNameFromPoint(touch.clientX, touch.clientY),
-        {x: touch.clientX, y: touch.clientY}
-      );
+  @HostListener('touchstart', ['$event'])
+  onTouchStartEvent(event: TouchEvent): void {
+    Array.from(event.targetTouches).forEach((touch) => {
+      this.ownedTouchIds.add(touch.identifier);
     });
+    this.onTouchEvent('start', event);
+  }
+
+  @HostListener('touchend', ['$event'])
+  @HostListener('touchcancel', ['$event'])
+  onTouchEndEvent(event: TouchEvent): void {
+    this.onTouchEvent('end', event);
+    Array.from(event.changedTouches).forEach((touch) => {
+      this.ownedTouchIds.delete(touch.identifier);
+    });
+  }
+
+  @HostListener('touchmove', ['"move"', '$event'])
+  onTouchEvent(eventType: string, event: TouchEvent): void {
+    Array.from(event.changedTouches)
+         .filter((touch) => this.ownedTouchIds.has(touch.identifier))
+         .forEach((touch) => {
+            this.touch.emitEvent(
+              eventType,
+              `touch${touch.identifier}`,
+              this.touchNameFromPoint(touch.clientX, touch.clientY),
+              {x: touch.clientX, y: touch.clientY}
+            );
+         });
     event.preventDefault();
   }
 
