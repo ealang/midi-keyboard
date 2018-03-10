@@ -1,33 +1,17 @@
 import { Directive, HostListener, ElementRef } from '@angular/core';
+
 import { TouchService } from './touch.service';
+import { Point } from '../../geometry';
 
 @Directive({
-  selector: '[appTouchRoot]'
+  selector: 'svg[appTouchRoot]'
 })
 export class TouchRootDirective {
   private static mouseId = 'mouse';
   private mouseActive = false;
   private ownedTouchIds = new Set<number>();
 
-  constructor(private root: ElementRef, private touch: TouchService) {
-  }
-
-  private elementFromPoint(clientX: number, clientY: number): Element {
-    const element = document.elementFromPoint(clientX, clientY);
-    if (element && this.root.nativeElement.contains(element)) {
-      return element;
-    } else {
-      return null;
-    }
-  }
-
-  private touchNameFromPoint(clientX: number, clientY: number): string {
-    const element = this.elementFromPoint(clientX, clientY);
-    if (element !== null && element.hasAttribute('data-touch-id')) {
-      return element.getAttribute('data-touch-id');
-    } else {
-      return null;
-    }
+  constructor(private element: ElementRef, private touch: TouchService) {
   }
 
   @HostListener('touchstart', ['$event'])
@@ -56,7 +40,7 @@ export class TouchRootDirective {
               eventType,
               `touch${touch.identifier}`,
               this.touchNameFromPoint(touch.clientX, touch.clientY),
-              {x: touch.clientX, y: touch.clientY}
+              this.pxlCoordinatesToSvg(touch.clientX, touch.clientY)
             );
          });
     event.preventDefault();
@@ -72,7 +56,7 @@ export class TouchRootDirective {
         eventType,
         TouchRootDirective.mouseId,
         this.touchNameFromPoint(event.clientX, event.clientY),
-        {x: event.clientX, y: event.clientY}
+        this.pxlCoordinatesToSvg(event.clientX, event.clientY)
       );
     }
     if (eventType === 'start') {
@@ -81,5 +65,31 @@ export class TouchRootDirective {
       this.mouseActive = false;
     }
     event.preventDefault();
+  }
+
+  private pxlCoordinatesToSvg(clientX: number, clientY: number): Point {
+    const matrix = (this.element.nativeElement as SVGGraphicsElement).getScreenCTM().inverse();
+    const pt = (this.element.nativeElement as SVGSVGElement).createSVGPoint();
+    pt.x = clientX;
+    pt.y = clientY;
+    return pt.matrixTransform(matrix);
+  }
+
+  private elementFromPoint(clientX: number, clientY: number): Element {
+    const element = document.elementFromPoint(clientX, clientY);
+    if (element && this.element.nativeElement.contains(element)) {
+      return element;
+    } else {
+      return null;
+    }
+  }
+
+  private touchNameFromPoint(clientX: number, clientY: number): string {
+    const element = this.elementFromPoint(clientX, clientY);
+    if (element !== null && element.hasAttribute('data-touch-id')) {
+      return element.getAttribute('data-touch-id');
+    } else {
+      return null;
+    }
   }
 }
