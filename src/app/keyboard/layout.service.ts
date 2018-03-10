@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { KeyConfigService } from '../keyconfig.service';
 
-const keySize = 16,
+const miniKey = true,
+      keySize = 16,
       keyStrokeWidth = 1,
       whiteKeyWidth = keySize,
       blackKeyWidth = keySize * 13.7 / 23.5,
-      whiteKeyHeight = keySize * 5,
-      blackKeyHeight = keySize * 5 / 2,
+      whiteKeyHeight = keySize * (miniKey ? 3 : 5),
+      blackKeyHeight = keySize * (miniKey ? 3 : 5) / 2,
       dragBarHeight = keySize * 4 / 9,
       keyBoardPadding = 0,
       dragBarStrokeWidth = 1,
