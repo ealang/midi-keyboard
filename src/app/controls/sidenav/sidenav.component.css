@@ -1,10 +1,6 @@
-mat-slider {
-  display: block;
-}
 
-mat-slider {
-  margin-left: 4px;
-  margin-right: 4px;
+mat-card {
+  margin: 5px;
 }
 
 button {

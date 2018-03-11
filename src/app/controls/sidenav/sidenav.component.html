@@ -1,17 +1,45 @@
-<mat-slider
-  [min]="minVisibleKeys"
-  [max]="maxVisibleKeys"
-  [(ngModel)]="numVisibleKeys">
-</mat-slider>
-<div>
-  <button (click)="onRemoveKey()"
-          mat-mini-fab
-          [disabled]="removeKeyDisabled">
-    -
-  </button>
-  <button (click)="onAddKey()"
-          mat-mini-fab
-          [disabled]="addKeyDisabled">
-    +
-  </button>
-</div>
+<mat-card>
+  <mat-card-title>Visible Keys</mat-card-title>
+  <mat-card-content>
+    <div>
+      <button (click)="onRemoveKey()"
+              mat-mini-fab
+              [disabled]="removeKeyDisabled">
+        -
+      </button>
+      <button (click)="onAddKey()"
+              mat-mini-fab
+              [disabled]="addKeyDisabled">
+        +
+      </button>
+    </div>
+    <mat-slider
+      [min]="minVisibleKeys"
+      [max]="maxVisibleKeys"
+      [(ngModel)]="numVisibleKeys">
+    </mat-slider>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-title>Midi Parameters</mat-card-title>
+  <mat-card-content>
+    <div>
+      <span>Velocity</span>
+      <mat-slider
+        [min]="minVelocity"
+        [max]="maxVelocity"
+        [(ngModel)]="velocity"
+        [disabled]="velocityDisabled">
+      </mat-slider>
+    </div>
+    <div>
+      <mat-form-field>
+        <mat-select placeholder="Y Mod" [(value)]="ymod">
+          <mat-option value="disabled">(Not Used)</mat-option>
+          <mat-option value="velocity">Velocity</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+</mat-card>

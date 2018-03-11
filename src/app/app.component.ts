@@ -16,6 +16,8 @@ export class AppComponent {
   deviceList = new Array<Device>();
   selectedDeviceId = <string> null;
   numVisibleKeys = 12;
+  velocity = 127;
+  ymod = 'disabled';
 
   constructor(keypress: KeypressService, private readonly webmidi: WebMidiService) {
     this.webmidi.onDevicesChanged((devices: Array<Device>) => {
@@ -52,11 +54,13 @@ export class AppComponent {
 
   onKeypressEvent(event: KeypressEvent): void {
     if (this.session) {
-      const vel = event.coordinates && Math.floor(Math.max(Math.min(event.coordinates.y, 1), 0) * 0x7F) || 0x7F;
+      const velocity = this.ymod === 'velocity' ?
+        (event.coordinates && Math.floor(Math.max(Math.min(event.coordinates.y, 1), 0) * 0x7F) || 0x7F) :
+        this.velocity;
       if (event.eventType === KeypressEventType.Down) {
-        this.session.send([0x90, event.keyNumber, vel]);
+        this.session.send([0x90, event.keyNumber, velocity]);
       } else if (event.eventType === KeypressEventType.Up) {
-        this.session.send([0x80, event.keyNumber, vel]);
+        this.session.send([0x80, event.keyNumber, velocity]);
       }
     }
   }

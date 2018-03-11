@@ -9,8 +9,10 @@
   <mat-sidenav #sidenav
                mode="side"
                position="end"
-               closed>
-    <app-sidenav [(numVisibleKeys)]="numVisibleKeys">
+               opened>
+    <app-sidenav [(numVisibleKeys)]="numVisibleKeys"
+                 [(velocity)]="velocity"
+                 [(ymod)]="ymod">
     </app-sidenav>
   </mat-sidenav>
   <mat-sidenav-content class="content-host main-content">

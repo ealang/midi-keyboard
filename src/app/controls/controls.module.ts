@@ -7,6 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 
 import { ToolbarComponent } from './toolbar/toolbar.component';
 import { SidenavComponent } from './sidenav/sidenav.component';
@@ -18,7 +19,8 @@ import { SidenavComponent } from './sidenav/sidenav.component';
     MatButtonModule,
     MatToolbarModule,
     MatSliderModule,
-    MatIconModule
+    MatIconModule,
+    MatCardModule
   ],
   declarations: [
     NgModel,
