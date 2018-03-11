@@ -12,19 +12,5 @@
 
   <span class="fill-space"></span>
 
-  <mat-slider
-    [min]="minVisibleKeys"
-    [max]="maxVisibleKeys"
-    [(ngModel)]="numVisibleKeys">
-  </mat-slider>
-  <button (click)="onRemoveKey()"
-          mat-mini-fab
-          [disabled]="removeKeyDisabled">
-    -
-  </button>
-  <button (click)="onAddKey()"
-          mat-mini-fab
-          [disabled]="addKeyDisabled">
-    +
-  </button>
+  <button (click)="onSideNavToggled()"><mat-icon>menu</mat-icon></button>
 </mat-toolbar>

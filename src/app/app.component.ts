@@ -1,6 +1,7 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import { WebMidiService, Device, DeviceSession } from './webmidi.service';
 import { KeypressService, KeypressEvent, KeypressEventType } from './keypress/keypress.service';
+import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-root',
@@ -9,6 +10,9 @@ import { KeypressService, KeypressEvent, KeypressEventType } from './keypress/ke
 })
 export class AppComponent {
   private session: DeviceSession;
+
+  @ViewChild('sidenav') sidenav: MatSidenav;
+
   deviceList = new Array<Device>();
   selectedDeviceId = <string> null;
   numVisibleKeys = 12;
@@ -55,5 +59,9 @@ export class AppComponent {
         this.session.send([0x80, event.keyNumber, vel]);
       }
     }
+  }
+
+  onSideNavToggled(): void {
+    this.sidenav.toggle();
   }
 }

@@ -1,5 +1,6 @@
 import { TestBed, async } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 import { KeypressModule } from './keypress/keypress.module';
 import { KeyboardModule } from './keyboard/keyboard.module';
@@ -18,7 +19,8 @@ describe('AppComponent', () => {
         BrowserAnimationsModule,
         KeypressModule,
         KeyboardModule,
-        ControlsModule
+        ControlsModule,
+        MatSidenavModule
       ],
       declarations: [
         AppComponent,

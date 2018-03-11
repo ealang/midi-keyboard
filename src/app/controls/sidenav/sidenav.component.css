@@ -1,0 +1,13 @@
+mat-slider {
+  display: block;
+}
+
+mat-slider {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+button {
+  margin-left: 2px;
+  margin-right: 2px;
+}

@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatSidenavModule } from '@angular/material/sidenav';
+
 import { KeyboardModule } from './keyboard/keyboard.module';
 import { ControlsModule } from './controls/controls.module';
 import { KeypressModule } from './keypress/keypress.module';
@@ -15,6 +17,7 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    MatSidenavModule,
     KeypressModule,
     KeyboardModule,
     ControlsModule

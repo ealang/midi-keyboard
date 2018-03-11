@@ -1,11 +1,24 @@
-<app-controls [deviceList]="deviceList"
-              [selectedDeviceId]="selectedDeviceId"
-              (selectedDeviceIdChange)="selectDevice($event)"
-              [(numVisibleKeys)]="numVisibleKeys">
-</app-controls>
+<app-toolbar class="menu-content"
+             [deviceList]="deviceList"
+             [selectedDeviceId]="selectedDeviceId"
+             (selectedDeviceIdChange)="selectDevice($event)"
+             (sideNavToggle)="onSideNavToggled()">
+</app-toolbar>
 
-<app-keyboard [numVisibleKeys]="numVisibleKeys">
-</app-keyboard>
-
-<app-keyboard [numVisibleKeys]="numVisibleKeys">
-</app-keyboard>
+<mat-sidenav-container class="content-host main-content">
+  <mat-sidenav #sidenav
+               mode="side"
+               position="end"
+               closed>
+    <app-sidenav [(numVisibleKeys)]="numVisibleKeys">
+    </app-sidenav>
+  </mat-sidenav>
+  <mat-sidenav-content class="content-host main-content">
+    <app-keyboard class="main-content"
+                  [numVisibleKeys]="numVisibleKeys">
+    </app-keyboard>
+    <app-keyboard class="main-content"
+                  [numVisibleKeys]="numVisibleKeys">
+    </app-keyboard>
+  </mat-sidenav-content>
+</mat-sidenav-container>

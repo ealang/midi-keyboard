@@ -1,0 +1,17 @@
+<mat-slider
+  [min]="minVisibleKeys"
+  [max]="maxVisibleKeys"
+  [(ngModel)]="numVisibleKeys">
+</mat-slider>
+<div>
+  <button (click)="onRemoveKey()"
+          mat-mini-fab
+          [disabled]="removeKeyDisabled">
+    -
+  </button>
+  <button (click)="onAddKey()"
+          mat-mini-fab
+          [disabled]="addKeyDisabled">
+    +
+  </button>
+</div>
