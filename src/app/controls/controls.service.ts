@@ -14,6 +14,8 @@ export class ControlsService {
 
   ymod = 'disabled';
 
+  numKeyboards = 1;
+
   constructor(keyconfig: KeyConfigService) {
     this.maxVisibleKeys = keyconfig.numWhiteKeys;
   }

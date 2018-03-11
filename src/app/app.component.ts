@@ -1,4 +1,4 @@
-import { Component, HostListener, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { WebMidiService, Device, DeviceSession } from './webmidi.service';
 import { KeypressService, KeypressEvent, KeypressEventType } from './keypress/keypress.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -35,6 +35,10 @@ export class AppComponent {
     keypress.keypressEvent.subscribe((event: KeypressEvent) => {
       this.onKeypressEvent(event);
     });
+  }
+
+  repeat(num: number): Array<void> {
+    return Array(num);
   }
 
   selectDevice(deviceId: string): void {

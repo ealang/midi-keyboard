@@ -14,11 +14,10 @@
     </app-sidenav>
   </mat-sidenav>
   <mat-sidenav-content class="content-host main-content">
-    <app-keyboard class="main-content"
-                  [numVisibleKeys]="controls.numVisibleKeys">
-    </app-keyboard>
-    <app-keyboard class="main-content"
-                  [numVisibleKeys]="controls.numVisibleKeys">
-    </app-keyboard>
+    <div class="content-host main-content" *ngFor="let _ of repeat(controls.numKeyboards)">
+      <app-keyboard class="main-content"
+                    [numVisibleKeys]="controls.numVisibleKeys">
+      </app-keyboard>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

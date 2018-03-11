@@ -1,7 +1,17 @@
 <mat-card>
-  <mat-card-title>Visible Keys</mat-card-title>
+  <mat-card-title>Key Config</mat-card-title>
   <mat-card-content>
     <div>
+      <mat-form-field>
+        <mat-select placeholder="Num Keyboards" [(value)]="controls.numKeyboards">
+          <mat-option [value]="1">1</mat-option>
+          <mat-option [value]="2">2</mat-option>
+          <mat-option [value]="3">3</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div>
+      <span>Num Keys</span>
       <button (click)="onRemoveKey()"
               mat-mini-fab
               [disabled]="removeKeyDisabled">
@@ -13,11 +23,6 @@
         +
       </button>
     </div>
-    <mat-slider
-      [min]="controls.minVisibleKeys"
-      [max]="controls.maxVisibleKeys"
-      [(ngModel)]="controls.numVisibleKeys">
-    </mat-slider>
   </mat-card-content>
 </mat-card>
 
