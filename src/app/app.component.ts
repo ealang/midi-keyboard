@@ -48,10 +48,11 @@ export class AppComponent {
 
   onKeypressEvent(event: KeypressEvent): void {
     if (this.session) {
+      const vel = Math.floor(Math.max(Math.min(event.coordinates.y, 1), 0) * 0x7F);
       if (event.eventType === KeypressEventType.Down) {
-        this.session.send([0x90, event.keyNumber, 0x7F]);
+        this.session.send([0x90, event.keyNumber, vel]);
       } else if (event.eventType === KeypressEventType.Up) {
-        this.session.send([0x80, event.keyNumber, 0x7F]);
+        this.session.send([0x80, event.keyNumber, vel]);
       }
     }
   }
