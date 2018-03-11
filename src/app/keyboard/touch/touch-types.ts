@@ -10,7 +10,8 @@ export class TouchEvent {
     readonly eventType: string,
     readonly touchId: TouchId,
     readonly elemId: ElemId,
-    readonly coordinates: Point
+    readonly elemRelCoordinates: Point,
+    readonly globalCoordinates: Point
   ) {
   }
 }

@@ -50,7 +50,7 @@ export class AppComponent {
     if (this.session) {
       if (event.eventType === KeypressEventType.Down) {
         this.session.send([0x90, event.keyNumber, 0x7F]);
-      } else {
+      } else if (event.eventType === KeypressEventType.Up) {
         this.session.send([0x80, event.keyNumber, 0x7F]);
       }
     }

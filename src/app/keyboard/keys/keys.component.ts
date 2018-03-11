@@ -65,7 +65,8 @@ export class KeysComponent {
     this.keypress.emitEvent(
       event.touchId,
       keyNumber,
-      event.eventType
+      event.eventType,
+      event.elemRelCoordinates
     );
     if (this.scrollActive_) {
       this.keypress.freezeAll();
@@ -76,6 +77,6 @@ export class KeysComponent {
     const keyNumber = event.keyNumber,
           keyIndex = this.keyNumToIndex.get(keyNumber),
           key = this.keys[keyIndex];
-    key.held = event.eventType === KeypressEventType.Down;
+    key.held = event.eventType !== KeypressEventType.Up;
   }
 }

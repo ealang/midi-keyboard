@@ -22,6 +22,7 @@ describe('DragbarService', () => {
       'start',
       'mouse',
       dragbar.touchElemId,
+      {x: 0, y: 0},
       {x: 0, y: 0}
     );
     expect(dragbar.scroll.emit).not.toHaveBeenCalled();
@@ -31,6 +32,7 @@ describe('DragbarService', () => {
       'move',
       'mouse',
       dragbar.touchElemId,
+      {x: 0, y: 0},
       {x: 3, y: 0}
     );
     expect(dragbar.scroll.emit).toHaveBeenCalledWith(3);
@@ -39,6 +41,7 @@ describe('DragbarService', () => {
       'end',
       'mouse',
       dragbar.touchElemId,
+      {x: 0, y: 0},
       {x: 3, y: 0}
     );
     expect(dragbar.scrollActive.emit).toHaveBeenCalledWith(false);

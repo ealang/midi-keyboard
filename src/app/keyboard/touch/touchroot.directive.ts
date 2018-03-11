@@ -8,10 +8,12 @@ import { Point } from '../../geometry';
 })
 export class TouchRootDirective {
   private static mouseId = 'mouse';
+  private root: Element;
   private mouseActive = false;
   private ownedTouchIds = new Set<number>();
 
-  constructor(private element: ElementRef, private touch: TouchService) {
+  constructor(root: ElementRef, private touch: TouchService) {
+    this.root = root.nativeElement;
   }
 
   @HostListener('touchstart', ['$event'])
@@ -36,11 +38,13 @@ export class TouchRootDirective {
     Array.from(event.changedTouches)
          .filter((touch) => this.ownedTouchIds.has(touch.identifier))
          .forEach((touch) => {
+            const elem = this.elementFromPoint(touch.clientX, touch.clientY);
             this.touch.emitEvent(
               eventType,
               `touch${touch.identifier}`,
-              this.touchNameFromPoint(touch.clientX, touch.clientY),
-              this.pxlCoordinatesToSvg(touch.clientX, touch.clientY)
+              elem && this.touchNameFromPoint(elem),
+              elem && this.toElemRelativeCoordinates(elem, touch.clientX, touch.clientY),
+              this.toSVGCoordinates(touch.clientX, touch.clientY)
             );
          });
     event.preventDefault();
@@ -52,11 +56,13 @@ export class TouchRootDirective {
   @HostListener('mouseleave', ['"end"', '$event'])
   onMouseEvent(eventType: string, event: MouseEvent): void {
     if (eventType === 'start' || this.mouseActive) {
+      const elem = this.elementFromPoint(event.clientX, event.clientY);
       this.touch.emitEvent(
         eventType,
         TouchRootDirective.mouseId,
-        this.touchNameFromPoint(event.clientX, event.clientY),
-        this.pxlCoordinatesToSvg(event.clientX, event.clientY)
+        elem && this.touchNameFromPoint(elem),
+        elem && this.toElemRelativeCoordinates(elem, event.clientX, event.clientY),
+        this.toSVGCoordinates(event.clientX, event.clientY)
       );
     }
     if (eventType === 'start') {
@@ -67,26 +73,36 @@ export class TouchRootDirective {
     event.preventDefault();
   }
 
-  private pxlCoordinatesToSvg(clientX: number, clientY: number): Point {
-    const matrix = (this.element.nativeElement as SVGGraphicsElement).getScreenCTM().inverse();
-    const pt = (this.element.nativeElement as SVGSVGElement).createSVGPoint();
-    pt.x = clientX;
-    pt.y = clientY;
-    return pt.matrixTransform(matrix);
-  }
-
   private elementFromPoint(clientX: number, clientY: number): Element {
     const element = document.elementFromPoint(clientX, clientY);
-    if (element && this.element.nativeElement.contains(element)) {
+    if (element && this.root.contains(element)) {
       return element;
     } else {
       return null;
     }
   }
 
-  private touchNameFromPoint(clientX: number, clientY: number): string {
-    const element = this.elementFromPoint(clientX, clientY);
-    if (element !== null && element.hasAttribute('data-touch-id')) {
+  private svgPoint(x: number, y: number): SVGPoint {
+    const pt = (this.root as SVGSVGElement).createSVGPoint();
+    pt.x = x;
+    pt.y = y;
+    return pt;
+  }
+
+  private toSVGCoordinates(clientX: number, clientY: number): Point {
+    const screenToSVG = (this.root as SVGGraphicsElement).getScreenCTM().inverse();
+    return this.svgPoint(clientX, clientY).matrixTransform(screenToSVG);
+  }
+
+  private toElemRelativeCoordinates(element: Element, clientX: number, clientY: number): Point {
+    const transform = (element as SVGGraphicsElement).getScreenCTM().inverse(),
+          bbox = (element as SVGGraphicsElement).getBBox(),
+          svgPt = this.svgPoint(clientX, clientY).matrixTransform(transform);
+    return {x: (svgPt.x - bbox.x) / bbox.width, y: (svgPt.y - bbox.y) / bbox.height};
+  }
+
+  private touchNameFromPoint(element: Element): string {
+    if (element.hasAttribute('data-touch-id')) {
       return element.getAttribute('data-touch-id');
     } else {
       return null;

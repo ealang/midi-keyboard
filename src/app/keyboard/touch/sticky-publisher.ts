@@ -9,7 +9,7 @@ export class StickyPublisher {
     this.subscribers.set(elemId, [...oldSubs, subscriber]);
   }
 
-  emitEvent(eventType: string, touchId: TouchId, curElemId: ElemId, coordinates: Point): void {
+  emitEvent(eventType: string, touchId: TouchId, curElemId: ElemId, elemRelCoordinates: Point, globalCoordinates: Point): void {
     let isFirstCapture = false;
     if (!this.capturedElem.has(touchId) && this.subscribers.has(stripData(curElemId))) {
       isFirstCapture = true;
@@ -22,7 +22,8 @@ export class StickyPublisher {
         isFirstCapture ? 'start' : eventType,
         touchId,
         elemsAreEqual(capturedElemId, curElemId) ? curElemId : null,
-        coordinates
+        elemRelCoordinates,
+        globalCoordinates
       );
       this.subscribers.get(capturedElemId).forEach((subscriber) => {
         subscriber(event);
