@@ -1,5 +1,5 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { TouchService, TouchEvent, ElemId } from '../../touch/touch.service';
+import { TouchService, TouchEvent, ElemId } from '../touch/touch.service';
 
 @Injectable()
 export class DragbarService {
@@ -42,7 +42,7 @@ export class DragbarService {
 
   private onTouchEvent(event: TouchEvent): void {
     const identifier = event.touchId,
-          x = event.coordinates.x;
+          x = event.globalCoordinates.x;
     if (event.eventType === 'start') {
       this.startScrolling(identifier, x);
     } else if (event.eventType === 'move') {

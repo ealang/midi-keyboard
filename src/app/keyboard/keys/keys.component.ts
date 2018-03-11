@@ -1,20 +1,11 @@
-import { Component, Input, Output, EventEmitter, ElementRef } from '@angular/core';
+import { Component, Input, ElementRef } from '@angular/core';
 
-import { LayoutService } from '../layout/layout.service';
+import { LayoutService } from '../layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
-import { TouchService, TouchEvent, ElemId } from '../../touch/touch.service';
+import { KeypressService, KeypressEvent, KeypressEventType } from '../../keypress/keypress.service';
 
+import { TouchService, TouchEvent, ElemId } from '../touch/touch.service';
 import { KeyViewModel, createDefaultKeys } from './key.viewmodel';
-import { TouchStack, TouchStackEvent } from './touchstack';
-
-export enum KeyEventType {
-  Down, Up
-}
-
-export class KeyEvent {
-  constructor(readonly eventType: KeyEventType, readonly keyNumber: number) {
-  }
-}
 
 @Component({
   // tslint:disable-next-line:component-selector (need component to be valid svg)
@@ -23,15 +14,8 @@ export class KeyEvent {
   styleUrls: ['./keys.component.css']
 })
 export class KeysComponent {
-  private static readonly eventTranslation = new Map<string, TouchStackEvent>([
-    ['start', TouchStackEvent.Down],
-    ['move', TouchStackEvent.Move],
-    ['end', TouchStackEvent.Up]
-  ]);
-  private static readonly mouseId = 'mouse';
-  private touches: TouchStack;
   private scrollActive_ = false;
-
+  private keyNumToIndex;
   touchElemId = 'keys';
   keys: Array<KeyViewModel>;
   labelFontSize: number;
@@ -41,7 +25,7 @@ export class KeysComponent {
   @Input() set scrollActive(active: boolean) {
     this.scrollActive_ = active;
     if (active) {
-      this.touches.freezeAll();
+      this.keypress.freezeAll();
     }
   }
 
@@ -49,41 +33,50 @@ export class KeysComponent {
     return this.scrollActive_;
   }
 
-  @Output() keyEvent = new EventEmitter<KeyEvent>();
-
   constructor(
     layout: LayoutService,
-    keyconfig: KeyConfigService,
     touch: TouchService,
+    private keyconfig: KeyConfigService,
+    private readonly keypress: KeypressService,
     private readonly element: ElementRef
   ) {
-    const onKeyDown = (keyIndex: number) => {
-      const key = this.keys[keyIndex];
-      key.held = true;
-      this.keyEvent.emit(new KeyEvent(KeyEventType.Down, key.keyNumber));
-    };
-    const onKeyUp = (keyIndex: number) => {
-      const key = this.keys[keyIndex];
-      key.held = false;
-      this.keyEvent.emit(new KeyEvent(KeyEventType.Up, key.keyNumber));
-    };
-    this.touches = new TouchStack(onKeyDown, onKeyUp);
     this.keys = createDefaultKeys(layout, keyconfig);
+    this.keyNumToIndex = new Map<number, number>(
+      this.keys.map((key, i) => <[number, number]>[key.keyNumber, i])
+    );
     this.labelFontSize = layout.labelFontSize;
+
+    keypress.keypressEvent.subscribe((event: KeypressEvent) => {
+      this.onKeypressEvent(event);
+    });
     touch.subscribeOrigin(this.touchElemId, (event: TouchEvent) => {
       this.onTouchEvent(event);
     });
   }
 
   private parseKeyFromElemId(elemId: ElemId): number {
-    return elemId && Number(elemId.split(':')[1]);
+    return elemId && this.keys[
+      Number(elemId.split(':')[1])
+    ].keyNumber;
   }
 
   onTouchEvent(event: TouchEvent): void {
-    const keyIndex = this.parseKeyFromElemId(event.elemId);
-    this.touches.push(event.touchId, keyIndex, KeysComponent.eventTranslation.get(event.eventType));
+    const keyNumber = this.parseKeyFromElemId(event.elemId);
+    this.keypress.emitEvent(
+      event.touchId,
+      keyNumber,
+      event.eventType,
+      event.elemRelCoordinates
+    );
     if (this.scrollActive_) {
-      this.touches.freezeAll();
+      this.keypress.freezeAll();
     }
+  }
+
+  onKeypressEvent(event: KeypressEvent): void {
+    const keyNumber = event.keyNumber,
+          keyIndex = this.keyNumToIndex.get(keyNumber),
+          key = this.keys[keyIndex];
+    key.held = event.eventType !== KeypressEventType.Up;
   }
 }

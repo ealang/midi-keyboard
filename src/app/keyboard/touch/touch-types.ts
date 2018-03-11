@@ -1,7 +1,6 @@
-export interface Point {
-  readonly x: number;
-  readonly y: number;
-}
+import { Point } from '../../geometry';
+
+export { Point };
 
 export type ElemId = string;
 export type TouchId = string;
@@ -11,7 +10,8 @@ export class TouchEvent {
     readonly eventType: string,
     readonly touchId: TouchId,
     readonly elemId: ElemId,
-    readonly coordinates: Point
+    readonly elemRelCoordinates: Point,
+    readonly globalCoordinates: Point
   ) {
   }
 }

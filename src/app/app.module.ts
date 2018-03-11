@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { KeyboardModule } from './keyboard/keyboard.module';
 import { ControlsModule } from './controls/controls.module';
+import { KeypressModule } from './keypress/keypress.module';
 
 import { WebMidiService } from './webmidi.service';
 import { KeyConfigService } from './keyconfig.service';
@@ -14,6 +15,7 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    KeypressModule,
     KeyboardModule,
     ControlsModule
   ],

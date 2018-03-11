@@ -1,6 +1,6 @@
 import { Component, HostListener } from '@angular/core';
 import { WebMidiService, Device, DeviceSession } from './webmidi.service';
-import { KeyEvent, KeyEventType } from './keyboard/keys/keys.component';
+import { KeypressService, KeypressEvent, KeypressEventType } from './keypress/keypress.service';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +13,7 @@ export class AppComponent {
   selectedDeviceId = <string> null;
   numVisibleKeys = 12;
 
-  constructor(private readonly webmidi: WebMidiService) {
+  constructor(keypress: KeypressService, private readonly webmidi: WebMidiService) {
     this.webmidi.onDevicesChanged((devices: Array<Device>) => {
       this.deviceList = devices;
     });
@@ -27,6 +27,9 @@ export class AppComponent {
       if (firstDevice) {
         this.selectDevice(firstDevice.id);
       }
+    });
+    keypress.keypressEvent.subscribe((event: KeypressEvent) => {
+      this.onKeypressEvent(event);
     });
   }
 
@@ -43,12 +46,13 @@ export class AppComponent {
     }
   }
 
-  onKeyEvent(event: KeyEvent): void {
+  onKeypressEvent(event: KeypressEvent): void {
     if (this.session) {
-      if (event.eventType === KeyEventType.Down) {
-        this.session.send([0x90, event.keyNumber, 0x7F]);
-      } else {
-        this.session.send([0x80, event.keyNumber, 0x7F]);
+      const vel = Math.floor(Math.max(Math.min(event.coordinates.y, 1), 0) * 0x7F);
+      if (event.eventType === KeypressEventType.Down) {
+        this.session.send([0x90, event.keyNumber, vel]);
+      } else if (event.eventType === KeypressEventType.Up) {
+        this.session.send([0x80, event.keyNumber, vel]);
       }
     }
   }

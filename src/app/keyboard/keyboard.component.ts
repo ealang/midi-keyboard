@@ -1,17 +1,22 @@
-import { Component, Input, Output, EventEmitter, ElementRef, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef } from '@angular/core';
+
+import { TouchService } from './touch/touch.service';
 import { DragbarService } from './dragbar/dragbar.service';
-import { LayoutService } from './layout/layout.service';
+import { LayoutService } from './layout.service';
 import { KeyConfigService } from '../keyconfig.service';
-import { KeyEvent } from './keys/keys.component';
 
 @Component({
   selector: 'app-keyboard',
   templateUrl: './keyboard.component.html',
-  styleUrls: ['./keyboard.component.css']
+  styleUrls: ['./keyboard.component.css'],
+  providers: [
+    LayoutService,
+    TouchService,
+    DragbarService
+  ],
 })
-export class KeyboardComponent implements OnInit {
+export class KeyboardComponent {
   private static scrollAmplifier = 2;
-  private svgElement: SVGGraphicsElement = null;
   private numVisibleKeys_ = 0;
 
   scrollActive = false;
@@ -24,19 +29,16 @@ export class KeyboardComponent implements OnInit {
     this.scrollPosition = this.boundScrollPosition(this.scrollPosition);
   }
 
-  @Output() keyEvent = new EventEmitter<KeyEvent>();
-
   constructor(
     dragbar: DragbarService,
     readonly layout: LayoutService,
-    private readonly keyconfig: KeyConfigService,
-    private readonly element: ElementRef
+    private readonly keyconfig: KeyConfigService
   ) {
     this.scrollPosition = this.boundScrollPosition(
       -keyconfig.initScrollPosition * layout.whiteKeyWidth
     );
-    dragbar.scroll.subscribe((pxlDelta) => {
-      this.onDragbarScroll(pxlDelta);
+    dragbar.scroll.subscribe((delta) => {
+      this.onDragbarScroll(delta);
     });
     dragbar.scrollActive.subscribe((active) => {
       this.scrollActive = active;
@@ -58,23 +60,8 @@ export class KeyboardComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
-    this.svgElement = this.element.nativeElement.querySelector('svg');
-  }
-
-  onKeyEvent(event: KeyEvent) {
-    this.keyEvent.emit(event);
-  }
-
-  private onDragbarScroll(pxlDelta: number): void {
-    const matrix = this.svgElement.getScreenCTM().inverse();
-    const pxlToSvgPt = (x: number) => {
-      const pt = this.svgElement['createSVGPoint']();
-      pt.x = x;
-      return pt.matrixTransform(matrix).x;
-    };
-    const scrollDelta = (pxlToSvgPt(pxlDelta) - pxlToSvgPt(0)) * KeyboardComponent.scrollAmplifier,
-          newScrollPosition = this.scrollPosition + scrollDelta;
+  private onDragbarScroll(delta: number): void {
+    const newScrollPosition = this.scrollPosition + delta * KeyboardComponent.scrollAmplifier;
     this.scrollPosition = this.boundScrollPosition(newScrollPosition);
   }
 }

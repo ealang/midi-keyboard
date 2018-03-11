@@ -1,15 +1,10 @@
 import { NgModule } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 
+import { TouchModule } from './touch/touch.module';
 import { DragbarComponent } from './dragbar/dragbar.component';
-import { DragbarService } from './dragbar/dragbar.service';
 import { KeyboardComponent } from './keyboard.component';
 import { KeysComponent } from './keys/keys.component';
-
-import { TouchModule } from '../touch/touch.module';
-import { TouchService } from '../touch/touch.service';
-import { LayoutService } from './layout/layout.service';
 
 @NgModule({
   imports: [
@@ -18,13 +13,8 @@ import { LayoutService } from './layout/layout.service';
   ],
   declarations: [
     DragbarComponent,
-    KeyboardComponent,
-    KeysComponent
-  ],
-  providers: [
-    LayoutService,
-    TouchService,
-    DragbarService
+    KeysComponent,
+    KeyboardComponent
   ],
   exports: [
     KeyboardComponent

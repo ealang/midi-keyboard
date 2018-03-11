@@ -1,11 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
-import { DragbarService } from './dragbar/dragbar.service';
-import { TouchService } from '../touch/touch.service';
-import { KeyConfigService } from '../keyconfig.service';
 import { KeyboardModule } from './keyboard.module';
 import { KeyboardComponent } from './keyboard.component';
+import { DragbarService } from './dragbar/dragbar.service';
+import { LayoutService } from './layout.service';
+import { TouchService } from './touch/touch.service';
+import { KeypressService } from '../keypress/keypress.service';
+import { KeyConfigService } from '../keyconfig.service';
 
 describe('KeyboardComponent', () => {
   let touch: TouchService;
@@ -29,7 +31,8 @@ describe('KeyboardComponent', () => {
         KeyboardModule
       ],
       providers: [
-        KeyConfigService
+        KeyConfigService,
+        KeypressService
       ]
     })
     .compileComponents();
@@ -37,8 +40,8 @@ describe('KeyboardComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(KeyboardComponent);
-    touch = TestBed.get(TouchService);
-    dragbar = TestBed.get(DragbarService);
+    touch = fixture.debugElement.injector.get(TouchService);
+    dragbar = fixture.debugElement.injector.get(DragbarService);
     component = fixture.componentInstance;
     component.scrollPosition = 0;
     component.numVisibleKeys = 7;
@@ -71,12 +74,14 @@ describe('KeyboardComponent', () => {
       'start',
       'mouse',
       dragbar.touchElemId,
+      {x: 0, y: 0},
       {x: 100, y: 0}
     );
     touch.emitEvent(
       'move',
       'mouse',
       dragbar.touchElemId,
+      {x: 0, y: 0},
       {x: 0, y: 0}
     );
 

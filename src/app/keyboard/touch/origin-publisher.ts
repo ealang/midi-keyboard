@@ -9,7 +9,7 @@ export class OriginPublisher {
     this.subscribers.set(elemId, [...oldSubs, subscriber]);
   }
 
-  emitEvent(eventType: string, touchId: TouchId, curElemId: ElemId, coordinates: Point): void {
+  emitEvent(eventType: string, touchId: TouchId, curElemId: ElemId, elemRelCoordinates: Point, globalCoordinates: Point): void {
     if (eventType === 'start') {
       this.origins.set(touchId, stripData(curElemId));
     }
@@ -20,7 +20,8 @@ export class OriginPublisher {
         eventType,
         touchId,
         elemsAreEqual(originElemId, curElemId) ? curElemId : null,
-        coordinates
+        elemRelCoordinates,
+        globalCoordinates
       );
       this.subscribers.get(originElemId).forEach((subscriber) => {
         subscriber(event);

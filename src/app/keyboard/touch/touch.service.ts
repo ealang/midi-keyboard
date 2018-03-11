@@ -22,8 +22,8 @@ export class TouchService {
     this.sticky.subscribe(elemId, subscriber);
   }
 
-  emitEvent(eventType: string, touchId: TouchId, elemId: ElemId, coordinates: Point): void {
-    this.origin.emitEvent(eventType, touchId, elemId, coordinates);
-    this.sticky.emitEvent(eventType, touchId, elemId, coordinates);
+  emitEvent(eventType: string, touchId: TouchId, elemId: ElemId, elemRelCoordinates: Point, globalCoordinates: Point): void {
+    this.origin.emitEvent(eventType, touchId, elemId, elemRelCoordinates, globalCoordinates);
+    this.sticky.emitEvent(eventType, touchId, elemId, elemRelCoordinates, globalCoordinates);
   }
 }
