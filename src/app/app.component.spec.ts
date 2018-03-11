@@ -9,6 +9,7 @@ import { ControlsModule } from './controls/controls.module';
 import { WebMidiService } from './webmidi.service';
 import { KeyConfigService } from './keyconfig.service';
 import { LayoutService } from './keyboard/layout.service';
+import { ControlsService } from './controls/controls.service';
 
 import { AppComponent } from './app.component';
 
@@ -28,7 +29,8 @@ describe('AppComponent', () => {
       providers: [
         WebMidiService,
         LayoutService,
-        KeyConfigService
+        KeyConfigService,
+        ControlsService
       ]
     }).compileComponents();
   }));

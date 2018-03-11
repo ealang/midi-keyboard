@@ -10,17 +10,15 @@
                mode="side"
                position="end"
                opened>
-    <app-sidenav [(numVisibleKeys)]="numVisibleKeys"
-                 [(velocity)]="velocity"
-                 [(ymod)]="ymod">
+    <app-sidenav>
     </app-sidenav>
   </mat-sidenav>
   <mat-sidenav-content class="content-host main-content">
     <app-keyboard class="main-content"
-                  [numVisibleKeys]="numVisibleKeys">
+                  [numVisibleKeys]="controls.numVisibleKeys">
     </app-keyboard>
     <app-keyboard class="main-content"
-                  [numVisibleKeys]="numVisibleKeys">
+                  [numVisibleKeys]="controls.numVisibleKeys">
     </app-keyboard>
   </mat-sidenav-content>
 </mat-sidenav-container>

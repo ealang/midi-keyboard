@@ -8,6 +8,7 @@ import { KeyboardModule } from './keyboard/keyboard.module';
 import { ControlsModule } from './controls/controls.module';
 import { KeypressModule } from './keypress/keypress.module';
 
+import { ControlsService } from './controls/controls.service';
 import { WebMidiService } from './webmidi.service';
 import { KeyConfigService } from './keyconfig.service';
 
@@ -27,7 +28,8 @@ import { AppComponent } from './app.component';
   ],
   providers: [
     KeyConfigService,
-    WebMidiService
+    WebMidiService,
+    ControlsService
   ],
   bootstrap: [
     AppComponent

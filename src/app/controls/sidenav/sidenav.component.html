@@ -14,9 +14,9 @@
       </button>
     </div>
     <mat-slider
-      [min]="minVisibleKeys"
-      [max]="maxVisibleKeys"
-      [(ngModel)]="numVisibleKeys">
+      [min]="controls.minVisibleKeys"
+      [max]="controls.maxVisibleKeys"
+      [(ngModel)]="controls.numVisibleKeys">
     </mat-slider>
   </mat-card-content>
 </mat-card>
@@ -27,15 +27,15 @@
     <div>
       <span>Velocity</span>
       <mat-slider
-        [min]="minVelocity"
-        [max]="maxVelocity"
-        [(ngModel)]="velocity"
+        [min]="controls.minVelocity"
+        [max]="controls.maxVelocity"
+        [(ngModel)]="controls.velocity"
         [disabled]="velocityDisabled">
       </mat-slider>
     </div>
     <div>
       <mat-form-field>
-        <mat-select placeholder="Y Mod" [(value)]="ymod">
+        <mat-select placeholder="Y Axis Mod" [(value)]="controls.ymod">
           <mat-option value="disabled">(Not Used)</mat-option>
           <mat-option value="velocity">Velocity</mat-option>
         </mat-select>

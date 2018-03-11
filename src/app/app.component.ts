@@ -2,6 +2,7 @@ import { Component, HostListener, ViewChild } from '@angular/core';
 import { WebMidiService, Device, DeviceSession } from './webmidi.service';
 import { KeypressService, KeypressEvent, KeypressEventType } from './keypress/keypress.service';
 import { MatSidenav } from '@angular/material/sidenav';
+import { ControlsService } from './controls/controls.service';
 
 @Component({
   selector: 'app-root',
@@ -15,11 +16,8 @@ export class AppComponent {
 
   deviceList = new Array<Device>();
   selectedDeviceId = <string> null;
-  numVisibleKeys = 12;
-  velocity = 127;
-  ymod = 'disabled';
 
-  constructor(keypress: KeypressService, private readonly webmidi: WebMidiService) {
+  constructor(keypress: KeypressService, private readonly webmidi: WebMidiService, private readonly controls: ControlsService) {
     this.webmidi.onDevicesChanged((devices: Array<Device>) => {
       this.deviceList = devices;
     });
@@ -54,9 +52,9 @@ export class AppComponent {
 
   onKeypressEvent(event: KeypressEvent): void {
     if (this.session) {
-      const velocity = this.ymod === 'velocity' ?
+      const velocity = this.controls.ymod === 'velocity' ?
         (event.coordinates && Math.floor(Math.max(Math.min(event.coordinates.y, 1), 0) * 0x7F) || 0x7F) :
-        this.velocity;
+        this.controls.velocity;
       if (event.eventType === KeypressEventType.Down) {
         this.session.send([0x90, event.keyNumber, velocity]);
       } else if (event.eventType === KeypressEventType.Up) {
