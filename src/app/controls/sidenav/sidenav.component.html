@@ -11,6 +11,9 @@
       </mat-form-field>
     </div>
     <div>
+      <mat-checkbox [(ngModel)]="controls.minikeys">Minikeys</mat-checkbox>
+    </div>
+    <div>
       <span>Num Keys</span>
       <button (click)="onRemoveKey()"
               mat-mini-fab

@@ -12,12 +12,13 @@
       </g>
       <svg:g app-keys
              attr.transform="translate(0, {{ layout.dragBarHeight + layout.keyBoardPadding }})"
+             [minikeys]="minikeys"
              [scrollPosition]="scrollPosition"
              [scrollActive]="scrollActive"
              (keyEvent)="onKeyEvent($event)">
       </g>
       <svg:g app-dragbar
-             attr.transform="translate({{ -layout.dragBarStrokeWidth / 2 }}, {{ layout.dragBarHeight + layout.keyBoardPadding * 2 + layout.whiteKeyHeight }})"
+             attr.transform="translate({{ -layout.dragBarStrokeWidth / 2 }}, {{ layout.dragBarHeight + layout.keyBoardPadding * 2 + layout.whiteKeyHeight(minikeys) }})"
              [width]="layout.dragBarWidth"
              [height]="layout.dragBarHeight"
              [strokeWidth]="layout.dragBarStrokeWidth">

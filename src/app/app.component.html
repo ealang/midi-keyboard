@@ -16,6 +16,7 @@
   <mat-sidenav-content class="content-host main-content">
     <div class="content-host main-content" *ngFor="let _ of repeat(controls.numKeyboards)">
       <app-keyboard class="main-content"
+                    [minikeys]="controls.minikeys"
                     [numVisibleKeys]="controls.numVisibleKeys">
       </app-keyboard>
     </div>

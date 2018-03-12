@@ -8,6 +8,7 @@ import { LayoutService } from './layout.service';
 import { TouchService } from './touch/touch.service';
 import { KeypressService } from '../keypress/keypress.service';
 import { KeyConfigService } from '../keyconfig.service';
+import { ControlsService } from '../controls/controls.service';
 
 describe('KeyboardComponent', () => {
   let touch: TouchService;
@@ -32,7 +33,8 @@ describe('KeyboardComponent', () => {
       ],
       providers: [
         KeyConfigService,
-        KeypressService
+        KeypressService,
+        ControlsService
       ]
     })
     .compileComponents();

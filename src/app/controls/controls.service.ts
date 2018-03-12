@@ -16,6 +16,8 @@ export class ControlsService {
 
   numKeyboards = 1;
 
+  minikeys = false;
+
   constructor(keyconfig: KeyConfigService) {
     this.maxVisibleKeys = keyconfig.numWhiteKeys;
   }
