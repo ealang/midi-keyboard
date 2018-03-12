@@ -10,7 +10,7 @@ export class SidenavComponent {
   private readonly controls: ControlsService;
 
   get velocityDisabled(): boolean {
-    return this.controls.ymod === 'velocity';
+    return this.controls.yMod === 'velocity';
   }
 
   onRemoveKey(): void {

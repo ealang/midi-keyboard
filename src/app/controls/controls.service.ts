@@ -12,7 +12,7 @@ export class ControlsService {
   readonly maxVisibleKeys: number;
   numVisibleKeys = 12;
 
-  ymod = 'disabled';
+  yMod = 'disabled';
 
   numKeyboards = 1;
 

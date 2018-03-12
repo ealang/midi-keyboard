@@ -56,7 +56,7 @@ export class AppComponent {
 
   onKeypressEvent(event: KeypressEvent): void {
     if (this.session) {
-      const velocity = this.controls.ymod === 'velocity' ?
+      const velocity = this.controls.yMod === 'velocity' ?
         (event.coordinates && Math.floor(Math.max(Math.min(event.coordinates.y, 1), 0) * 0x7F) || 0x7F) :
         this.controls.velocity;
       if (event.eventType === KeypressEventType.Down) {

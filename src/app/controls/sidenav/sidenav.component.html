@@ -1,53 +1,64 @@
-<mat-card>
-  <mat-card-title>Key Config</mat-card-title>
-  <mat-card-content>
-    <div>
-      <mat-form-field>
-        <mat-select placeholder="Num Keyboards" [(value)]="controls.numKeyboards">
-          <mat-option [value]="1">1</mat-option>
-          <mat-option [value]="2">2</mat-option>
-          <mat-option [value]="3">3</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <div>
-      <mat-checkbox [(ngModel)]="controls.minikeys">Minikeys</mat-checkbox>
-    </div>
-    <div>
-      <span>Num Keys</span>
-      <button (click)="onRemoveKey()"
-              mat-mini-fab
-              [disabled]="removeKeyDisabled">
-        -
-      </button>
-      <button (click)="onAddKey()"
-              mat-mini-fab
-              [disabled]="addKeyDisabled">
-        +
-      </button>
-    </div>
-  </mat-card-content>
-</mat-card>
+<mat-tab-group>
+  <mat-tab label="Keyboard Layout">
+    <mat-card>
+      <mat-card-content>
+        <div>
+          <mat-form-field>
+            <mat-select placeholder="Num Keyboards" [(value)]="controls.numKeyboards">
+              <mat-option [value]="1">1</mat-option>
+              <mat-option [value]="2">2</mat-option>
+              <mat-option [value]="3">3</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-checkbox [(ngModel)]="controls.minikeys">Minikeys</mat-checkbox>
+        </div>
+        <div>
+          <span>Num Keys</span>
+          <button (click)="onRemoveKey()"
+                  mat-mini-fab
+                  [disabled]="removeKeyDisabled">
+            -
+          </button>
+          <button (click)="onAddKey()"
+                  mat-mini-fab
+                  [disabled]="addKeyDisabled">
+            +
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+  <mat-tab label="Midi Params">
+    <mat-card>
+      <mat-card-title>Global Params</mat-card-title>
+      <mat-card-content>
+        <div>
+          <span>Velocity</span>
+          <mat-slider
+            [min]="controls.minVelocity"
+            [max]="controls.maxVelocity"
+            [(ngModel)]="controls.velocity"
+            [disabled]="velocityDisabled">
+          </mat-slider>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
-<mat-card>
-  <mat-card-title>Midi Parameters</mat-card-title>
-  <mat-card-content>
-    <div>
-      <span>Velocity</span>
-      <mat-slider
-        [min]="controls.minVelocity"
-        [max]="controls.maxVelocity"
-        [(ngModel)]="controls.velocity"
-        [disabled]="velocityDisabled">
-      </mat-slider>
-    </div>
-    <div>
-      <mat-form-field>
-        <mat-select placeholder="Y Axis Mod" [(value)]="controls.ymod">
-          <mat-option value="disabled">(Not Used)</mat-option>
-          <mat-option value="velocity">Velocity</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-  </mat-card-content>
-</mat-card>
+    <mat-card>
+      <mat-card-title>Gestures</mat-card-title>
+      <mat-card-content>
+        <div>
+          <mat-form-field>
+            <mat-select placeholder="Y Mod" [(value)]="controls.yMod">
+              <mat-option value="disabled">(Disabled)</mat-option>
+              <mat-option value="velocity">On/Off Velocity</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+</mat-tab-group>
+
