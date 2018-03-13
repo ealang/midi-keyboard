@@ -11,6 +11,7 @@ import { KeypressModule } from './keypress/keypress.module';
 import { ControlsService } from './controls/controls.service';
 import { WebMidiService } from './webmidi.service';
 import { KeyConfigService } from './keyconfig.service';
+import { PlayService } from './play.service';
 
 import { AppComponent } from './app.component';
 
@@ -29,7 +30,8 @@ import { AppComponent } from './app.component';
   providers: [
     KeyConfigService,
     WebMidiService,
-    ControlsService
+    ControlsService,
+    PlayService
   ],
   bootstrap: [
     AppComponent

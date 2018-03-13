@@ -10,6 +10,7 @@ import { WebMidiService } from './webmidi.service';
 import { KeyConfigService } from './keyconfig.service';
 import { LayoutService } from './keyboard/layout.service';
 import { ControlsService } from './controls/controls.service';
+import { PlayService } from './play.service';
 
 import { AppComponent } from './app.component';
 
@@ -30,7 +31,8 @@ describe('AppComponent', () => {
         WebMidiService,
         LayoutService,
         KeyConfigService,
-        ControlsService
+        ControlsService,
+        PlayService
       ]
     }).compileComponents();
   }));

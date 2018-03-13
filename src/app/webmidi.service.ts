@@ -1,88 +1,72 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
+import { Option, none, some } from 'ts-option';
 
 export interface Device {
   id: string;
   name: string;
 }
 
-export class DeviceSession {
-  id: string;
-
-  constructor(private output: WebMidi.MIDIOutput) {
-    this.id = output.id;
-  }
-
-  send(data: Array<number>): void {
-    this.output.send(data, 0);
-  }
-
-  close(): void {
-    this.output.close();
-  }
-}
-
 @Injectable()
 export class WebMidiService {
+  private openDevice: Option<WebMidi.MIDIOutput> = none;
   private midiAccess: Promise<WebMidi.MIDIAccess>;
-  private currentSession: DeviceSession;
-  private _onDevicesChanged: (devices: Array<Device>) => void;
-  private _onSessionLost: () => void;
+
   isSupported: boolean;
+  devicesChange = new EventEmitter<Array<Device>>();
+  deviceLost = new EventEmitter<void>();
 
   constructor() {
     this.isSupported = window.navigator.requestMIDIAccess !== undefined;
+
     this.midiAccess =
       (this.isSupported) ?
         window.navigator.requestMIDIAccess() :
         Promise.reject('Midi is not supported');
 
     this.midiAccess.then((access: WebMidi.MIDIAccess) => {
-      access.onstatechange = (event: WebMidi.MIDIConnectionEvent) => {
-        const id = event.port.id,
-              state = event.port.state;
-        if (
-          this.currentSession &&
-          this.currentSession.id === id &&
-          state === 'disconnected' &&
-          this._onSessionLost
-        ) {
-          this._onSessionLost();
-        }
-        if (this._onDevicesChanged) {
-          this.devices().then(this._onDevicesChanged);
-        }
+      access.onstatechange = (event) => {
+        this.onStateChange(access, event);
       };
     });
   }
 
+  sendData(data: Array<number>): void {
+    this.openDevice.forEach((device) => {
+      device.send(data, 0);
+    });
+  }
+
   devices(): Promise<Array<Device>> {
-    return this.midiAccess.then((access: WebMidi.MIDIAccess) => {
-      const devices = access.outputs;
-      return Array.from(devices.values()).map(device => {
-        return {id: device.id, name: device.name};
-      });
+    return this.midiAccess.then(access => {
+      return this.parseDevices(access);
     });
   }
 
-  openSession(deviceId: string): Promise<DeviceSession> {
-    if (this.currentSession) {
-      this.currentSession.close();
-      this.currentSession = null;
-    }
-    return this.midiAccess.then((access: WebMidi.MIDIAccess) => {
+  openSession(deviceId: string): Promise<void> {
+    this.openDevice.forEach((device) => {
+      device.close();
+    });
+    this.openDevice = none;
+    return this.midiAccess.then(access => {
       const device = access.outputs.get(deviceId);
-      device.open();
-
-      this.currentSession = new DeviceSession(device);
-      return this.currentSession;
+      this.openDevice = some(device);
     });
   }
 
-  onDevicesChanged(callback: (devices: Array<Device>) => void): void {
-    this._onDevicesChanged = callback;
+  private parseDevices(access: WebMidi.MIDIAccess): Array<Device> {
+    const devices = access.outputs;
+    return Array.from(devices.values()).map(device => {
+      return {id: device.id, name: device.name};
+    });
   }
 
-  onSessionLost(callback: () => void): void {
-    this._onSessionLost = callback;
+  private onStateChange(access: WebMidi.MIDIAccess, event: WebMidi.MIDIConnectionEvent) {
+    const id = event.port.id,
+          state = event.port.state;
+    if (state === 'disconnected' && this.openDevice.exists((device) => device.id === id)) {
+      this.openDevice = none;
+      this.deviceLost.emit();
+    }
+    this.devicesChange.emit(this.parseDevices(access));
   }
 }

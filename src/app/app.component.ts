@@ -1,8 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { WebMidiService, Device, DeviceSession } from './webmidi.service';
-import { KeypressService, KeypressEvent, KeypressEventType } from './keypress/keypress.service';
 import { MatSidenav } from '@angular/material/sidenav';
+
+import { WebMidiService, Device } from './webmidi.service';
 import { ControlsService } from './controls/controls.service';
+import { KeypressService, KeypressEvent } from './keypress/keypress.service';
+import { PlayService } from './play.service';
 
 @Component({
   selector: 'app-root',
@@ -10,19 +12,21 @@ import { ControlsService } from './controls/controls.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  private session: DeviceSession;
-
   @ViewChild('sidenav') sidenav: MatSidenav;
 
   deviceList = new Array<Device>();
-  selectedDeviceId = <string> null;
+  selectedDeviceId = <string>null;
 
-  constructor(keypress: KeypressService, private readonly webmidi: WebMidiService, private readonly controls: ControlsService) {
-    this.webmidi.onDevicesChanged((devices: Array<Device>) => {
+  constructor(
+    keypress: KeypressService,
+    private readonly controls: ControlsService,
+    private readonly webmidi: WebMidiService,
+    private readonly play: PlayService
+  ) {
+    this.webmidi.devicesChange.subscribe((devices: Array<Device>) => {
       this.deviceList = devices;
     });
-    this.webmidi.onSessionLost(() => {
-      this.session = null;
+    this.webmidi.deviceLost.subscribe(() => {
       this.selectedDeviceId = null;
     });
     this.webmidi.devices().then((devices: Array<Device>) => {
@@ -42,29 +46,17 @@ export class AppComponent {
   }
 
   selectDevice(deviceId: string): void {
-    this.session = null;
-    this.selectedDeviceId = deviceId;
     if (deviceId !== null) {
-      this.webmidi.openSession(deviceId).then((session: DeviceSession) => {
-        this.session = session;
+      this.webmidi.openSession(deviceId).then(() => {
+        this.selectedDeviceId = deviceId;
       }, (error: string) => {
         console.log(error);
-        this.selectedDeviceId = null;
       });
     }
   }
 
   onKeypressEvent(event: KeypressEvent): void {
-    if (this.session) {
-      const velocity = this.controls.yMod === 'velocity' ?
-        (event.coordinates && Math.floor(Math.max(Math.min(event.coordinates.y, 1), 0) * 0x7F) || 0x7F) :
-        this.controls.velocity;
-      if (event.eventType === KeypressEventType.Down) {
-        this.session.send([0x90, event.keyNumber, velocity]);
-      } else if (event.eventType === KeypressEventType.Up) {
-        this.session.send([0x80, event.keyNumber, velocity]);
-      }
-    }
+    this.play.processEvent(event);
   }
 
   onSideNavToggled(): void {

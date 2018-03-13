@@ -12,6 +12,8 @@ export class ControlsService {
   readonly maxVisibleKeys: number;
   numVisibleKeys = 12;
 
+  channel = 0;
+
   yMod = 'disabled';
 
   numKeyboards = 1;
