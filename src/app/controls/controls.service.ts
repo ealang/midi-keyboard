@@ -15,6 +15,7 @@ export class ControlsService {
   channel = 0;
 
   yMod = 'disabled';
+  xSlideMod = 'disabled';
 
   numKeyboards = 1;
 

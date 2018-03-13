@@ -4,7 +4,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { WebMidiService, Device } from './webmidi.service';
 import { ControlsService } from './controls/controls.service';
 import { KeypressService, KeypressEvent } from './keypress/keypress.service';
-import { PlayService } from './play.service';
+import { PlayService } from './play/play.service';
 
 @Component({
   selector: 'app-root',
