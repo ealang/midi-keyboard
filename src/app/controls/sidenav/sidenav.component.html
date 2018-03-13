@@ -35,6 +35,13 @@
       <mat-card-title>Global Params</mat-card-title>
       <mat-card-content>
         <div>
+          <mat-form-field>
+            <mat-select placeholder="Channel" [(value)]="controls.channel">
+              <mat-option *ngFor="let i of allChannels" [value]="i">{{ i }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div>
           <span>Velocity</span>
           <mat-slider
             [min]="controls.minVelocity"

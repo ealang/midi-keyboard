@@ -9,6 +9,8 @@ import { ControlsService } from './../controls.service';
 export class SidenavComponent {
   private readonly controls: ControlsService;
 
+  readonly allChannels: Array<number>;
+
   get velocityDisabled(): boolean {
     return this.controls.yMod === 'velocity';
   }
@@ -31,5 +33,9 @@ export class SidenavComponent {
 
   constructor(controls: ControlsService) {
     this.controls = controls;
+    this.allChannels = Array(16);
+    for (let i = 0; i < 16; i++) {
+      this.allChannels[i] = i;
+    }
   }
 }
