@@ -5,17 +5,36 @@ import { WebMidiService } from '../webmidi.service';
 import { ControlsService } from '../controls/controls.service';
 import { KeypressEvent, KeypressEventType } from '../keypress/keypress.service';
 
-import { MidiCommand } from './midi-command';
+import { MidiCommand, MidiCommandSeq } from './midi-command';
 import { SlideAccum } from './slide-accum';
 
 @Injectable()
 export class PlayService {
   private readonly accum = new SlideAccum();
 
+  private static applyDeadZone(value: number, deadzone: number): number {
+    return Math.abs(value) < deadzone ?
+      0 :
+      value - Math.sign(value) * deadzone;
+  }
+
   constructor(
     private readonly midi: WebMidiService,
     private readonly controls: ControlsService
   ) {
+    controls.channelChange.subscribe(([oldCh, newCh]) => {
+      this.processChannelClose(oldCh);
+      this.processChannelChanged();
+    });
+    controls.pitchBendSemiChange.subscribe(() => {
+      this.processChannelChanged();
+    });
+    midi.deviceOpened.subscribe(() => {
+      this.processChannelChanged();
+    });
+    midi.preDeviceClose.subscribe(() => {
+      this.processChannelClose(controls.channel);
+    });
   }
 
   private noteVelocity(event: KeypressEvent): number {
@@ -26,15 +45,20 @@ export class PlayService {
     }
   }
 
-  private commandsForSlide(delta: Point): Array<Array<number>> {
+  private commandsForPreDeviceClose(): MidiCommandSeq {
+    return [];
+  }
+
+  private commandsForSlide(delta: Point): MidiCommandSeq {
     if (delta && this.controls.xSlideMod === 'channel-pitch-bend') {
-      return MidiCommand.pitchBendNorm(this.controls.channel, delta.x);
+      const bend = PlayService.applyDeadZone(delta.x, this.controls.xSlideDeadZone);
+      return MidiCommand.pitchBendNorm(this.controls.channel, bend);
     } else {
       return [];
     }
   }
 
-  private commandsForSlideCancel(): Array<Array<number>> {
+  private commandsForSlideCancel(): MidiCommandSeq {
     if (this.controls.xSlideMod === 'channel-pitch-bend') {
       return MidiCommand.resetPitchBend(this.controls.channel);
     } else {
@@ -42,7 +66,7 @@ export class PlayService {
     }
   }
 
-  private commandsForEvent(event: KeypressEvent): Array<Array<number>> {
+  private commandsForEvent(event: KeypressEvent): MidiCommandSeq {
     if (event.eventType === KeypressEventType.Down) {
       return MidiCommand.noteOn(this.controls.channel, event.keyNumber, this.noteVelocity(event));
     } else if (event.eventType === KeypressEventType.Up) {
@@ -56,9 +80,25 @@ export class PlayService {
     }
   }
 
-  processEvent(event: KeypressEvent): void {
-    this.commandsForEvent(event).forEach((data) => {
+  private sendCommandSeq(commands: MidiCommandSeq): void {
+    commands.forEach((data) => {
       this.midi.sendData(data);
     });
+  }
+
+  private commandsToConfigureChannel(channel: number): MidiCommandSeq {
+    return MidiCommand.pitchBendSensitivity(channel, this.controls.pitchBendSemi);
+  }
+
+  processChannelClose(channel: number): void {
+    this.sendCommandSeq(MidiCommand.resetAllControllers(channel));
+  }
+
+  processChannelChanged(): void {
+    this.sendCommandSeq(this.commandsToConfigureChannel(this.controls.channel));
+  }
+
+  processEvent(event: KeypressEvent): void {
+    this.sendCommandSeq(this.commandsForEvent(event));
   }
 }

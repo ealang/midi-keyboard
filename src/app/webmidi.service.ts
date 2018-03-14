@@ -15,6 +15,9 @@ export class WebMidiService {
   devicesChange = new EventEmitter<Array<Device>>();
   deviceLost = new EventEmitter<void>();
 
+  deviceOpened = new EventEmitter<void>();
+  preDeviceClose = new EventEmitter<void>();
+
   constructor() {
     this.isSupported = window.navigator.requestMIDIAccess !== undefined;
 
@@ -44,11 +47,14 @@ export class WebMidiService {
 
   openSession(deviceId: string): Promise<void> {
     this.openDevice.forEach((device) => {
+      this.preDeviceClose.emit();
       device.close();
     });
     this.openDevice = none;
     return this.midiAccess.then(access => {
       const device = access.outputs.get(deviceId);
+      device.open();
+      this.deviceOpened.emit();
       this.openDevice = some(device);
     });
   }

@@ -1,5 +1,10 @@
+export type MidiCommandSeq = Array<Array<number>>;
+
 export namespace MidiCommand {
-  type MidiCommandSeq = Array<Array<number>>;
+
+  export function resetAllControllers(channel: number): MidiCommandSeq {
+    return [[0xB0 + channel, 121, 0]];
+  }
 
   export function noteOn(channel: number, keyNumber: number, velocity: number): MidiCommandSeq {
     return [[0x90 + channel, keyNumber, velocity]];
@@ -7,6 +12,14 @@ export namespace MidiCommand {
 
   export function noteOff(channel: number, keyNumber: number, velocity: number): MidiCommandSeq {
     return [[0x80 + channel, keyNumber, velocity]];
+  }
+
+  export function polyphonicKeyPressure(channel: number, keyNumber: number, pressure: number): MidiCommandSeq {
+    return [[0xA0 + channel, keyNumber, pressure]];
+  }
+
+  export function channelPressure(channel: number, pressure: number): MidiCommandSeq {
+    return [[0xD0 + channel, pressure]];
   }
 
   export function pitchBendSensitivity(channel: number, semitones: number): MidiCommandSeq {
