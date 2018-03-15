@@ -63,7 +63,7 @@
             <mat-option value="pressure">Polyphonic Key Pressure</mat-option>
           </mat-select>
         </mat-form-field>
-        <div>
+        <div *ngIf="controls.yMod !== 'disabled'">
           <mat-checkbox [(ngModel)]="controls.yModInvert">Invert Axis</mat-checkbox>
         </div>
       </mat-card-content>
