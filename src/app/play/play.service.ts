@@ -18,6 +18,14 @@ export class PlayService {
       value - Math.sign(value) * deadzone;
   }
 
+  private static bound(value: number, min: number, max: number): number {
+    return Math.max(Math.min(value, max), min);
+  }
+
+  private static normToMidi(normValue: number, invert: boolean): number {
+    return Math.floor(PlayService.bound(invert ? 1 - normValue : normValue, 0, 1) * 127);
+  }
+
   constructor(
     private readonly midi: WebMidiService,
     private readonly controls: ControlsService
@@ -39,23 +47,32 @@ export class PlayService {
 
   private noteVelocity(event: KeypressEvent): number {
     if (this.controls.yMod === 'velocity') {
-      return event.coordinates && Math.floor(Math.max(Math.min(event.coordinates.y, 1), 0) * 0x7F) || 0x7F;
+      return (event.coordinates && PlayService.normToMidi(event.coordinates.y, this.controls.yModInvert)) || 0x7F;
     } else {
       return this.controls.velocity;
     }
+  }
+
+  private commandsForCurrentPressure(event: KeypressEvent): MidiCommandSeq {
+      const pressure = (event.coordinates && PlayService.normToMidi(event.coordinates.y, this.controls.yModInvert)) || 0;
+      return MidiCommand.polyphonicKeyPressure(this.controls.channel, event.keyNumber, pressure);
   }
 
   private commandsForPreDeviceClose(): MidiCommandSeq {
     return [];
   }
 
-  private commandsForSlide(delta: Point): MidiCommandSeq {
-    if (delta && this.controls.xSlideMod === 'channel-pitch-bend') {
-      const bend = PlayService.applyDeadZone(delta.x, this.controls.xSlideDeadZone);
-      return MidiCommand.pitchBendNorm(this.controls.channel, bend);
-    } else {
-      return [];
-    }
+  private commandsForSlide(event: KeypressEvent, delta: Point): MidiCommandSeq {
+    const yCmds = (this.controls.yMod === 'pressure') ?
+      this.commandsForCurrentPressure(event) : [];
+
+    const xCmds = (delta && this.controls.xSlideMod === 'channel-pitch-bend') ?
+      (() => {
+        const bend = PlayService.applyDeadZone(PlayService.bound(delta.x, -1, 1), this.controls.xSlideDeadZone);
+        return MidiCommand.pitchBendNorm(this.controls.channel, bend);
+      })() : [];
+
+    return [...yCmds, ...xCmds];
   }
 
   private commandsForSlideCancel(): MidiCommandSeq {
@@ -66,9 +83,17 @@ export class PlayService {
     }
   }
 
+  private commandsForNoteOn(event: KeypressEvent): MidiCommandSeq {
+    const pressureCmds = this.controls.yMod === 'pressure' ? this.commandsForCurrentPressure(event) : [];
+    return [
+      ...pressureCmds,
+      ...MidiCommand.noteOn(this.controls.channel, event.keyNumber, this.noteVelocity(event))
+    ];
+  }
+
   private commandsForEvent(event: KeypressEvent): MidiCommandSeq {
     if (event.eventType === KeypressEventType.Down) {
-      return MidiCommand.noteOn(this.controls.channel, event.keyNumber, this.noteVelocity(event));
+      return this.commandsForNoteOn(event);
     } else if (event.eventType === KeypressEventType.Up) {
       this.accum.cancelSlide(event.keyNumber);
       const offCmds = MidiCommand.noteOff(this.controls.channel, event.keyNumber, this.noteVelocity(event)),
@@ -76,7 +101,7 @@ export class PlayService {
       return [...slideCmds, ...offCmds];
     } else if (event.eventType === KeypressEventType.Move) {
       const delta = this.accum.trackKeySlide(event.keyNumber, event.coordinates);
-      return this.commandsForSlide(delta);
+      return this.commandsForSlide(event, delta);
     }
   }
 

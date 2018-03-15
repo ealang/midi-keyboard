@@ -24,6 +24,8 @@ export class ControlsService {
   channelChange = new EventEmitter<[number, number]>();
 
   yMod = 'disabled';
+  yModInvert = false;
+
   xSlideMod = 'disabled';
 
   xSlideDeadZone = 0.1;

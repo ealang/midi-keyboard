@@ -57,11 +57,15 @@
       <mat-card-title>Y Mod</mat-card-title>
       <mat-card-content>
         <mat-form-field>
-          <mat-select placeholder="Mode" [(value)]="controls.yMod">
+          <mat-select placeholder="Target" [(value)]="controls.yMod">
             <mat-option value="disabled">(Disabled)</mat-option>
             <mat-option value="velocity">On/Off Velocity</mat-option>
+            <mat-option value="pressure">Polyphonic Key Pressure</mat-option>
           </mat-select>
         </mat-form-field>
+        <div>
+          <mat-checkbox [(ngModel)]="controls.yModInvert">Invert Axis</mat-checkbox>
+        </div>
       </mat-card-content>
     </mat-card>
 
@@ -69,7 +73,7 @@
       <mat-card-title>X Slide Mod</mat-card-title>
       <mat-card-content>
         <mat-form-field>
-          <mat-select placeholder="Mode" [(value)]="controls.xSlideMod">
+          <mat-select placeholder="Target" [(value)]="controls.xSlideMod">
             <mat-option value="disabled">(Disabled)</mat-option>
             <mat-option value="channel-pitch-bend">Channel Pitch Bend</mat-option>
           </mat-select>
