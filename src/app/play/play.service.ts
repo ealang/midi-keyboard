@@ -86,8 +86,8 @@ export class PlayService {
   private commandsForNoteOn(event: KeypressEvent): MidiCommandSeq {
     const pressureCmds = this.controls.yMod === 'pressure' ? this.commandsForCurrentPressure(event) : [];
     return [
-      ...pressureCmds,
-      ...MidiCommand.noteOn(this.controls.channel, event.keyNumber, this.noteVelocity(event))
+      ...MidiCommand.noteOn(this.controls.channel, event.keyNumber, this.noteVelocity(event)),
+      ...pressureCmds
     ];
   }
 
