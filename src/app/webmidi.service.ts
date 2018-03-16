@@ -1,4 +1,4 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable, EventEmitter, OnInit } from '@angular/core';
 import { Option, none, some } from 'ts-option';
 
 export interface Device {
@@ -7,7 +7,7 @@ export interface Device {
 }
 
 @Injectable()
-export class WebMidiService {
+export class WebMidiService implements OnInit {
   private openDevice: Option<WebMidi.MIDIOutput> = none;
   private midiAccess: Promise<WebMidi.MIDIAccess>;
 
@@ -16,7 +16,6 @@ export class WebMidiService {
   deviceLost = new EventEmitter<void>();
 
   deviceOpened = new EventEmitter<void>();
-  preDeviceClose = new EventEmitter<void>();
 
   constructor() {
     this.isSupported = window.navigator.requestMIDIAccess !== undefined;
@@ -25,7 +24,9 @@ export class WebMidiService {
       (this.isSupported) ?
         window.navigator.requestMIDIAccess() :
         Promise.reject('Midi is not supported');
+  }
 
+  ngOnInit(): void {
     this.midiAccess.then((access: WebMidi.MIDIAccess) => {
       access.onstatechange = (event) => {
         this.onStateChange(access, event);
@@ -33,9 +34,11 @@ export class WebMidiService {
     });
   }
 
-  sendData(data: Array<number>): void {
+  sendData(commands: Array<Array<number>>): void {
     this.openDevice.forEach((device) => {
-      device.send(data, 0);
+      commands.forEach((data) => {
+        device.send(data, 0);
+      });
     });
   }
 
@@ -47,7 +50,6 @@ export class WebMidiService {
 
   openSession(deviceId: string): Promise<void> {
     this.openDevice.forEach((device) => {
-      this.preDeviceClose.emit();
       device.close();
     });
     this.openDevice = none;

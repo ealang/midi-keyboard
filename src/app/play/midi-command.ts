@@ -40,7 +40,7 @@ export namespace MidiCommand {
     ]];
   }
 
-  export function resetPitchBend(channel: number): MidiCommandSeq {
+  export function pitchBendReset(channel: number): MidiCommandSeq {
     return pitchBend(channel, 0x2000);
   }
 

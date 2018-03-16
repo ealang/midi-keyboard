@@ -31,7 +31,6 @@ export class PlayService {
     private readonly controls: ControlsService
   ) {
     controls.channelChange.subscribe(([oldCh, newCh]) => {
-      this.processChannelClose(oldCh);
       this.processChannelChanged();
     });
     controls.pitchBendSemiChange.subscribe(() => {
@@ -39,9 +38,6 @@ export class PlayService {
     });
     midi.deviceOpened.subscribe(() => {
       this.processChannelChanged();
-    });
-    midi.preDeviceClose.subscribe(() => {
-      this.processChannelClose(controls.channel);
     });
   }
 
@@ -58,15 +54,11 @@ export class PlayService {
       return MidiCommand.polyphonicKeyPressure(this.controls.channel, event.keyNumber, pressure);
   }
 
-  private commandsForPreDeviceClose(): MidiCommandSeq {
-    return [];
-  }
-
   private commandsForSlide(event: KeypressEvent, delta: Point): MidiCommandSeq {
     const yCmds = (this.controls.yMod === 'pressure') ?
       this.commandsForCurrentPressure(event) : [];
 
-    const xCmds = (delta && this.controls.xSlideMod === 'channel-pitch-bend') ?
+    const xCmds = (delta.x !== 0 && this.controls.xSlideMod === 'channel-pitch-bend') ?
       (() => {
         const bend = PlayService.applyDeadZone(PlayService.bound(delta.x, -1, 1), this.controls.xSlideDeadZone);
         return MidiCommand.pitchBendNorm(this.controls.channel, bend);
@@ -77,7 +69,7 @@ export class PlayService {
 
   private commandsForSlideCancel(): MidiCommandSeq {
     if (this.controls.xSlideMod === 'channel-pitch-bend') {
-      return MidiCommand.resetPitchBend(this.controls.channel);
+      return MidiCommand.pitchBendReset(this.controls.channel);
     } else {
       return [];
     }
@@ -105,25 +97,15 @@ export class PlayService {
     }
   }
 
-  private sendCommandSeq(commands: MidiCommandSeq): void {
-    commands.forEach((data) => {
-      this.midi.sendData(data);
-    });
-  }
-
   private commandsToConfigureChannel(channel: number): MidiCommandSeq {
     return MidiCommand.pitchBendSensitivity(channel, this.controls.pitchBendSemi);
   }
 
-  processChannelClose(channel: number): void {
-    this.sendCommandSeq(MidiCommand.resetAllControllers(channel));
-  }
-
-  processChannelChanged(): void {
-    this.sendCommandSeq(this.commandsToConfigureChannel(this.controls.channel));
+  private processChannelChanged(): void {
+    this.midi.sendData(this.commandsToConfigureChannel(this.controls.channel));
   }
 
   processEvent(event: KeypressEvent): void {
-    this.sendCommandSeq(this.commandsForEvent(event));
+    this.midi.sendData(this.commandsForEvent(event));
   }
 }
