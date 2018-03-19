@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs/Subject';
 
 import { Point } from '../geometry';
 import { WebMidiService } from '../webmidi.service';
@@ -7,10 +8,13 @@ import { KeypressEvent, KeypressEventType } from '../keypress/keypress.service';
 
 import { MidiCommand, MidiCommandSeq } from './midi-command';
 import { SlideAccum } from './slide-accum';
+import { PlayPluginHost } from './plugins';
 
 @Injectable()
 export class PlayService {
   private readonly accum = new SlideAccum();
+  private pluginHost: PlayPluginHost;
+  private keypresses = new Subject<KeypressEvent>();
 
   private static applyDeadZone(value: number, deadzone: number): number {
     return Math.abs(value) < deadzone ?
@@ -39,6 +43,8 @@ export class PlayService {
     midi.deviceOpened.subscribe(() => {
       this.processChannelChanged();
     });
+
+    this.pluginHost = new PlayPluginHost(this.keypresses, midi, controls);
   }
 
   private noteVelocity(event: KeypressEvent): number {
@@ -106,6 +112,6 @@ export class PlayService {
   }
 
   processEvent(event: KeypressEvent): void {
-    this.midi.sendData(this.commandsForEvent(event));
+    this.keypresses.next(event);
   }
 }

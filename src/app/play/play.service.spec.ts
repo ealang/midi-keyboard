@@ -32,14 +32,15 @@ describe('PlayService', () => {
 
   const withInst = (controls: ControlsService, body: (service: PlayService) => void) => {
     return () => {
-      body(new PlayService(midi, controls));
+      const service = new PlayService(midi, controls);
+      expect(midi.sendData).not.toHaveBeenCalled();
+      body(service);
     };
   };
 
   beforeEach(() => {
     midi = new MockWebMidiService();
     spyOn(midi, 'sendData');
-    expect(midi.sendData).not.toHaveBeenCalled();
   });
 
   describe('basic mode', () => {
