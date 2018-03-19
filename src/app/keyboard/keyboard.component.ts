@@ -4,6 +4,7 @@ import { TouchService } from './touch/touch.service';
 import { DragbarService } from './dragbar/dragbar.service';
 import { LayoutService } from './layout.service';
 import { KeyConfigService } from '../keyconfig.service';
+import { ControlsService } from '../controls/controls.service';
 
 @Component({
   selector: 'app-keyboard',
@@ -17,22 +18,35 @@ import { KeyConfigService } from '../keyconfig.service';
 })
 export class KeyboardComponent {
   private static scrollAmplifier = 2;
-  private numVisibleKeys_ = 0;
+  private minikeysValue;
+  private numVisibleKeysValue = 0;
 
   scrollActive = false;
   scrollPosition = 0;
   viewBox: Array<number> = [0, 0, 0, 0];
 
+  @Input() set minikeys(enabled: boolean) {
+    this.minikeysValue = enabled;
+    this.viewBox = this.calcViewBox();
+  }
+  get minikeys(): boolean {
+    return this.minikeysValue;
+  }
+
   @Input() set numVisibleKeys(num: number) {
-    this.numVisibleKeys_ = num;
+    this.numVisibleKeysValue = num;
     this.viewBox = this.calcViewBox();
     this.scrollPosition = this.boundScrollPosition(this.scrollPosition);
+  }
+  get numVisibleKeys(): number {
+    return this.numVisibleKeysValue;
   }
 
   constructor(
     dragbar: DragbarService,
     readonly layout: LayoutService,
-    private readonly keyconfig: KeyConfigService
+    private readonly keyconfig: KeyConfigService,
+    controls: ControlsService
   ) {
     this.scrollPosition = this.boundScrollPosition(
       -keyconfig.initScrollPosition * layout.whiteKeyWidth
@@ -46,17 +60,20 @@ export class KeyboardComponent {
   }
 
   private calcViewBox(): Array<number> {
+    const w = this.numVisibleKeys * this.layout.whiteKeyWidth + this.layout.keyStrokeWidth,
+          h = this.layout.whiteKeyHeight(this.minikeys) +
+              (this.layout.dragBarHeight + this.layout.keyBoardPadding) * 2 +
+              this.layout.dragBarStrokeWidth;
     return [
       0, 0,
-      this.numVisibleKeys_ * this.layout.whiteKeyWidth + this.layout.keyStrokeWidth,
-      this.layout.whiteKeyHeight + (this.layout.dragBarHeight + this.layout.keyBoardPadding) * 2 + this.layout.dragBarStrokeWidth
+      w, h
     ];
   }
 
   private boundScrollPosition(position: number): number {
     return Math.max(
       Math.min(0, position),
-      -(this.keyconfig.numWhiteKeys - this.numVisibleKeys_) * this.layout.whiteKeyWidth + this.layout.keyStrokeWidth
+      -(this.keyconfig.numWhiteKeys - this.numVisibleKeys) * this.layout.whiteKeyWidth + this.layout.keyStrokeWidth
     );
   }
 

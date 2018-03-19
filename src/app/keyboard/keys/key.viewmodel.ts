@@ -20,12 +20,12 @@ export class KeyViewModel {
 
   held: boolean;
 
-  constructor(readonly keyNumber: number, xOffset: number, layout: LayoutService) {
+  constructor(readonly keyNumber: number, xOffset: number, layout: LayoutService, minikeys: boolean) {
     this.black = isBlackKey(keyNumber);
     this.x = xOffset + (this.black ? -layout.blackKeyWidth / 2 : 0);
     this.y = 0;
     this.width = this.black ? layout.blackKeyWidth : layout.whiteKeyWidth;
-    this.height = this.black ? layout.blackKeyHeight : layout.whiteKeyHeight;
+    this.height = this.black ? layout.blackKeyHeight(minikeys) : layout.whiteKeyHeight(minikeys);
     this.strokeWidth = layout.keyStrokeWidth;
     this.resetState();
 
@@ -38,12 +38,12 @@ export class KeyViewModel {
   }
 }
 
-export function createDefaultKeys(layout: LayoutService, keyconfig: KeyConfigService): Array<KeyViewModel> {
+export function createDefaultKeys(layout: LayoutService, keyconfig: KeyConfigService, minikeys: boolean): Array<KeyViewModel> {
   const whiteKeys = new Array<KeyViewModel>(),
         blackKeys = new Array<KeyViewModel>();
   let xOffset = 0;
   for (let i = keyconfig.keyStart; i < keyconfig.keyEnd; i++) {
-    const key = new KeyViewModel(i, xOffset, layout);
+    const key = new KeyViewModel(i, xOffset, layout, minikeys);
     if (key.black) {
       blackKeys.push(key);
     } else {

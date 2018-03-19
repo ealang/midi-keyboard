@@ -4,10 +4,23 @@
   flex-direction: column;
 }
 
-app-controls {
+.content-host {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-content {
   flex: 0 0 auto;
 }
 
-app-keyboard {
+.main-content {
   flex: 1 1 auto;
+}
+
+mat-sidenav-content {
+  background: #333;
+}
+
+mat-sidenav {
+  background: #f5f5f5;
 }

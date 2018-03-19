@@ -1,11 +1,24 @@
-<app-controls [deviceList]="deviceList"
-              [selectedDeviceId]="selectedDeviceId"
-              (selectedDeviceIdChange)="selectDevice($event)"
-              [(numVisibleKeys)]="numVisibleKeys">
-</app-controls>
+<app-toolbar class="menu-content"
+             [deviceList]="deviceList"
+             [selectedDeviceId]="selectedDeviceId"
+             (selectedDeviceIdChange)="selectDevice($event)"
+             (sideNavToggle)="onSideNavToggled()">
+</app-toolbar>
 
-<app-keyboard [numVisibleKeys]="numVisibleKeys">
-</app-keyboard>
-
-<app-keyboard [numVisibleKeys]="numVisibleKeys">
-</app-keyboard>
+<mat-sidenav-container class="content-host main-content">
+  <mat-sidenav #sidenav
+               mode="side"
+               position="end"
+               opened>
+    <app-sidenav>
+    </app-sidenav>
+  </mat-sidenav>
+  <mat-sidenav-content class="content-host main-content">
+    <div class="content-host main-content" *ngFor="let _ of repeat(controls.numKeyboards)">
+      <app-keyboard class="main-content"
+                    [minikeys]="controls.minikeys"
+                    [numVisibleKeys]="controls.numVisibleKeys">
+      </app-keyboard>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

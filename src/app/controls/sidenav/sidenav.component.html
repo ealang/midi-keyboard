@@ -1,0 +1,106 @@
+<mat-tab-group>
+  <mat-tab label="Keyboard Layout">
+    <mat-card>
+      <mat-card-content>
+        <div>
+          <mat-form-field>
+            <mat-select placeholder="Num Keyboards" [(value)]="controls.numKeyboards">
+              <mat-option [value]="1">1</mat-option>
+              <mat-option [value]="2">2</mat-option>
+              <mat-option [value]="3">3</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-checkbox [(ngModel)]="controls.minikeys">Minikeys</mat-checkbox>
+        </div>
+        <div>
+          <span>Num Keys</span>
+          <button (click)="onRemoveKey()"
+                  mat-mini-fab
+                  [disabled]="removeKeyDisabled">
+            -
+          </button>
+          <button (click)="onAddKey()"
+                  mat-mini-fab
+                  [disabled]="addKeyDisabled">
+            +
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+  <mat-tab label="Midi Params">
+    <mat-card>
+      <mat-card-title>Global Params</mat-card-title>
+      <mat-card-content>
+        <div>
+          <mat-form-field>
+            <mat-select placeholder="Channel" [(value)]="controls.channel">
+              <mat-option *ngFor="let i of allChannels" [value]="i">{{ i }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div>
+          <span>Velocity</span>
+          <mat-slider
+            [min]="controls.minVelocity"
+            [max]="controls.maxVelocity"
+            [(ngModel)]="controls.velocity"
+            [disabled]="velocityDisabled">
+          </mat-slider>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-title>Y Mod</mat-card-title>
+      <mat-card-content>
+        <mat-form-field>
+          <mat-select placeholder="Target" [(value)]="controls.yMod">
+            <mat-option value="disabled">(Disabled)</mat-option>
+            <mat-option value="velocity">On/Off Velocity</mat-option>
+            <mat-option value="pressure">Polyphonic Key Pressure</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div *ngIf="controls.yMod !== 'disabled'">
+          <mat-checkbox [(ngModel)]="controls.yModInvert">Invert Axis</mat-checkbox>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-title>X Slide Mod</mat-card-title>
+      <mat-card-content>
+        <mat-form-field>
+          <mat-select placeholder="Target" [(value)]="controls.xSlideMod">
+            <mat-option value="disabled">(Disabled)</mat-option>
+            <mat-option value="channel-pitch-bend">Channel Pitch Bend</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div>
+          <div *ngIf="controls.xSlideMod==='channel-pitch-bend'">
+            <div>
+              <div>Sensitivity (Semitones)</div>
+              <mat-slider
+                thumbLabel
+                [min]="controls.minPitchBendSemi"
+                [max]="controls.maxPitchBendSemi"
+                [(ngModel)]="controls.pitchBendSemi">
+              </mat-slider>
+            </div>
+            <div>
+              <div>Dead Zone</div>
+              <mat-slider
+                [min]="controls.guiMinXSlideDeadZone"
+                [max]="controls.guiMaxXSlideDeadZone"
+                [(ngModel)]="controls.guiXSlideDeadZone">
+              </mat-slider>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+</mat-tab-group>
+

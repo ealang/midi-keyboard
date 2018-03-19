@@ -1,4 +1,4 @@
-import { Component, Input, ElementRef } from '@angular/core';
+import { Component, Input, ElementRef, OnInit } from '@angular/core';
 
 import { LayoutService } from '../layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
@@ -13,37 +13,43 @@ import { KeyViewModel, createDefaultKeys } from './key.viewmodel';
   templateUrl: './keys.component.html',
   styleUrls: ['./keys.component.css']
 })
-export class KeysComponent {
-  private scrollActive_ = false;
+export class KeysComponent implements OnInit {
+  private scrollActiveValue = false;
   private keyNumToIndex;
+  private minikeysValue = false;
   touchElemId = 'keys';
   keys: Array<KeyViewModel>;
   labelFontSize: number;
 
   @Input() scrollPosition = 0;
 
+  @Input() set minikeys(enabled: boolean) {
+    if (enabled !== this.minikeys) {
+      this.minikeysValue = enabled;
+      this.regenerateKeys();
+    }
+  }
+  get minikeys(): boolean {
+    return this.minikeysValue;
+  }
+
   @Input() set scrollActive(active: boolean) {
-    this.scrollActive_ = active;
+    this.scrollActiveValue = active;
     if (active) {
       this.keypress.freezeAll();
     }
   }
-
   get scrollActive(): boolean {
-    return this.scrollActive_;
+    return this.scrollActiveValue;
   }
 
   constructor(
-    layout: LayoutService,
     touch: TouchService,
-    private keyconfig: KeyConfigService,
+    private readonly layout: LayoutService,
+    private readonly keyconfig: KeyConfigService,
     private readonly keypress: KeypressService,
     private readonly element: ElementRef
   ) {
-    this.keys = createDefaultKeys(layout, keyconfig);
-    this.keyNumToIndex = new Map<number, number>(
-      this.keys.map((key, i) => <[number, number]>[key.keyNumber, i])
-    );
     this.labelFontSize = layout.labelFontSize;
 
     keypress.keypressEvent.subscribe((event: KeypressEvent) => {
@@ -54,10 +60,8 @@ export class KeysComponent {
     });
   }
 
-  private parseKeyFromElemId(elemId: ElemId): number {
-    return elemId && this.keys[
-      Number(elemId.split(':')[1])
-    ].keyNumber;
+  ngOnInit(): void {
+    this.regenerateKeys();
   }
 
   onTouchEvent(event: TouchEvent): void {
@@ -68,7 +72,7 @@ export class KeysComponent {
       event.eventType,
       event.elemRelCoordinates
     );
-    if (this.scrollActive_) {
+    if (this.scrollActive) {
       this.keypress.freezeAll();
     }
   }
@@ -78,5 +82,18 @@ export class KeysComponent {
           keyIndex = this.keyNumToIndex.get(keyNumber),
           key = this.keys[keyIndex];
     key.held = event.eventType !== KeypressEventType.Up;
+  }
+
+  private regenerateKeys(): void {
+    this.keys = createDefaultKeys(this.layout, this.keyconfig, this.minikeys);
+    this.keyNumToIndex = new Map<number, number>(
+      this.keys.map((key, i) => <[number, number]>[key.keyNumber, i])
+    );
+  }
+
+  private parseKeyFromElemId(elemId: ElemId): number {
+    return elemId && this.keys[
+      Number(elemId.split(':')[1])
+    ].keyNumber;
   }
 }
