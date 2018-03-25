@@ -15,10 +15,10 @@ export function yModPolyphonicPressure(
 ) {
   return keyStreams.map(stream => {
     return stream.filter(event => {
-      return event.event.eventType !== KeypressEventType.Up && !!event.event.coordinates;
+      return event.eventType !== KeypressEventType.Up && !!event.coordinates;
     }).map(event => {
-      const pressure = normToMidi(event.event.coordinates.y, controls.yMod.yInvert);
-      return MidiCommand.polyphonicKeyPressure(event.channel, event.event.keyNumber, pressure);
+      const pressure = normToMidi(event.coordinates.y, controls.yMod.yInvert);
+      return MidiCommand.polyphonicKeyPressure(event.channel, event.keyNumber, pressure);
     });
   }).mergeAll();
 }

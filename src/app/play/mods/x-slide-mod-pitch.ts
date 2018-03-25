@@ -27,17 +27,17 @@ export function xSlideModPitch(
   });
 
   const bends = keyStreams.map(stream => {
-    const resets = stream.filter(event => event.event.eventType === KeypressEventType.Up)
+    const resets = stream.filter(event => event.eventType === KeypressEventType.Up)
       .map(event => {
         return MidiCommand.pitchBendReset(event.channel);
       });
     const changes = stream
       .filter(event => {
-        return event.event.eventType !== KeypressEventType.Up && !!event.event.coordinates;
+        return event.eventType !== KeypressEventType.Up && !!event.coordinates;
       })
       .scan((state, event: KeypressEventWithChannel) => {
-        const x = event.event.coordinates.x;
-        if (event.event.eventType === KeypressEventType.Down) {
+        const x = event.coordinates.x;
+        if (event.eventType === KeypressEventType.Down) {
           return { xStart: x, x: x, channel: event.channel };
         } else {
           return Object.assign({}, state, {x: x});

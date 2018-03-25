@@ -13,11 +13,11 @@ export function noteFixedVelocity(
   controls: ControlsService
 ) {
   const flatStream = keyStreams.mergeAll();
-  const downs = flatStream.filter(event => event.event.eventType === KeypressEventType.Down).map(event => {
-    return MidiCommand.noteOn(event.channel, event.event.keyNumber, controls.velocity.fixedValue);
+  const downs = flatStream.filter(event => event.eventType === KeypressEventType.Down).map(event => {
+    return MidiCommand.noteOn(event.channel, event.keyNumber, controls.velocity.fixedValue);
   });
-  const ups = flatStream.filter(event => event.event.eventType === KeypressEventType.Up).map(event => {
-    return MidiCommand.noteOff(event.channel, event.event.keyNumber, controls.velocity.fixedValue);
+  const ups = flatStream.filter(event => event.eventType === KeypressEventType.Up).map(event => {
+    return MidiCommand.noteOff(event.channel, event.keyNumber, controls.velocity.fixedValue);
   });
   return Observable.merge(downs, ups);
 }

@@ -1,5 +1,9 @@
-import { KeypressEvent } from '../keypress/keypress.service';
+import { KeypressEventType } from '../keypress/keypress.service';
+import { Point } from '../geometry';
 
-export class KeypressEventWithChannel {
-  constructor(readonly event: KeypressEvent, readonly channel: number) {}
+export interface KeypressEventWithChannel {
+  readonly channel: number;
+  readonly eventType: KeypressEventType;
+  readonly keyNumber: number;
+  readonly coordinates: Point;
 }

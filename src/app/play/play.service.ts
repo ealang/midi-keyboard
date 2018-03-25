@@ -51,7 +51,7 @@ function attachChannelFactory(controls: ControlsService): () => (event: Keypress
         return c;
       })();
     return (event: KeypressEvent) => {
-      return new KeypressEventWithChannel(event, myChannel);
+      return <KeypressEventWithChannel>{...event, channel: myChannel};
     };
   };
   return onNewStream;
