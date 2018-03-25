@@ -36,7 +36,7 @@
       <mat-card-content>
         <mat-form-field>
           <mat-select placeholder="Mode" [(value)]="controls.channel.mode.value">
-            <mat-option value="fixed">Fixed Value</mat-option>
+            <mat-option value="fixed">Fixed</mat-option>
             <mat-option value="round-robin">Round-robin</mat-option>
           </mat-select>
         </mat-form-field>
@@ -53,12 +53,12 @@
       <mat-card-content>
         <mat-form-field>
           <mat-select placeholder="Mode" [(value)]="controls.velocity.mode.value">
-            <mat-option value="fixed">Fixed Value</mat-option>
+            <mat-option value="fixed">Fixed</mat-option>
             <mat-option value="ymod">Y Mod</mat-option>
           </mat-select>
         </mat-form-field>
         <div *ngIf="controls.velocity.mode.value === 'fixed'">
-          <span>Value</span>
+          <span>Velocity</span>
           <mat-slider
             [min]="controls.midiMin"
             [max]="controls.midiMax"
