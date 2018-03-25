@@ -136,6 +136,7 @@ describe('PlayService', () => {
       expect(midi.sendData).toHaveBeenCalledWith(
         MidiCommand.pitchBendSensitivity(0, 3)
       );
+      play.processEvent(evt(KeypressEventType.Up));
 
       controls.xSlideMod.pitchBendSemi.value = 6;
       play.processEvent(evt(KeypressEventType.Down));
@@ -150,6 +151,8 @@ describe('PlayService', () => {
       controls.channel.fixedChannel.value = 0;
       play.processEvent(evt(KeypressEventType.Down));
       expect(midi.sendData).toHaveBeenCalledWith(pitchBendRangeCh0);
+      play.processEvent(evt(KeypressEventType.Up));
+
       controls.channel.fixedChannel.value = 1;
       play.processEvent(evt(KeypressEventType.Down));
       expect(midi.sendData).toHaveBeenCalledWith(pitchBendRangeCh1);
@@ -161,6 +164,7 @@ describe('PlayService', () => {
 
       play.processEvent(evt(KeypressEventType.Down));
       expect(midi.sendData).toHaveBeenCalledWith(pitchBendRange);
+      play.processEvent(evt(KeypressEventType.Up));
 
       midi.sendData['calls'].reset();
       midi.deviceOpened.emit();

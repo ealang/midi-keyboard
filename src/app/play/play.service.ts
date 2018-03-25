@@ -7,6 +7,8 @@ import 'rxjs/add/observable/empty';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
+import 'rxjs/add/operator/groupBy';
+import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/takeUntil';
 
 import { WebMidiService } from '../webmidi.service';
@@ -19,25 +21,16 @@ import { xSlideModPitch } from './mods/x-slide-mod-pitch';
 import { yModPolyphonicPressure } from './mods/y-mod-poly-pressure';
 import { KeypressEventWithChannel } from './keypress-with-channel';
 
-function partitionKeypresses(keypresses: Observable<KeypressEvent>): Observable<Observable<KeypressEvent>> {
-  const keyStreams = new Subject<Observable<KeypressEvent>>();
-  const keyToStream = new Map<number, Subject<KeypressEvent>>();
-  keypresses.subscribe(event => {
-    if (event.eventType === KeypressEventType.Down) {
-      const subject = new Subject<KeypressEvent>();
-      keyToStream.set(event.keyNumber, subject);
-      keyStreams.next(subject);
-      subject.next(event);
-    } else {
-      const subject = keyToStream.get(event.keyNumber);
-      subject.next(event);
-      if (event.eventType === KeypressEventType.Up) {
-        subject.complete();
-        keyToStream.delete(event.keyNumber);
-      }
+function groupKeypresses(keypresses: Observable<KeypressEvent>): Observable<Observable<KeypressEvent>> {
+  return keypresses.groupBy(
+    keypress => keypress.keyNumber,
+    keypress => keypress,
+    keyStream => {
+      return keyStream.filter(keypress => {
+        return keypress.eventType === KeypressEventType.Up;
+      });
     }
-  });
-  return keyStreams;
+  );
 }
 
 function attachChannelFactory(controls: ControlsService): () => (event: KeypressEvent) => KeypressEventWithChannel {
@@ -91,7 +84,8 @@ export class PlayService {
     controls: ControlsService
   ) {
     const attachChannel = attachChannelFactory(controls);
-    const keyStreams = partitionKeypresses(this.keypresses).map((stream: Observable<KeypressEvent>) => {
+    const keyStreams = groupKeypresses(this.keypresses)
+      .map((stream: Observable<KeypressEvent>) => {
         return stream.map(attachChannel()).share();
       }).share();
 
