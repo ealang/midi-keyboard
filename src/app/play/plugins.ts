@@ -3,6 +3,7 @@ import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/distinct';
 import 'rxjs/add/operator/delay';
@@ -89,8 +90,8 @@ function constructPipeline(
 export class PlayPluginHost {
   constructor(keypresses: Observable<KeypressEvent>, midi: WebMidiService, controls: ControlsService) {
     const keyStreams = partitionKeypresses(keypresses).map((stream: Observable<KeypressEvent>) => {
-        return stream.map(attachChannel(controls));
-      });
+        return stream.map(attachChannel(controls)).share();
+      }).share();
 
     let curSub = null;
     const setupPipeline = () => {
