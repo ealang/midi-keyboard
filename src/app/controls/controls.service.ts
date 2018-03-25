@@ -20,12 +20,12 @@ export class ControlsService {
   readonly velocity = {
     mode: new ConfigItem<string>('fixed'),
     fixedValue: midiMax,
-    yModInvert: true
+    yModInvert: false
   };
 
   readonly yMod = {
     mode: new ConfigItem<string>('disabled'),
-    yInvert: false
+    yInvert: true
   };
 
   readonly xSlideMod = {

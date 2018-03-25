@@ -1,9 +1,7 @@
-
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/merge';
-import 'rxjs/add/operator/buffer';
-import 'rxjs/add/operator/do';
+import 'rxjs/add/observable/empty';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/distinct';
@@ -11,12 +9,11 @@ import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeAll';
-import 'rxjs/add/operator/multicast';
 
 import { KeypressEvent, KeypressEventType } from '../keypress/keypress.service';
 import { WebMidiService } from '../webmidi.service';
-import { MidiCommand } from './midi-command';
 import { ControlsService } from '../controls/controls.service';
+import { MidiCommand } from './midi-command';
 
 function applyDeadZone(value: number, deadzone: number): number {
   return Math.abs(value) < deadzone ?
@@ -64,21 +61,53 @@ function attachChannel(controls: ControlsService): (event: KeypressEvent) => Key
   };
 }
 
+function constructPipeline(
+  keyStreams: Observable<Observable<KeypressEventWithChannel>>,
+  controls: ControlsService
+): Observable<Array<Array<number>>> {
+  const empty = Observable.empty<Array<Array<number>>>();
+
+  const velocity = controls.velocity.mode.value === 'fixed' ?
+    fixedVelocityNotes(keyStreams, controls) :
+    yModVelocityNotePlugin(keyStreams, controls);
+
+  const yMod = controls.yMod.mode.value === 'pressure' ?
+    yModPolyphonicPressure(keyStreams, controls).delay(0) :  // TODO: delay is a hack to send pressure commands after node on commands
+    empty;
+
+  const xSlideMod = controls.xSlideMod.mode.value === 'channel-pitch-bend' ?
+    xRelModPitchBend(keyStreams, controls) :
+    empty;
+
+  return Observable.merge(
+    velocity,
+    yMod,
+    xSlideMod
+  );
+}
+
 export class PlayPluginHost {
   constructor(keypresses: Observable<KeypressEvent>, midi: WebMidiService, controls: ControlsService) {
     const keyStreams = partitionKeypresses(keypresses).map((stream: Observable<KeypressEvent>) => {
         return stream.map(attachChannel(controls));
       });
 
-    Observable.merge(
-      yModPolyphonicPressure(keyStreams, controls).delay(0),
-      // yModVelocityNotePlugin(keyStreams, controls),
-      fixedVelocityNotes(keyStreams, controls),
-      xRelModPitchBend(keyStreams, controls)
-    ).subscribe(cmds => {
-      console.log(cmds.map(l => l.join(' ')).join(', '));
-      midi.sendData(cmds);
-    });
+    let curSub = null;
+    const setupPipeline = () => {
+      if (curSub) {
+        curSub.unsubscribe();
+      }
+      curSub = constructPipeline(keyStreams, controls).subscribe(cmds => {
+        console.log(cmds.map(l => l.join(' ')).join(', '));
+        midi.sendData(cmds);
+      });
+    };
+
+    controls.channel.mode.change.subscribe(() => setupPipeline());
+    controls.velocity.mode.change.subscribe(() => setupPipeline());
+    controls.yMod.mode.change.subscribe(() => setupPipeline());
+    controls.xSlideMod.mode.change.subscribe(() => setupPipeline());
+    setupPipeline();
   }
 }
 
@@ -122,7 +151,7 @@ function yModPolyphonicPressure(
     return stream.filter(event => {
       return event.event.eventType !== KeypressEventType.Up && !!event.event.coordinates;
     }).map(event => {
-      const pressure = normToMidi(event.event.coordinates.y, controls.velocity.yModInvert);
+      const pressure = normToMidi(event.event.coordinates.y, controls.yMod.yInvert);
       return MidiCommand.polyphonicKeyPressure(event.channel, event.event.keyNumber, pressure);
     });
   }).mergeAll();
