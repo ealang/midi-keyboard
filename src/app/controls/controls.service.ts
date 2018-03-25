@@ -1,58 +1,54 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 
+import { ConfigItem } from './config-item';
 import { KeyConfigService } from '../keyconfig.service';
+
+const midiMin = 1;
+const midiMax = 127;
 
 @Injectable()
 export class ControlsService {
-  readonly minVelocity = 1;
-  readonly maxVelocity = 127;
-  velocity = 127;
+  readonly midiMin = midiMin;
+  readonly midiMax = midiMax;
 
   readonly minVisibleKeys = 3;
   readonly maxVisibleKeys: number;
   numVisibleKeys = 7;
+  numKeyboards = 1;
+  minikeys = false;
 
-  private channel_ = 0;
-  get channel(): number {
-    return this.channel_;
-  }
-  set channel(newChannel: number) {
-    const oldChannel = this.channel_;
-    this.channel_ = newChannel;
-    this.channelChange.emit([oldChannel, newChannel]);
-  }
-  channelChange = new EventEmitter<[number, number]>();
+  readonly velocity = {
+    mode: new ConfigItem<string>('fixed'),
+    fixedValue: midiMax,
+    yModInvert: true
+  };
 
-  yMod = 'disabled';
-  yModInvert = false;
+  readonly yMod = {
+    mode: new ConfigItem<string>('disabled'),
+    yInvert: false
+  };
 
-  xSlideMod = 'disabled';
+  readonly xSlideMod = {
+    mode: new ConfigItem<string>('disabled'),
+    deadZone: 0.1,
+    minPitchBendSemi: 1,
+    maxPitchBendSemi: 12,
+    pitchBendSemi: new ConfigItem<number>(2)
+  };
 
-  xSlideDeadZone = 0.1;
-  readonly guiMinXSlideDeadZone = 0;
-  readonly guiMaxXSlideDeadZone = 40;
+  readonly guiMinXSlideDeadZone: 0;
+  readonly guiMaxXSlideDeadZone: 40;
   get guiXSlideDeadZone(): number {
-    return Math.floor(this.xSlideDeadZone * 100);
+    return Math.floor(this.xSlideMod.deadZone * 100);
   }
   set guiXSlideDeadZone(val: number) {
-    this.xSlideDeadZone = val / 100;
+    this.xSlideMod.deadZone = val / 100;
   }
 
-  readonly minPitchBendSemi = 1;
-  readonly maxPitchBendSemi = 12;
-  pitchBendSemi_ = 2;
-  get pitchBendSemi() {
-    return this.pitchBendSemi_;
-  }
-  set pitchBendSemi(val: number) {
-    this.pitchBendSemi_ = val;
-    this.pitchBendSemiChange.emit(val);
-  }
-  pitchBendSemiChange = new EventEmitter<number>();
-
-  numKeyboards = 1;
-
-  minikeys = false;
+  readonly channel = {
+    mode: new ConfigItem<string>('fixed'),
+    fixedChannel: new ConfigItem<number>(0)
+  };
 
   constructor(keyconfig: KeyConfigService) {
     this.maxVisibleKeys = keyconfig.numWhiteKeys;

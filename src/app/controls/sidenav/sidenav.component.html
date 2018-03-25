@@ -32,23 +32,41 @@
   </mat-tab>
   <mat-tab label="Midi Params">
     <mat-card>
-      <mat-card-title>Global Params</mat-card-title>
+      <mat-card-title>Channel</mat-card-title>
       <mat-card-content>
-        <div>
-          <mat-form-field>
-            <mat-select placeholder="Channel" [(value)]="controls.channel">
-              <mat-option *ngFor="let i of allChannels" [value]="i">{{ i }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-        <div>
-          <span>Velocity</span>
+        <mat-form-field>
+          <mat-select placeholder="Mode" [(value)]="controls.channel.mode.value">
+            <mat-option value="fixed">Fixed Value</mat-option>
+            <mat-option value="round-robin">Round-robin</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field *ngIf="controls.channel.mode.value === 'fixed'">
+          <mat-select placeholder="Channel" [(value)]="controls.channel.fixedChannel.value">
+            <mat-option *ngFor="let i of allChannels" [value]="i">{{ i }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-title>Velocity</mat-card-title>
+      <mat-card-content>
+        <mat-form-field>
+          <mat-select placeholder="Mode" [(value)]="controls.velocity.mode.value">
+            <mat-option value="fixed">Fixed Value</mat-option>
+            <mat-option value="ymod">Y Mod</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div *ngIf="controls.velocity.mode.value === 'fixed'">
+          <span>Value</span>
           <mat-slider
-            [min]="controls.minVelocity"
-            [max]="controls.maxVelocity"
-            [(ngModel)]="controls.velocity"
-            [disabled]="velocityDisabled">
+            [min]="controls.midiMin"
+            [max]="controls.midiMax"
+            [(ngModel)]="controls.velocity.fixedValue">
           </mat-slider>
+        </div>
+        <div *ngIf="controls.velocity.mode.value === 'ymod'">
+          <mat-checkbox [(ngModel)]="controls.velocity.yModInvert">Invert Axis</mat-checkbox>
         </div>
       </mat-card-content>
     </mat-card>
@@ -57,14 +75,13 @@
       <mat-card-title>Y Mod</mat-card-title>
       <mat-card-content>
         <mat-form-field>
-          <mat-select placeholder="Target" [(value)]="controls.yMod">
+          <mat-select placeholder="Target" [(value)]="controls.yMod.mode.value">
             <mat-option value="disabled">(Disabled)</mat-option>
-            <mat-option value="velocity">On/Off Velocity</mat-option>
             <mat-option value="pressure">Polyphonic Key Pressure</mat-option>
           </mat-select>
         </mat-form-field>
-        <div *ngIf="controls.yMod !== 'disabled'">
-          <mat-checkbox [(ngModel)]="controls.yModInvert">Invert Axis</mat-checkbox>
+        <div *ngIf="controls.yMod.mode.value === 'pressure'">
+          <mat-checkbox [(ngModel)]="controls.yMod.yInvert">Invert Axis</mat-checkbox>
         </div>
       </mat-card-content>
     </mat-card>
@@ -73,31 +90,25 @@
       <mat-card-title>X Slide Mod</mat-card-title>
       <mat-card-content>
         <mat-form-field>
-          <mat-select placeholder="Target" [(value)]="controls.xSlideMod">
+          <mat-select placeholder="Target" [(value)]="controls.xSlideMod.mode.value">
             <mat-option value="disabled">(Disabled)</mat-option>
             <mat-option value="channel-pitch-bend">Channel Pitch Bend</mat-option>
           </mat-select>
         </mat-form-field>
-        <div>
-          <div *ngIf="controls.xSlideMod==='channel-pitch-bend'">
-            <div>
-              <div>Sensitivity (Semitones)</div>
-              <mat-slider
-                thumbLabel
-                [min]="controls.minPitchBendSemi"
-                [max]="controls.maxPitchBendSemi"
-                [(ngModel)]="controls.pitchBendSemi">
-              </mat-slider>
-            </div>
-            <div>
-              <div>Dead Zone</div>
-              <mat-slider
-                [min]="controls.guiMinXSlideDeadZone"
-                [max]="controls.guiMaxXSlideDeadZone"
-                [(ngModel)]="controls.guiXSlideDeadZone">
-              </mat-slider>
-            </div>
-          </div>
+        <div *ngIf="controls.xSlideMod.mode.value === 'channel-pitch-bend'">
+          <div>Sensitivity (Semitones)</div>
+          <mat-slider
+            thumbLabel
+            [min]="controls.xSlideMod.minPitchBendSemi"
+            [max]="controls.xSlideMod.maxPitchBendSemi"
+            [(ngModel)]="controls.xSlideMod.pitchBendSemi.value">
+          </mat-slider>
+          <div>Dead Zone</div>
+          <mat-slider
+            [min]="controls.guiMinXSlideDeadZone"
+            [max]="controls.guiMaxXSlideDeadZone"
+            [(ngModel)]="controls.guiXSlideDeadZone">
+          </mat-slider>
         </div>
       </mat-card-content>
     </mat-card>

@@ -58,7 +58,7 @@ class KeypressEventWithChannel {
 }
 
 function attachChannel(controls: ControlsService): (event: KeypressEvent) => KeypressEventWithChannel {
-  const channel = controls.channel;
+  const channel = controls.channel.fixedChannel.value;
   return (event: KeypressEvent) => {
     return {event, channel};
   };
@@ -72,7 +72,8 @@ export class PlayPluginHost {
 
     Observable.merge(
       yModPolyphonicPressure(keyStreams, controls).delay(0),
-      yModVelocityNotePlugin(keyStreams, controls),
+      // yModVelocityNotePlugin(keyStreams, controls),
+      fixedVelocityNotes(keyStreams, controls),
       xRelModPitchBend(keyStreams, controls)
     ).subscribe(cmds => {
       console.log(cmds.map(l => l.join(' ')).join(', '));
@@ -87,10 +88,10 @@ function fixedVelocityNotes(
 ) {
   const flatStream = keyStreams.mergeAll();
   const downs = flatStream.filter(event => event.event.eventType === KeypressEventType.Down).map(event => {
-    return MidiCommand.noteOn(event.channel, event.event.keyNumber, controls.velocity);
+    return MidiCommand.noteOn(event.channel, event.event.keyNumber, controls.velocity.fixedValue);
   });
   const ups = flatStream.filter(event => event.event.eventType === KeypressEventType.Up).map(event => {
-    return MidiCommand.noteOff(event.channel, event.event.keyNumber, controls.velocity);
+    return MidiCommand.noteOff(event.channel, event.event.keyNumber, controls.velocity.fixedValue);
   });
   return Observable.merge(downs, ups);
 }
@@ -101,7 +102,7 @@ function yModVelocityNotePlugin(
 ) {
   function velocityFromEvent(event: KeypressEvent): number {
     return event.coordinates ?
-      normToMidi(event.coordinates.y, controls.yModInvert) : 0x7F;
+      normToMidi(event.coordinates.y, controls.velocity.yModInvert) : 0x7F;
   }
   const flatStream = keyStreams.mergeAll();
   const downs = flatStream.filter(event => event.event.eventType === KeypressEventType.Down).map(event => {
@@ -121,7 +122,7 @@ function yModPolyphonicPressure(
     return stream.filter(event => {
       return event.event.eventType !== KeypressEventType.Up && !!event.event.coordinates;
     }).map(event => {
-      const pressure = normToMidi(event.event.coordinates.y, controls.yModInvert);
+      const pressure = normToMidi(event.event.coordinates.y, controls.velocity.yModInvert);
       return MidiCommand.polyphonicKeyPressure(event.channel, event.event.keyNumber, pressure);
     });
   }).mergeAll();
@@ -134,7 +135,10 @@ function xRelModPitchBend(
   const channelInits = keyStreams.map(stream => {
     return stream.first();
   }).mergeAll().distinct((event) => event.channel).map(event => {
-    return MidiCommand.pitchBendSensitivity(event.channel, controls.pitchBendSemi);
+    return MidiCommand.pitchBendSensitivity(
+      event.channel,
+      controls.xSlideMod.pitchBendSemi.value
+    );
   });
 
   const bends = keyStreams.map(stream => {
@@ -152,7 +156,10 @@ function xRelModPitchBend(
           return Object.assign({}, state, {x: x});
         }
       }, {}).map((state: any) => {
-        return MidiCommand.pitchBendNorm(state.channel, applyDeadZone(state.x - state.xStart, controls.xSlideDeadZone));
+        return MidiCommand.pitchBendNorm(
+          state.channel,
+          applyDeadZone(state.x - state.xStart, controls.xSlideMod.deadZone)
+        );
       });
       return Observable.merge(resets, changes);
     }).mergeAll();

@@ -11,10 +11,6 @@ export class SidenavComponent {
 
   readonly allChannels: Array<number>;
 
-  get velocityDisabled(): boolean {
-    return this.controls.yMod === 'velocity';
-  }
-
   onRemoveKey(): void {
     this.controls.numVisibleKeys--;
   }
