@@ -32,7 +32,9 @@ export function xSlideModPitch(
         return MidiCommand.pitchBendReset(event.channel);
       });
     const changes = stream
-      .filter(event => !!event.event.coordinates)
+      .filter(event => {
+        return event.event.eventType !== KeypressEventType.Up && !!event.event.coordinates;
+      })
       .scan((state, event: KeypressEventWithChannel) => {
         const x = event.event.coordinates.x;
         if (event.event.eventType === KeypressEventType.Down) {
