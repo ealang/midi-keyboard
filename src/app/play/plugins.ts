@@ -55,11 +55,21 @@ class KeypressEventWithChannel {
   constructor(readonly event: KeypressEvent, readonly channel: number) {}
 }
 
-function attachChannel(controls: ControlsService): (event: KeypressEvent) => KeypressEventWithChannel {
-  const channel = controls.channel.fixedChannel.value;
-  return (event: KeypressEvent) => {
-    return {event, channel};
+function attachChannelFactory(controls: ControlsService): () => (event: KeypressEvent) => KeypressEventWithChannel {
+  let rrChannel = 0;
+  const onNewStream = () => {
+    const myChannel = controls.channel.mode.value === 'fixed' ?
+      controls.channel.fixedChannel.value :
+      (() => {
+        const c = rrChannel;
+        rrChannel = (rrChannel + 1) % 16;
+        return c;
+      })();
+    return (event: KeypressEvent) => {
+      return new KeypressEventWithChannel(event, myChannel);
+    };
   };
+  return onNewStream;
 }
 
 function constructPipeline(
@@ -89,8 +99,9 @@ function constructPipeline(
 
 export class PlayPluginHost {
   constructor(keypresses: Observable<KeypressEvent>, midi: WebMidiService, controls: ControlsService) {
+    const attachChannel = attachChannelFactory(controls);
     const keyStreams = partitionKeypresses(keypresses).map((stream: Observable<KeypressEvent>) => {
-        return stream.map(attachChannel(controls)).share();
+        return stream.map(attachChannel()).share();
       }).share();
 
     let curSub = null;
@@ -99,7 +110,6 @@ export class PlayPluginHost {
         curSub.unsubscribe();
       }
       curSub = constructPipeline(keyStreams, controls).subscribe(cmds => {
-        console.log(cmds.map(l => l.join(' ')).join(', '));
         midi.sendData(cmds);
       });
     };
