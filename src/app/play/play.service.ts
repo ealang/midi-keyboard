@@ -7,6 +7,7 @@ import 'rxjs/add/observable/empty';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
+import 'rxjs/add/operator/takeUntil';
 
 import { WebMidiService } from '../webmidi.service';
 import { ControlsService } from '../controls/controls.service';
@@ -94,22 +95,24 @@ export class PlayService {
         return stream.map(attachChannel()).share();
       }).share();
 
-    let curSub = null;
+    const configChangedStream = Observable.merge(
+      controls.channel.mode.change,
+      controls.velocity.mode.change,
+      controls.yMod.mode.change,
+      controls.xSlideMod.mode.change,
+      controls.xSlideMod.pitchBendSemi.change,
+      midi.deviceOpened
+    );
+
     const setupPipeline = () => {
-      if (curSub) {
-        curSub.unsubscribe();
-      }
-      curSub = constructPipeline(keyStreams, controls).subscribe(cmds => {
-        midi.sendData(cmds);
-      });
+      constructPipeline(keyStreams, controls)
+        .takeUntil(configChangedStream)
+        .subscribe(cmds => {
+          midi.sendData(cmds);
+        });
     };
 
-    controls.channel.mode.change.subscribe(() => setupPipeline());
-    controls.velocity.mode.change.subscribe(() => setupPipeline());
-    controls.yMod.mode.change.subscribe(() => setupPipeline());
-    controls.xSlideMod.mode.change.subscribe(() => setupPipeline());
-    controls.xSlideMod.pitchBendSemi.change.subscribe(() => setupPipeline());
-    midi.deviceOpened.subscribe(() => setupPipeline());
+    configChangedStream.subscribe(setupPipeline);
     setupPipeline();
   }
 
