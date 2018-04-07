@@ -14,8 +14,7 @@
              attr.transform="translate(0, {{ layout.dragBarHeight + layout.keyBoardPadding }})"
              [minikeys]="minikeys"
              [scrollPosition]="scrollPosition"
-             [scrollActive]="scrollActive"
-             (keyEvent)="onKeyEvent($event)">
+             [scrollActive]="scrollActive">
       </g>
       <svg:g app-dragbar
              attr.transform="translate({{ -layout.dragBarStrokeWidth / 2 }}, {{ layout.dragBarHeight + layout.keyBoardPadding * 2 + layout.whiteKeyHeight(minikeys) }})"

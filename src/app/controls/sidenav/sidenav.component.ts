@@ -7,7 +7,7 @@ import { ControlsService } from './../controls.service';
   styleUrls: ['./sidenav.component.css']
 })
 export class SidenavComponent {
-  private readonly controls: ControlsService;
+  readonly controls: ControlsService;
 
   readonly allChannels: Array<number>;
 

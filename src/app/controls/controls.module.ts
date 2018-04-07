@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgModel } from '@angular/forms';
 
+import { FormsModule } from '@angular/forms';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +17,7 @@ import { SidenavComponent } from './sidenav/sidenav.component';
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     MatSelectModule,
     MatButtonModule,
     MatToolbarModule,
@@ -27,7 +28,6 @@ import { SidenavComponent } from './sidenav/sidenav.component';
     MatTabsModule
   ],
   declarations: [
-    NgModel,
     ToolbarComponent,
     SidenavComponent
   ],

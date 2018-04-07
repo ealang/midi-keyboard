@@ -19,7 +19,7 @@ export class AppComponent {
 
   constructor(
     keypress: KeypressService,
-    private readonly controls: ControlsService,
+    readonly controls: ControlsService,
     private readonly webmidi: WebMidiService,
     private readonly play: PlayService
   ) {
