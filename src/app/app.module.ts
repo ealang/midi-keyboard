@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
-
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { MatSidenavModule } from '@angular/material/sidenav';
 
 import { KeyboardModule } from './keyboard/keyboard.module';
@@ -12,6 +12,7 @@ import { ControlsService } from './controls/controls.service';
 import { WebMidiService } from './webmidi.service';
 import { KeyConfigService } from './keyconfig.service';
 import { PlayService } from './play/play.service';
+import { GoogleAnalyticsService } from './g-analytics.service';
 
 import { AppComponent } from './app.component';
 
@@ -31,7 +32,8 @@ import { AppComponent } from './app.component';
     KeyConfigService,
     WebMidiService,
     ControlsService,
-    PlayService
+    PlayService,
+    GoogleAnalyticsService
   ],
   bootstrap: [
     AppComponent

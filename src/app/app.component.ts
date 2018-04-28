@@ -1,28 +1,38 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 
 import { WebMidiService, Device } from './webmidi.service';
 import { ControlsService } from './controls/controls.service';
 import { KeypressService, KeypressEvent } from './keypress/keypress.service';
 import { PlayService } from './play/play.service';
+import { environment } from '../environments/environment';
+import { GoogleAnalyticsService } from './g-analytics.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   @ViewChild('sidenav') sidenav: MatSidenav;
 
   deviceList = new Array<Device>();
   selectedDeviceId = <string>null;
 
   constructor(
-    keypress: KeypressService,
     readonly controls: ControlsService,
+    private readonly keypress: KeypressService,
     private readonly webmidi: WebMidiService,
-    private readonly play: PlayService
+    private readonly play: PlayService,
+    private readonly analytics: GoogleAnalyticsService
   ) {
+  }
+
+  ngOnInit(): void {
+    if (environment.production) {
+      this.analytics.sendPageView();
+    }
+
     this.webmidi.devicesChange.subscribe((devices: Array<Device>) => {
       this.deviceList = devices;
     });
@@ -36,7 +46,7 @@ export class AppComponent {
         this.selectDevice(firstDevice.id);
       }
     });
-    keypress.keypressEvent.subscribe((event: KeypressEvent) => {
+    this.keypress.keypressEvent.subscribe((event: KeypressEvent) => {
       this.onKeypressEvent(event);
     });
   }

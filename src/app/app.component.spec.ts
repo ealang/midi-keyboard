@@ -11,6 +11,7 @@ import { KeyConfigService } from './keyconfig.service';
 import { LayoutService } from './keyboard/layout.service';
 import { ControlsService } from './controls/controls.service';
 import { PlayService } from './play/play.service';
+import { GoogleAnalyticsService } from './g-analytics.service';
 
 import { AppComponent } from './app.component';
 
@@ -32,7 +33,13 @@ describe('AppComponent', () => {
         LayoutService,
         KeyConfigService,
         ControlsService,
-        PlayService
+        PlayService,
+        {
+          provide: GoogleAnalyticsService,
+          useValue: {
+            sendPageView: () => {}
+          }
+        }
       ]
     }).compileComponents();
   }));
