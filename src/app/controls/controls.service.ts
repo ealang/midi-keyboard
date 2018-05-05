@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-
 import { ConfigItem } from './config-item';
-import { KeyConfigService } from '../keyconfig.service';
 
 const midiMin = 1;
 const midiMax = 127;
@@ -11,8 +9,6 @@ export class ControlsService {
   readonly midiMin = midiMin;
   readonly midiMax = midiMax;
 
-  readonly minVisibleKeys = 3;
-  readonly maxVisibleKeys: number;
   numVisibleKeys = 7;
   numKeyboards = 1;
   minikeys = false;
@@ -49,8 +45,4 @@ export class ControlsService {
     mode: new ConfigItem<string>('fixed'),
     fixedChannel: new ConfigItem<number>(0)
   };
-
-  constructor(keyconfig: KeyConfigService) {
-    this.maxVisibleKeys = keyconfig.numWhiteKeys;
-  }
 }

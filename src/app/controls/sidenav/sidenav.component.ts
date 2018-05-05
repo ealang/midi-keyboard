@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ControlsService } from './../controls.service';
+import { KeyConfigService } from '../../keyconfig.service';
 
 @Component({
   selector: 'app-sidenav',
@@ -20,14 +21,14 @@ export class SidenavComponent {
   }
 
   get removeKeyDisabled() {
-    return this.controls.numVisibleKeys - 1 < this.controls.minVisibleKeys;
+    return this.controls.numVisibleKeys - 1 < 3;
   }
 
   get addKeyDisabled() {
-    return this.controls.numVisibleKeys + 1 > this.controls.maxVisibleKeys;
+    return this.controls.numVisibleKeys + 1 > this.keyConfig.numWhiteKeys;
   }
 
-  constructor(controls: ControlsService) {
+  constructor(controls: ControlsService, private keyConfig: KeyConfigService) {
     this.controls = controls;
     this.allChannels = Array(16);
     for (let i = 0; i < 16; i++) {

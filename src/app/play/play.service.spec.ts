@@ -4,7 +4,6 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { Point } from '../geometry';
 import { ControlsService } from '../controls/controls.service';
 import { WebMidiService } from '../webmidi.service';
-import { KeyConfigService } from '../keyconfig.service';
 import { KeypressEvent, KeypressEventType } from '../keypress/keypress.service';
 import { MidiCommand } from './mods/midi-command';
 import { PlayService } from './play.service';
@@ -18,30 +17,29 @@ class MockWebMidiService extends WebMidiService {
 describe('PlayService', () => {
   let midi: MockWebMidiService;
 
-  const keyconfig = new KeyConfigService();
-  const defaultConfig = () => new ControlsService(keyconfig);
+  const defaultConfig = () => new ControlsService();
   const fixedVelConfig = () => {
-    const cfg = new ControlsService(keyconfig);
+    const cfg = new ControlsService();
     cfg.velocity.mode.value = 'fixed';
     return cfg;
   };
   const yModVelConfig = () => {
-    const cfg = new ControlsService(keyconfig);
+    const cfg = new ControlsService();
     cfg.velocity.mode.value = 'ymod';
     return cfg;
   };
   const yModPressureConfig = () => {
-    const cfg = new ControlsService(keyconfig);
+    const cfg = new ControlsService();
     cfg.yMod.mode.value = 'pressure';
     return cfg;
   };
   const roundRobinChConfig = () => {
-    const cfg = new ControlsService(keyconfig);
+    const cfg = new ControlsService();
     cfg.channel.mode.value = 'round-robin';
     return cfg;
   };
   const pitchBendXModConfig = () => {
-    const cfg = new ControlsService(keyconfig);
+    const cfg = new ControlsService();
     cfg.xSlideMod.mode.value = 'channel-pitch-bend';
     cfg.xSlideMod.deadZone = 0;
     cfg.xSlideMod.pitchBendSemi.value = 1;
