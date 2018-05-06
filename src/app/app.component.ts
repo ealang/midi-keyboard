@@ -3,6 +3,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 
 import { WebMidiService, Device } from './webmidi.service';
 import { ControlsService } from './controls/controls.service';
+import { ControlsPersistenceService } from './controls/persistence/controls-persistence.service';
 import { KeypressService, KeypressEvent } from './keypress/keypress.service';
 import { PlayService } from './play/play.service';
 import { environment } from '../environments/environment';
@@ -24,7 +25,8 @@ export class AppComponent implements OnInit {
     private readonly keypress: KeypressService,
     private readonly webmidi: WebMidiService,
     private readonly play: PlayService,
-    private readonly analytics: GoogleAnalyticsService
+    private readonly analytics: GoogleAnalyticsService,
+    persistence: ControlsPersistenceService
   ) {
   }
 

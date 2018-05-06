@@ -10,6 +10,8 @@ import { WebMidiService } from './webmidi.service';
 import { KeyConfigService } from './keyconfig.service';
 import { LayoutService } from './keyboard/layout.service';
 import { ControlsService } from './controls/controls.service';
+import { ControlsPersistenceService } from './controls/persistence/controls-persistence.service';
+import { LocalStorageService } from './controls/persistence/local-storage.service';
 import { PlayService } from './play/play.service';
 import { GoogleAnalyticsService } from './g-analytics.service';
 
@@ -33,7 +35,15 @@ describe('AppComponent', () => {
         LayoutService,
         KeyConfigService,
         ControlsService,
+        ControlsPersistenceService,
         PlayService,
+        {
+          provide: LocalStorageService,
+          useValue: {
+            getItem: () => {},
+            setItem: () => {}
+          }
+        },
         {
           provide: GoogleAnalyticsService,
           useValue: {

@@ -9,6 +9,8 @@ import { ControlsModule } from './controls/controls.module';
 import { KeypressModule } from './keypress/keypress.module';
 
 import { ControlsService } from './controls/controls.service';
+import { ControlsPersistenceService } from './controls/persistence/controls-persistence.service';
+import { LocalStorageService } from './controls/persistence/local-storage.service';
 import { WebMidiService } from './webmidi.service';
 import { KeyConfigService } from './keyconfig.service';
 import { PlayService } from './play/play.service';
@@ -31,9 +33,15 @@ import { AppComponent } from './app.component';
   providers: [
     KeyConfigService,
     WebMidiService,
-    ControlsService,
+    ControlsPersistenceService,
+    LocalStorageService,
     PlayService,
-    GoogleAnalyticsService
+    GoogleAnalyticsService,
+    {
+      provide: ControlsService,
+      useFactory: ControlsPersistenceService.restoreControlsService,
+      deps: [LocalStorageService]
+    }
   ],
   bootstrap: [
     AppComponent
