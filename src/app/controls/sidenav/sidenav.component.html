@@ -4,7 +4,7 @@
       <mat-card-content>
         <div>
           <mat-form-field>
-            <mat-select placeholder="Num Keyboards" [(value)]="controls.numKeyboards">
+            <mat-select placeholder="Num Keyboards" [(value)]="controls.numKeyboards.value">
               <mat-option [value]="1">1</mat-option>
               <mat-option [value]="2">2</mat-option>
               <mat-option [value]="3">3</mat-option>
@@ -12,7 +12,7 @@
           </mat-form-field>
         </div>
         <div>
-          <mat-checkbox [(ngModel)]="controls.minikeys">Minikeys</mat-checkbox>
+          <mat-checkbox [(ngModel)]="controls.minikeys.value">Minikeys</mat-checkbox>
         </div>
         <div>
           <span>Num Keys</span>
@@ -35,13 +35,13 @@
       <mat-card-title>Channel</mat-card-title>
       <mat-card-content>
         <mat-form-field>
-          <mat-select placeholder="Mode" [(value)]="controls.channel.mode.value">
+          <mat-select placeholder="Mode" [(value)]="controls.channelMode.value">
             <mat-option value="fixed">Fixed</mat-option>
             <mat-option value="round-robin">Round-robin</mat-option>
           </mat-select>
         </mat-form-field>
-        <mat-form-field *ngIf="controls.channel.mode.value === 'fixed'">
-          <mat-select placeholder="Channel" [(value)]="controls.channel.fixedChannel.value">
+        <mat-form-field *ngIf="controls.channelMode.value === 'fixed'">
+          <mat-select placeholder="Channel" [(value)]="controls.channelFixedChannel.value">
             <mat-option *ngFor="let i of allChannels" [value]="i">{{ i }}</mat-option>
           </mat-select>
         </mat-form-field>
@@ -52,21 +52,21 @@
       <mat-card-title>Velocity</mat-card-title>
       <mat-card-content>
         <mat-form-field>
-          <mat-select placeholder="Mode" [(value)]="controls.velocity.mode.value">
+          <mat-select placeholder="Mode" [(value)]="controls.velocityMode.value">
             <mat-option value="fixed">Fixed</mat-option>
             <mat-option value="ymod">Y Mod</mat-option>
           </mat-select>
         </mat-form-field>
-        <div *ngIf="controls.velocity.mode.value === 'fixed'">
+        <div *ngIf="controls.velocityMode.value === 'fixed'">
           <span>Velocity</span>
           <mat-slider
             [min]="controls.midiMin"
             [max]="controls.midiMax"
-            [(ngModel)]="controls.velocity.fixedValue">
+            [(ngModel)]="controls.velocityFixedValue.value">
           </mat-slider>
         </div>
-        <div *ngIf="controls.velocity.mode.value === 'ymod'">
-          <mat-checkbox [(ngModel)]="controls.velocity.yModInvert">Invert Axis</mat-checkbox>
+        <div *ngIf="controls.velocityMode.value === 'ymod'">
+          <mat-checkbox [(ngModel)]="controls.velocityYModInvert.value">Invert Axis</mat-checkbox>
         </div>
       </mat-card-content>
     </mat-card>
@@ -75,13 +75,13 @@
       <mat-card-title>Y Mod</mat-card-title>
       <mat-card-content>
         <mat-form-field>
-          <mat-select placeholder="Target" [(value)]="controls.yMod.mode.value">
+          <mat-select placeholder="Target" [(value)]="controls.yModMode.value">
             <mat-option value="disabled">(Disabled)</mat-option>
             <mat-option value="pressure">Polyphonic Key Pressure</mat-option>
           </mat-select>
         </mat-form-field>
-        <div *ngIf="controls.yMod.mode.value === 'pressure'">
-          <mat-checkbox [(ngModel)]="controls.yMod.yInvert">Invert Axis</mat-checkbox>
+        <div *ngIf="controls.yModMode.value === 'pressure'">
+          <mat-checkbox [(ngModel)]="controls.yModYInvert.value">Invert Axis</mat-checkbox>
         </div>
       </mat-card-content>
     </mat-card>
@@ -90,18 +90,18 @@
       <mat-card-title>X Slide Mod</mat-card-title>
       <mat-card-content>
         <mat-form-field>
-          <mat-select placeholder="Target" [(value)]="controls.xSlideMod.mode.value">
+          <mat-select placeholder="Target" [(value)]="controls.xSlideMode.value">
             <mat-option value="disabled">(Disabled)</mat-option>
             <mat-option value="channel-pitch-bend">Channel Pitch Bend</mat-option>
           </mat-select>
         </mat-form-field>
-        <div *ngIf="controls.xSlideMod.mode.value === 'channel-pitch-bend'">
+        <div *ngIf="controls.xSlideMode.value === 'channel-pitch-bend'">
           <div>Sensitivity (Semitones)</div>
           <mat-slider
             thumbLabel
-            [min]="controls.xSlideMod.minPitchBendSemi"
-            [max]="controls.xSlideMod.maxPitchBendSemi"
-            [(ngModel)]="controls.xSlideMod.pitchBendSemi.value">
+            [min]="controls.xSlideMinPitchBendSemi.value"
+            [max]="controls.xSlideMaxPitchBendSemi.value"
+            [(ngModel)]="controls.xSlidePitchBendSemi.value">
           </mat-slider>
           <div>Dead Zone</div>
           <mat-slider

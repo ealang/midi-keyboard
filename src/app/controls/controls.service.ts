@@ -9,40 +9,32 @@ export class ControlsService {
   readonly midiMin = midiMin;
   readonly midiMax = midiMax;
 
-  numVisibleKeys = 7;
-  numKeyboards = 1;
-  minikeys = false;
+  numVisibleKeys = new ConfigItem<number>(7);
+  numKeyboards = new ConfigItem<number>(1);
+  minikeys = new ConfigItem<boolean>(false);
 
-  readonly velocity = {
-    mode: new ConfigItem<string>('fixed'),
-    fixedValue: midiMax,
-    yModInvert: false
-  };
+  velocityMode = new ConfigItem<string>('fixed');
+  velocityFixedValue = new ConfigItem<number>(midiMax);
+  velocityYModInvert = new ConfigItem<boolean>(false);
 
-  readonly yMod = {
-    mode: new ConfigItem<string>('disabled'),
-    yInvert: true
-  };
+  yModMode = new ConfigItem<string>('disabled');
+  yModYInvert = new ConfigItem<boolean>(true);
 
-  readonly xSlideMod = {
-    mode: new ConfigItem<string>('disabled'),
-    deadZone: 0.1,
-    minPitchBendSemi: 1,
-    maxPitchBendSemi: 12,
-    pitchBendSemi: new ConfigItem<number>(2)
-  };
+  xSlideMode = new ConfigItem<string>('disabled');
+  xSlideDeadZone = new ConfigItem<number>(0.1);
+  xSlideMinPitchBendSemi = new ConfigItem<number>(1);
+  xSlideMaxPitchBendSemi = new ConfigItem<number>(12);
+  xSlidePitchBendSemi = new ConfigItem<number>(2);
 
-  readonly guiMinXSlideDeadZone: 0;
-  readonly guiMaxXSlideDeadZone: 40;
+  readonly guiMinXSlideDeadZone = 0;
+  readonly guiMaxXSlideDeadZone = 40;
   get guiXSlideDeadZone(): number {
-    return Math.floor(this.xSlideMod.deadZone * 100);
+    return Math.floor(this.xSlideDeadZone.value * 100);
   }
   set guiXSlideDeadZone(val: number) {
-    this.xSlideMod.deadZone = val / 100;
+    this.xSlideDeadZone.value = val / 100;
   }
 
-  readonly channel = {
-    mode: new ConfigItem<string>('fixed'),
-    fixedChannel: new ConfigItem<number>(0)
-  };
+  channelMode = new ConfigItem<string>('fixed');
+  channelFixedChannel = new ConfigItem<number>(0);
 }

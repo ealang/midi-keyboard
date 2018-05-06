@@ -17,7 +17,7 @@ export function yModPolyphonicPressure(
     return stream.filter(event => {
       return event.eventType !== KeypressEventType.Up && !!event.coordinates;
     }).map(event => {
-      const pressure = normToMidi(event.coordinates.y, controls.yMod.yInvert);
+      const pressure = normToMidi(event.coordinates.y, controls.yModYInvert.value);
       return MidiCommand.polyphonicKeyPressure(event.channel, event.keyNumber, pressure);
     });
   }).mergeAll();

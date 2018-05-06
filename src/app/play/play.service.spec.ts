@@ -20,29 +20,29 @@ describe('PlayService', () => {
   const defaultConfig = () => new ControlsService();
   const fixedVelConfig = () => {
     const cfg = new ControlsService();
-    cfg.velocity.mode.value = 'fixed';
+    cfg.velocityMode.value = 'fixed';
     return cfg;
   };
   const yModVelConfig = () => {
     const cfg = new ControlsService();
-    cfg.velocity.mode.value = 'ymod';
+    cfg.velocityMode.value = 'ymod';
     return cfg;
   };
   const yModPressureConfig = () => {
     const cfg = new ControlsService();
-    cfg.yMod.mode.value = 'pressure';
+    cfg.yModMode.value = 'pressure';
     return cfg;
   };
   const roundRobinChConfig = () => {
     const cfg = new ControlsService();
-    cfg.channel.mode.value = 'round-robin';
+    cfg.channelMode.value = 'round-robin';
     return cfg;
   };
   const pitchBendXModConfig = () => {
     const cfg = new ControlsService();
-    cfg.xSlideMod.mode.value = 'channel-pitch-bend';
-    cfg.xSlideMod.deadZone = 0;
-    cfg.xSlideMod.pitchBendSemi.value = 1;
+    cfg.xSlideMode.value = 'channel-pitch-bend';
+    cfg.xSlideDeadZone.value = 0;
+    cfg.xSlidePitchBendSemi.value = 1;
     return cfg;
   };
 
@@ -66,13 +66,13 @@ describe('PlayService', () => {
 
   describe('note events', () => {
     it('should send note events with fixed velocity', withInst(fixedVelConfig, (play: PlayService, controls: ControlsService) => {
-      controls.velocity.fixedValue = 0x44;
+      controls.velocityFixedValue.value = 0x44;
       play.processEvent(evt(KeypressEventType.Down));
       expect(midi.sendData).toHaveBeenCalledWith(
         MidiCommand.noteOn(0, 12, 0x44)
       );
 
-      controls.velocity.fixedValue = 0x45;
+      controls.velocityFixedValue.value = 0x45;
       play.processEvent(evt(KeypressEventType.Up));
       expect(midi.sendData).toHaveBeenCalledWith(
         MidiCommand.noteOff(0, 12, 0x45)
@@ -82,7 +82,7 @@ describe('PlayService', () => {
     it('should send note events with ymod velocity (non-inverted)',
       withInst(yModVelConfig, (play: PlayService, controls: ControlsService) => {
 
-      controls.velocity.yModInvert = false;
+      controls.velocityYModInvert.value = false;
 
       play.processEvent(evt(KeypressEventType.Down, {x: 0, y: 0}));
       expect(midi.sendData).toHaveBeenCalledWith(
@@ -98,7 +98,7 @@ describe('PlayService', () => {
     it('should send note events with ymod velocity (inverted)',
       withInst(yModVelConfig, (play: PlayService, controls: ControlsService) => {
 
-      controls.velocity.yModInvert = true;
+      controls.velocityYModInvert.value = true;
 
       play.processEvent(evt(KeypressEventType.Down, {x: 0, y: 0}));
       expect(midi.sendData).toHaveBeenCalledWith(
@@ -129,14 +129,14 @@ describe('PlayService', () => {
     }));
 
     it('updates when sensitivity is changed', withInst(pitchBendXModConfig, (play: PlayService, controls: ControlsService) => {
-      controls.xSlideMod.pitchBendSemi.value = 3;
+      controls.xSlidePitchBendSemi.value = 3;
       play.processEvent(evt(KeypressEventType.Down));
       expect(midi.sendData).toHaveBeenCalledWith(
         MidiCommand.pitchBendSensitivity(0, 3)
       );
       play.processEvent(evt(KeypressEventType.Up));
 
-      controls.xSlideMod.pitchBendSemi.value = 6;
+      controls.xSlidePitchBendSemi.value = 6;
       play.processEvent(evt(KeypressEventType.Down));
       expect(midi.sendData).toHaveBeenCalledWith(
         MidiCommand.pitchBendSensitivity(0, 6)
@@ -144,21 +144,21 @@ describe('PlayService', () => {
     }));
 
     it('initializes new channels', withInst(pitchBendXModConfig, (play: PlayService, controls: ControlsService) => {
-      const pitchBendRangeCh0 = MidiCommand.pitchBendSensitivity(0, controls.xSlideMod.pitchBendSemi.value);
-      const pitchBendRangeCh1 = MidiCommand.pitchBendSensitivity(1, controls.xSlideMod.pitchBendSemi.value);
-      controls.channel.fixedChannel.value = 0;
+      const pitchBendRangeCh0 = MidiCommand.pitchBendSensitivity(0, controls.xSlidePitchBendSemi.value);
+      const pitchBendRangeCh1 = MidiCommand.pitchBendSensitivity(1, controls.xSlidePitchBendSemi.value);
+      controls.channelFixedChannel.value = 0;
       play.processEvent(evt(KeypressEventType.Down));
       expect(midi.sendData).toHaveBeenCalledWith(pitchBendRangeCh0);
       play.processEvent(evt(KeypressEventType.Up));
 
-      controls.channel.fixedChannel.value = 1;
+      controls.channelFixedChannel.value = 1;
       play.processEvent(evt(KeypressEventType.Down));
       expect(midi.sendData).toHaveBeenCalledWith(pitchBendRangeCh1);
     }));
 
     it('initializes new devices', withInst(pitchBendXModConfig, (play: PlayService, controls: ControlsService) => {
-      const pitchBendRange = MidiCommand.pitchBendSensitivity(0, controls.xSlideMod.pitchBendSemi.value);
-      controls.channel.fixedChannel.value = 0;
+      const pitchBendRange = MidiCommand.pitchBendSensitivity(0, controls.xSlidePitchBendSemi.value);
+      controls.channelFixedChannel.value = 0;
 
       play.processEvent(evt(KeypressEventType.Down));
       expect(midi.sendData).toHaveBeenCalledWith(pitchBendRange);
@@ -181,13 +181,13 @@ describe('PlayService', () => {
           noteOffCh5 = MidiCommand.noteOff(5, 12, 0x7F);
 
     it('can send notes on a fixed channel', withInst(defaultConfig, (play: PlayService, controls: ControlsService) => {
-      controls.channel.fixedChannel.value = 0;
+      controls.channelFixedChannel.value = 0;
       play.processEvent(evt(KeypressEventType.Down));
       play.processEvent(evt(KeypressEventType.Up));
       expect(midi.sendData).toHaveBeenCalledWith(noteOnCh0);
       expect(midi.sendData).toHaveBeenCalledWith(noteOffCh0);
 
-      controls.channel.fixedChannel.value = 1;
+      controls.channelFixedChannel.value = 1;
       play.processEvent(evt(KeypressEventType.Down));
       play.processEvent(evt(KeypressEventType.Up));
       expect(midi.sendData).toHaveBeenCalledWith(noteOnCh1);
@@ -211,7 +211,7 @@ describe('PlayService', () => {
     it('should send pressure events as touch moves (non-inverted)',
       withInst(yModPressureConfig, fakeAsync((play: PlayService, controls: ControlsService) => {
 
-      controls.yMod.yInvert = false;
+      controls.yModYInvert.value = false;
 
       play.processEvent(evt(KeypressEventType.Down, {x: 0, y: 1}));
       tick();
@@ -229,7 +229,7 @@ describe('PlayService', () => {
     it('should send pressure events as touch moves (inverted)',
       withInst(yModPressureConfig, fakeAsync((play: PlayService, controls: ControlsService) => {
 
-      controls.yMod.yInvert = true;
+      controls.yModYInvert.value = true;
 
       play.processEvent(evt(KeypressEventType.Down, {x: 0, y: 1}));
       tick();

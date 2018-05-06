@@ -13,19 +13,19 @@ export class SidenavComponent {
   readonly allChannels: Array<number>;
 
   onRemoveKey(): void {
-    this.controls.numVisibleKeys--;
+    this.controls.numVisibleKeys.value--;
   }
 
   onAddKey(): void {
-    this.controls.numVisibleKeys++;
+    this.controls.numVisibleKeys.value++;
   }
 
   get removeKeyDisabled() {
-    return this.controls.numVisibleKeys - 1 < 3;
+    return this.controls.numVisibleKeys.value - 1 < 3;
   }
 
   get addKeyDisabled() {
-    return this.controls.numVisibleKeys + 1 > this.keyConfig.numWhiteKeys;
+    return this.controls.numVisibleKeys.value + 1 > this.keyConfig.numWhiteKeys;
   }
 
   constructor(controls: ControlsService, private keyConfig: KeyConfigService) {

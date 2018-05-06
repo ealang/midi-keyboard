@@ -16,7 +16,7 @@ export function noteYModVelocity(
 ) {
   function velocityFromEvent(event: KeypressEventWithChannel): number {
     return event.coordinates ?
-      normToMidi(event.coordinates.y, controls.velocity.yModInvert) : 0x7F;
+      normToMidi(event.coordinates.y, controls.velocityYModInvert.value) : 0x7F;
   }
   const flatStream = keyStreams.mergeAll();
   const downs = flatStream.filter(event => event.eventType === KeypressEventType.Down).map(event => {

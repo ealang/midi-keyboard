@@ -36,8 +36,8 @@ function groupKeypresses(keypresses: Observable<KeypressEvent>): Observable<Obse
 function attachChannelFactory(controls: ControlsService): () => (event: KeypressEvent) => KeypressEventWithChannel {
   let rrChannel = 0;
   const onNewStream = () => {
-    const myChannel = controls.channel.mode.value === 'fixed' ?
-      controls.channel.fixedChannel.value :
+    const myChannel = controls.channelMode.value === 'fixed' ?
+      controls.channelFixedChannel.value :
       (() => {
         const c = rrChannel;
         rrChannel = (rrChannel + 1) % 16;
@@ -56,15 +56,15 @@ function constructPipeline(
 ): Observable<Array<Array<number>>> {
   const empty = Observable.empty<Array<Array<number>>>();
 
-  const velocity = controls.velocity.mode.value === 'fixed' ?
+  const velocity = controls.velocityMode.value === 'fixed' ?
     noteFixedVelocity(keyStreams, controls) :
     noteYModVelocity(keyStreams, controls);
 
-  const yMod = controls.yMod.mode.value === 'pressure' ?
+  const yMod = controls.yModMode.value === 'pressure' ?
     yModPolyphonicPressure(keyStreams, controls).delay(0) :  // TODO: delay is a hack to send pressure commands after node on commands
     empty;
 
-  const xSlideMod = controls.xSlideMod.mode.value === 'channel-pitch-bend' ?
+  const xSlideMod = controls.xSlideMode.value === 'channel-pitch-bend' ?
     xSlideModPitch(keyStreams, controls) :
     empty;
 
@@ -90,11 +90,11 @@ export class PlayService {
       }).share();
 
     const configChangedStream = Observable.merge(
-      controls.channel.mode.change,
-      controls.velocity.mode.change,
-      controls.yMod.mode.change,
-      controls.xSlideMod.mode.change,
-      controls.xSlideMod.pitchBendSemi.change,
+      controls.channelMode.change,
+      controls.velocityMode.change,
+      controls.yModMode.change,
+      controls.xSlideMode.change,
+      controls.xSlidePitchBendSemi.change,
       midi.deviceOpened
     );
 

@@ -22,7 +22,7 @@ export function xSlideModPitch(
   }).mergeAll().distinct((event) => event.channel).map(event => {
     return MidiCommand.pitchBendSensitivity(
       event.channel,
-      controls.xSlideMod.pitchBendSemi.value
+      controls.xSlidePitchBendSemi.value
     );
   });
 
@@ -45,7 +45,7 @@ export function xSlideModPitch(
       }, {}).map((state: any) => {
         return MidiCommand.pitchBendNorm(
           state.channel,
-          applyDeadZone(state.x - state.xStart, controls.xSlideMod.deadZone)
+          applyDeadZone(state.x - state.xStart, controls.xSlideDeadZone.value)
         );
       });
       return Observable.merge(resets, changes);
