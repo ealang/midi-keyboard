@@ -18,6 +18,9 @@ export class ControlsService {
   minikeys = new ConfigItem<boolean>(false);
 
   @persist()
+  stickyTouch = new ConfigItem<boolean>(false);
+
+  @persist()
   velocityMode = new ConfigItem<string>('fixed');
   @persist()
   velocityFixedValue = new ConfigItem<number>(midiMax);

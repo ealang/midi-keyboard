@@ -1,4 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
+import { ControlsService } from '../controls/controls.service';
 
 import { Point } from '../geometry';
 
@@ -24,6 +25,7 @@ export class KeypressService {
   private heldKeys = new Map<string, number>();        // touch id -> key number
   private heldKeysRefCount = new Map<number, number>();  // key number -> num touches
   private frozenIds = new Set<string>();
+  private stickyMode: boolean;
 
   keypressEvent = new EventEmitter<KeypressEvent>();
 
@@ -33,7 +35,6 @@ export class KeypressService {
           isExistingTouch = existingKeyIndex !== undefined,
           on = 1, off = -1,
           eventType = KeypressService.eventTranslation.get(touchEventType);
-
     if (eventType === KeypressEventType.Down && isValidKey) {
       if (isExistingTouch) {
         this.addRefCount(existingKeyIndex, off, coordinates);
@@ -47,7 +48,7 @@ export class KeypressService {
           keyNumber,
           coordinates
         ));
-      } else if (!this.frozenIds.has(identifier)) {
+      } else if (!this.stickyMode && !this.frozenIds.has(identifier)) {
         this.addRefCount(existingKeyIndex, off, coordinates);
         this.addRefCount(keyNumber, on, coordinates);
         this.heldKeys.set(identifier, keyNumber);
@@ -88,5 +89,14 @@ export class KeypressService {
         coordinates
       ));
     }
+  }
+
+  constructor(
+    private readonly controls: ControlsService
+  ) {
+    controls.stickyTouch.change.subscribe((value: boolean) => {
+      this.stickyMode = value;
+    });
+    this.stickyMode = controls.stickyTouch.value;
   }
 }

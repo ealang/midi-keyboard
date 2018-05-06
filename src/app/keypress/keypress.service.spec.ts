@@ -1,38 +1,30 @@
 import { KeypressService, KeypressEvent, KeypressEventType } from './keypress.service';
+import { ControlsService } from '../controls/controls.service';
 
 describe('KeypressService', () => {
   let inst: KeypressService,
       downEvents: Array<number>,
-      upEvents: Array<number>;
+      moveEvents: Array<number>,
+      upEvents: Array<number>,
+      controls: ControlsService;
+
   const dummyPt = {x: 0, y: 0};
 
   beforeEach(() => {
     downEvents = [];
+    moveEvents = [];
     upEvents = [];
-    inst = new KeypressService();
+    controls = new ControlsService();
+    inst = new KeypressService(controls);
     inst.keypressEvent.subscribe((e) => {
       if (e.eventType === KeypressEventType.Down) {
         downEvents.push(e.keyNumber);
       } else if (e.eventType === KeypressEventType.Up) {
         upEvents.push(e.keyNumber);
+      } else if (e.eventType === KeypressEventType.Move) {
+        moveEvents.push(e.keyNumber);
       }
     });
-  });
-
-  it('should send events as touch moves along keys', () => {
-    const id1 = '1';
-    // push down a key
-    inst.emitEvent(id1, 33, 'start', dummyPt);
-    expect(downEvents).toEqual([33]);
-    expect(upEvents).toEqual([]);
-    // move to another key
-    inst.emitEvent(id1, 32, 'move', dummyPt);
-    expect(downEvents).toEqual([33, 32]);
-    expect(upEvents).toEqual([33]);
-    // release key
-    inst.emitEvent(id1, 32, 'end', dummyPt);
-    expect(downEvents).toEqual([33, 32]);
-    expect(upEvents).toEqual([33, 32]);
   });
 
   it('should not play key if touch began off keyboard and later moves onto keyboard', () => {
@@ -130,5 +122,53 @@ describe('KeypressService', () => {
     inst.freezeAll();
     expect(downEvents).toEqual([32, 34, 35]);
     expect(upEvents).toEqual([32, 34]);
+  });
+
+  describe('travel mode', () => {
+    beforeEach(() => {
+      controls.stickyTouch.value = false;
+    });
+
+    it('should send events for each key touch moves across', () => {
+      const id1 = '1';
+      // push down a key
+      inst.emitEvent(id1, 33, 'start', dummyPt);
+      expect(downEvents).toEqual([33]);
+      expect(upEvents).toEqual([]);
+      // move to another key
+      inst.emitEvent(id1, 32, 'move', dummyPt);
+      expect(downEvents).toEqual([33, 32]);
+      expect(upEvents).toEqual([33]);
+      // release key
+      inst.emitEvent(id1, 32, 'end', dummyPt);
+      expect(downEvents).toEqual([33, 32]);
+      expect(upEvents).toEqual([33, 32]);
+    });
+
+  });
+
+  describe('sticky mode', () => {
+    beforeEach(() => {
+      controls.stickyTouch.value = true;
+    });
+
+    it('should send events only for key the touch originates on', () => {
+      const id1 = '1';
+      // push down a key
+      inst.emitEvent(id1, 33, 'start', dummyPt);
+      expect(downEvents).toEqual([33]);
+      expect(moveEvents).toEqual([]);
+      expect(upEvents).toEqual([]);
+      // move to another key
+      inst.emitEvent(id1, 32, 'move', dummyPt);
+      expect(downEvents).toEqual([33]);
+      expect(moveEvents).toEqual([]);
+      expect(upEvents).toEqual([]);
+      // release key
+      inst.emitEvent(id1, 32, 'end', dummyPt);
+      expect(downEvents).toEqual([33]);
+      expect(moveEvents).toEqual([]);
+      expect(upEvents).toEqual([33]);
+    });
   });
 });

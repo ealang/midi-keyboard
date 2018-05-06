@@ -1,5 +1,5 @@
 <mat-tab-group>
-  <mat-tab label="Keyboard Layout">
+  <mat-tab label="Keyboard">
     <mat-card>
       <mat-card-content>
         <div>
@@ -26,6 +26,13 @@
                   [disabled]="addKeyDisabled">
             +
           </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-content>
+        <div>
+          <mat-checkbox [(ngModel)]="controls.stickyTouch.value">Sticky Touch Mode</mat-checkbox>
         </div>
       </mat-card-content>
     </mat-card>

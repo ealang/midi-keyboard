@@ -5,6 +5,7 @@ import { TouchService, TouchEvent } from '../touch/touch.service';
 import { LayoutService } from '../layout.service';
 import { KeyConfigService } from '../../keyconfig.service';
 import { KeypressService } from '../../keypress/keypress.service';
+import { ControlsService } from '../../controls/controls.service';
 import { KeysComponent } from './keys.component';
 
 describe('KeysComponent', () => {
@@ -21,7 +22,8 @@ describe('KeysComponent', () => {
         TouchService,
         LayoutService,
         KeyConfigService,
-        KeypressService
+        KeypressService,
+        ControlsService
       ]
     })
     .compileComponents();
