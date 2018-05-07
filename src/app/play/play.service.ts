@@ -61,7 +61,7 @@ function constructPipeline(
     noteYModVelocity(keyStreams, controls);
 
   const yMod = controls.yModMode.value === 'pressure' ?
-    yModPolyphonicPressure(keyStreams, controls).delay(0) :  // TODO: delay is a hack to send pressure commands after node on commands
+    yModPolyphonicPressure(keyStreams, controls) :
     empty;
 
   const xSlideMod = controls.xSlideMode.value === 'channel-pitch-bend' ?

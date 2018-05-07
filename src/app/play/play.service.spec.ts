@@ -1,5 +1,4 @@
 import { EventEmitter } from '@angular/core';
-import { fakeAsync, tick } from '@angular/core/testing';
 
 import { Point } from '../geometry';
 import { ControlsService } from '../controls/controls.service';
@@ -12,6 +11,15 @@ class MockWebMidiService extends WebMidiService {
   deviceOpened = new EventEmitter<void>();
   preDeviceClose = new EventEmitter<void>();
   sendData(data: Array<Array<number>>): void {}
+}
+
+function indexWhere<T>(list: T[], predicate: (t: T) => boolean): number {
+  for (let i = 0; i < list.length; i++) {
+    if (predicate(list[i])) {
+      return i;
+    }
+  }
+  return null;
 }
 
 describe('PlayService', () => {
@@ -209,39 +217,50 @@ describe('PlayService', () => {
 
   describe('ymod polyphonic pressure', () => {
     it('should send pressure events as touch moves (non-inverted)',
-      withInst(yModPressureConfig, fakeAsync((play: PlayService, controls: ControlsService) => {
+      withInst(yModPressureConfig, (play: PlayService, controls: ControlsService) => {
 
       controls.yModYInvert.value = false;
 
       play.processEvent(evt(KeypressEventType.Down, {x: 0, y: 1}));
-      tick();
       expect(midi.sendData).toHaveBeenCalledWith(
         MidiCommand.polyphonicKeyPressure(0, 12, 0x7F)
       );
 
       play.processEvent(evt(KeypressEventType.Move, {x: 0, y: 0}));
-      tick();
       expect(midi.sendData).toHaveBeenCalledWith(
         MidiCommand.polyphonicKeyPressure(0, 12, 0x0)
       );
-    })));
+    }));
 
     it('should send pressure events as touch moves (inverted)',
-      withInst(yModPressureConfig, fakeAsync((play: PlayService, controls: ControlsService) => {
+      withInst(yModPressureConfig, (play: PlayService, controls: ControlsService) => {
 
       controls.yModYInvert.value = true;
 
       play.processEvent(evt(KeypressEventType.Down, {x: 0, y: 1}));
-      tick();
       expect(midi.sendData).toHaveBeenCalledWith(
         MidiCommand.polyphonicKeyPressure(0, 12, 0x0)
       );
 
       play.processEvent(evt(KeypressEventType.Move, {x: 0, y: 0}));
-      tick();
       expect(midi.sendData).toHaveBeenCalledWith(
         MidiCommand.polyphonicKeyPressure(0, 12, 0x7F)
       );
-    })));
+    }));
+
+    it('should send pressure commands after note on commands',
+      withInst(yModPressureConfig, (play: PlayService, controls: ControlsService) => {
+
+      play.processEvent(evt(KeypressEventType.Down, {x: 0, y: 1}));
+      const commands = midi.sendData['calls'].allArgs().map(args => args[0]);
+
+      const noteOnIndex = indexWhere(commands, (command) => {
+        return command[0][0] === 0x90;
+      });
+      const pressureIndex = indexWhere(commands, (command) => {
+        return command[0][0] === 0xA0;
+      });
+      expect(pressureIndex).toBeGreaterThan(noteOnIndex);
+    }));
   });
 });
