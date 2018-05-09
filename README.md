@@ -16,3 +16,7 @@ A touchscreen optimized MIDI keyboard. [Try it out here.](http://elang.us/midi-k
 # Browser Support 
 
 A Web MIDI supported browser is required. It has been developed using Chrome.
+
+# Contact
+
+**@deltaloop0** on Twitter.
