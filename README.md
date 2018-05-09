@@ -4,7 +4,7 @@ A touchscreen optimized MIDI keyboard. [Try it out here.](http://elang.us/midi-k
 
 [![Screenshot](ss.png)](http://elang.us/midi-keyboard/)
 
-# Features:
+# Features
 
 - Runs in the web browser
 - Supports modifiers to control various MIDI params as you play:
