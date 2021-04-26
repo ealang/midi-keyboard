@@ -2,4 +2,4 @@
 
 A touchscreen optimized WebMIDI keyboard.
 
-[![Screenshot](ss.png)](http://elang.us/midi-keyboard/)
+[![Screenshot](ss.png)](https://ealang.github.io/midi-keyboard/)
